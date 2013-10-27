@@ -4,14 +4,24 @@ ini_set('display_errors', '1');
 
 $settings = array();
 
+#time scale to test.  Current this is days for historic data, but should be a few times/min when analyzing live data
 $settings['scale'] = "days";
+
+#start and end dates for testing.  I'm not sure if we want to test on historical data...daily information isn't very helpful
 $settings['start'] = "1-7-2013";
 $settings['end'] = "20-10-2013";
+
+#capital available?  or is this capital per trade we are willing to risk?
 $settings['capital'] = 1;
+
+#min spread we are willing to entertain.  This would be higher than the avg spread
 $settings['min'] = 4;
+
+#spread delta we will close with.  In this case it's $5 more narrow than the entry spread.
 $settings['ds'] = 5;
 
-
+#****Not sure what $_GET does****
+#What are we doing here?  Just testing if the array values are set?  
 if (isset($_GET['scale'])) {
 	$settings['scale'] = $_GET['scale'];
 }
@@ -36,39 +46,71 @@ if (isset($_GET['ds'])) {
 	$settings['ds'] = $_GET['ds'];
 }
 
+#calls the doBtcSpreadTrades function below
 doBtcSpreadTrades($settings);
+
+
+
+/*
+ 
+    Function: doBTCSpreadTrades
+    Purpose: 
+ 
+    @param (array) - details about trade conditions
+        -scale: frequency of spread comparison
+        -start: date/time to start spread comparison (only for back testing)
+        -end: date/time to end spread comparison (only for back testing)
+        -capital: # of Bitcoins to trade
+        -min:  minimum spread (in $ terms) that we are willing to OPEN a position.  Hard coded at $10 for now.
+        -ds:  current delta of the spread at exchange1 and exchange2
+ 
+ 
+ 
+*/
 
 
 function doBtcSpreadTrades($settings)
 {
+    #do we have connection to mysql server?
 	$mysql = mysql_connect('localhost', 'root', 'root');
 	if (!$mysql) {
 		die('Not connected : ' . mysql_error());
 	}
-	
+	#is database FTM available?
 	$db_selected = mysql_select_db('ftm', $mysql);
 	if (!$db_selected) {
 		die ('Can\'t use ftm : ' . mysql_error());
 	}
 
-	$startDate = date_parse($settings['start']);
+    #parses and sets local variables for testing date ranges which were passed in via array
+    $startDate = date_parse($settings['start']);
 	$endDate = date_parse($settings['end']);
 	
+    #parses out separate month, day, year
+    #***how does this work?  Is $startDate and array?  
 	$month = $startDate['month'];
 	$day = $startDate['day'];
 	$year = $startDate['year'];
 	
+    #extracts the Day, Month, Year for back testing
 	$endMonth = $endDate['month'];
 	$endDay = $endDate['day'];
 	$endYear = $endDate['year'];
 	
+    #sets start and end date formats for comparison purposes
 	$s = "{$day}-{$month}-{$year} 00:00:00";
 	$e = "{$endDay}-{$endMonth}-{$endYear} 00:00:00";
+
+    #converts times to standard UNIX time stamp for ease of comparison
 	$startTime = strtotime($s);
 	$endTime = strtotime($e);
 	
 	#sorting through historical data by time stamp and storing in to array
-	$xchg = 'mtgox';
+    #sets exchange1
+        #should this be called $xchg1 ?
+    $xchg = 'mtgox';
+
+    #
 	$query = "SELECT * FROM {$xchg}_history_{$settings['scale']} WHERE timestamp > {$startTime} AND timestamp < {$endTime} ORDER BY timestamp ASC";
 	$result = mysql_query($query);
 	$mtgox = array();
@@ -209,6 +251,12 @@ function getTradeTrend($trade, $xchg)
 	return $trade["open{$xchg}"]['avg'] - $trade["close{$xchg}]['avg']";
 }
 */
+
+#######
+#
+#is this our "Opportunity Finder"?
+#
+#######
 function getTradeSpread($mtgox, $bitstamp)
 {
     #if the average price is > 0?  
@@ -257,4 +305,5 @@ function getMtGoxPerc()
 function getBitstampPerc()
 {
 }
+ 
 ?>
