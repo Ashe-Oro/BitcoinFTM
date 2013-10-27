@@ -22,6 +22,8 @@ $settings['ds'] = 5;
 
 #****Not sure what $_GET does****
 #What are we doing here?  Just testing if the array values are set?  
+
+/***** TEST ME ****/
 if (isset($_GET['scale'])) {
 	$settings['scale'] = $_GET['scale'];
 }
