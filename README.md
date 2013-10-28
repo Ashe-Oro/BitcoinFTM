@@ -1,7 +1,7 @@
 BitcoinFTM
 ==========
 
-Initial push
+Financial Trade Manager (FTM)
 
 ===============================================================
 

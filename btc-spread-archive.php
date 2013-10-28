@@ -20,7 +20,14 @@ $settings['min'] = 8;
 //spread delta we will close with.  In this case it's $5 more narrow than the entry spread.
 $settings['ds'] = 2;
 
+<<<<<<< HEAD:steve-btc-spread-archive.php
 // allow URL-level overrides of default values
+=======
+#****Not sure what $_GET does****
+#What are we doing here?  Just testing if the array values are set?  
+
+/***** TEST ME ****/
+>>>>>>> c3dae9c7be5e8fd1e46ac0f712241fa7e68c2d41:btc-spread-archive.php
 if (isset($_GET['scale'])) {
 	$settings['scale'] = $_GET['scale'];
 }
