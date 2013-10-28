@@ -15,10 +15,10 @@ $settings['end'] = "20-10-2013";
 $settings['capital'] = 1;
 
 //min spread we are willing to entertain.  This would be higher than the avg spread
-$settings['min'] = 4;
+$settings['min'] = 8;
 
 //spread delta we will close with.  In this case it's $5 more narrow than the entry spread.
-$settings['ds'] = 5;
+$settings['ds'] = 2;
 
 // allow URL-level overrides of default values
 if (isset($_GET['scale'])) {
@@ -133,74 +133,94 @@ function doBtcSpreadTrades($settings)
 		'openBitstamp' => NULL,
 		'closeMtGox' => NULL,
 		'closeBitstamp' => NULL,
-		'openMtGoxSell' = 0,
-		'openBitstampClose' = 0,
-		'closeMtGoxBuy' = 0,
-		'closeBitstampSell' = 0,
-		'profit' => 0
+		'openMtGoxSell' => 0,
+		'openBitstampClose' => 0,
+		'closeMtGoxBuy' => 0,
+		'closeBitstampSell' => 0,
+		'profit' => 0,
+		'trend' => 'NONE'
 	);
+	$totalProfit = 0;
 	
     //comparing each row of timestamp at each exhange
 	if (count($mtgox) == count($bitstamp)) {
-        #what is $ts and $m?
+        // $ts = timestamp key, $m is mtgox at that timestamp
 		foreach($mtgox as $ts => $m) {
 			if (isset($bitstamp[$ts])){
+				// $ts = timestamp key, $b is bitstamp at that timestamp
 				$b = $bitstamp[$ts];
-                #spread at certain historical time
+                
+				//spread at certain historical time
                 $d = getTradeSpread($m, $b);
 				echo date('d M Y', $ts).': '.$d.'<br />';
-				
-                #if $d == -1 then  
+				  
 				if ($d != -1) { // returns -1 if JSON or DB data is invalid
-					if ($trade['status'] == 'SEARCHING' && $d >= $settings['min']) {
-						$trade = openTrade($trade, $d, $m, $b); 
-						
-						echo "<p><b>TRADE OPENED!</b><br/>\n";
-						echo "<b>Date:</b> ".date('d M Y', $trade['openTimestamp'])."<br />\n";
-						echo "<b>Open Spread:</b>".$d."<br />\n";
-						echo "<b>MtGox Value:</b>".$m['avg']."<br />\n";
-						echo "<b>Bitstamp Value:</b>".$b['avg']."<br />\n";
-						echo "</p>\n";
-					} if ($trade['status'] == 'OPEN') {
-						if ($settings['ds'] >= $trade['open']-$d) {
-							$trade = closeTrade($trade, $d, $m, $b);
-							
-							echo "<p><b>TRADE CLOSED!</b><br/>\n";
-							echo "<b>Date:</b> ".date('d M Y', $trade['closeTimestamp'])."<br />\n";
-							echo "<b>Close Spread:</b>".$d."<br />\n";
-							echo "<b>MtGox Value:</b>".$m['avg']."<br />\n";
-							echo "<b>Bitstamp Value:</b>".$b['avg']."<br />\n";
-							echo "</p>\n";
-							
-							// here is where we will add the profit calc to the running total
-							$profit = getTradeProfit($trade);
-							echo "<b>TRADE PROFIT!!!</b><br />\n";
-							echo "<b>Profit: </b>".$profit;
-							
-					}else if ($trade['status'] == 'CLOSED'){
-						if ($d >= $settings['min'] || $d > $settings['ds']) {
-							$trade = openTrade($trade, $d, $m, $b);
-							
-							echo "<p><b>TRADE OPENED!</b><br/>\n";
-							echo "<b>Date:</b> ".date('d M Y', $trade['openTimestamp'])."<br />\n";
-							echo "<b>Open Spread:</b>".$d."<br />\n";
-							echo "<b>MtGox Value:</b>".$m['avg']."<br />\n";
-							echo "<b>Bitstamp Value:</b>".$b['avg']."<br />\n";
-							echo "</p>\n";
-							
-						} 
+					if ($trade['status'] == 'SEARCHING') {
+						if ($d >= $settings['min']) {
+							echo "OPEN SEARCH {$d}";
+							$trade = echoTrade(openTrade($trade, $d, $m, $b));
+						}
+					} else if ($trade['status'] == 'OPEN') {
+						if ($d < $trade['open']) {
+							if ($trade['open'] - $d >=  $settings['ds']) {
+								$trade = echoTrade(closeTrade($trade, $d, $m, $b));
+								$totalProfit += $trade['profit'];	
+							}
+						}
+					} else if ($trade['status'] == 'CLOSED'){
+						if ($d >= $settings['min']) {
+							$trade = echoTrade(openTrade($trade, $d, $m, $b));
+						}
 					} else  {
+						// ...queef?
 					}
 				}
 			}
 		}
 	}
+	
+	echo "<p><b>TOTAL TRADE PROFIT:</b> {$totalProfit}</p>";
 	mysql_close($mysql);
 }
 
-/**
- * Opens a trade
- */
+function echoTrade($trade)
+{
+	if (!$trade) { return NULL; }
+	$isOpenTrade = ($trade['status'] == 'OPEN');
+	
+	if ($isOpenTrade) {
+		echo "<p><b>TRADE OPENED!</b><br/>\n";
+	} else {
+		echo "<p><b>TRADE CLOSED!</b><br/>\n";
+	}
+	
+	echo "<b>Date:</b> ".date('d M Y', $trade['openTimestamp'])."<br />\n";
+	
+	if ($isOpenTrade) {
+		echo "<b>OPEN Spread:</b>".$trade['open']."<br />\n";
+		echo "<b>MtGox SELL:</b>".$trade['openMtGoxSell']."<br />\n";
+		echo "<b>Bitstamp BUY:</b>".$trade['openBitstampBuy']."<br />\n";
+	} else {
+		echo "<b>CLOSE Spread:</b>".$trade['close']."<br />\n";
+		echo "<b>MtGox BUY:</b>".$trade['closeMtGoxBuy']."<br />\n";
+		echo "<b>Bitstamp SELL:</b>".$trade['closeBitstampSell']."<br /><br />\n";
+		
+		$mtGoxProfit = getMtGoxProfit($trade);
+		$bitstampProfit = getBitstampProfit($trade);
+		echo "<b>MtGox PROFIT:</b> {$mtGoxProfit}<br />\n";
+		echo "<b>Bitstamp PROFIT:</b> {$bitstampProfit}<br />\n";
+		echo "<b>Trade PROFIT: </b>".$trade['profit']."<br /><br />\n";
+		
+		echo "<b>MtGox TREND: </b>".getXchgTradeTrend($trade, 'mtgox')."<br />\n";
+		echo "<b>Bitstamp TREND: </b>".getXchgTradeTrend($trade, 'bitstamp')."<br />\n";
+		echo "<b>Trade TREND: </b>".$trade['trend']."<br />\n";
+	}
+	echo "</p>\n";
+	if (!$isOpenTrade) { echo "<hr />"; }
+	return $trade;
+}
+
+
 function openTrade($trade, $d, $mtgox, $bitstamp)
 {
 	$trade['status'] = 'OPEN';
@@ -220,6 +240,10 @@ function openTrade($trade, $d, $mtgox, $bitstamp)
 	$trade['closemtgox'] = NULL;
 	$trade['closebitstamp'] = NULL;
 	$trade['closeTimestamp'] = $mtgox['timestamp'];
+	
+	$trade['profit'] = 0;
+	$trade['trend'] = 'NONE';
+	
 	return $trade;
 }
 
@@ -235,6 +259,9 @@ function closeTrade($trade, $d, $mtgox, $bitstamp)
 	
 	$trade['closeMtGoxBuy'] = $mtgox['avg'];
 	$trade['closeBitstampSell'] = $bitstamp['avg'];
+	
+	$trade['profit'] = getTradeProfit($trade);
+	$trade['trend'] = getTradeTrend($trade);
 	
 	return $trade;
 }
@@ -253,11 +280,11 @@ function getTradeProfit($trade)
 }
 
 function getMtGoxProfit($trade) {
-	return  getMtGoxCommission()*($trade['openMtGoxSell']-$trade['closeMtGoxBuy']); // in a rising BTC market, usually a neg number
+	return  getMtGoxCommission(1)*($trade['openMtGoxSell']-$trade['closeMtGoxBuy']); // in a rising BTC market, usually a neg number
 }
 
 function getBitstampProfit($trade) {
-	return  getBitstampCommission()*($trade['openBitstampBuy']-$trade['closeBitstampSell']); // in a rising BTC market, usually a pos number
+	return  getBitstampCommission(1)*($trade['closeBitstampSell']-$trade['openBitstampBuy']); // in a rising BTC market, usually a pos number
 }
 
 function getBitstampCommission($volume)
@@ -274,68 +301,75 @@ function getMtGoxCommission($volume)
 	return 1 - $com;
 }
 
-
-/*
-
-function openOrCloseTrade($trade)
-{
-	return ($trade['status'] == 'OPEN') ? 'CLOSED': 'OPEN';
-}
-
-
-
-
-
-function getTradeTrend($trade, $xchg)
-{
-	return $trade["open{$xchg}"]['avg'] - $trade["close{$xchg}]['avg']";
-}
-*/
-
-#######
-#
-#is this our "Opportunity Finder"?
-#
-#######
 function getTradeSpread($mtgox, $bitstamp)
 {
-    #if the average price is > 0?  
-    #return the spread
-    #if -1 then unable to get the current price?
 	if ($mtgox['avg'] > 0 && $bitstamp['avg'] > 0) {
 		return $mtgox['avg'] - $bitstamp['avg']; 
 	}
 	return -1;
 }
-/*
+
+function tradeIsOpen($trade)
+{
+	return $trade['status'] == 'OPEN';
+}
+
+function tradeIsClosed($trade)
+{
+	return $trade['status'] == 'CLOSED';
+}
+
+function getTradeTrend($trade)
+{
+	$trend = 'NONE';
+	if (isTandemBullish($trade)){
+		$trend = 'TBULL';
+	} else
+	if (isTandemBearish($trade)){
+		$trend = 'TBEAR';
+	} else
+	if (isPriceConvergance($trade)){
+		$trend = 'PCONV';
+	} else
+	if (isPriceDivergance($trade)){
+		$trend = 'PDIV';
+	}
+	return $trend;
+}
+
+
+function getXchgTradeTrend($trade, $xchg)
+{
+	return $trade["open{$xchg}"]['avg'] - $trade["close{$xchg}"]['avg'];
+}
+
 function isTandemBullish($trade)
 {
-	$mtgoxT = getTradeTrend($trade, 'mtgox');
-	$bitstampT = getTradeTrend($trade, 'bitstamp')
+	$mtgoxT = getXchgTradeTrend($trade, 'mtgox');
+	$bitstampT = getXchgTradeTrend($trade, 'bitstamp');
 	return ($mtgoxT > 0 && $bitstampT > 0 && $bitstampT > $mtgoxT);
 }
 
 function isTandemBearish($trade)
 {
-	$mtgoxT = getTradeTrend($trade, 'mtgox');
-	$bitstampT = getTradeTrend($trade, 'bitstamp')
+	$mtgoxT = getXchgTradeTrend($trade, 'mtgox');
+	$bitstampT = getXchgTradeTrend($trade, 'bitstamp');
 	return ($mtgoxT < 0 && $bitstampT < 0 && $bitstampT < $mtgoxT);
 }
 
 function isPriceConvergance($trade)
 {
-	$mtgoxT = getTradeTrend($trade, 'mtgox');
-	$bitstampT = getTradeTrend($trade, 'bitstamp')
+	$mtgoxT = getXchgTradeTrend($trade, 'mtgox');
+	$bitstampT = getXchgTradeTrend($trade, 'bitstamp');
 	return ($mtgoxT < 0 && $bitstampT > 0);
 }
 
 function isPriceDivergance($trade)
 {
-	$mtgoxT = getTradeTrend($trade, 'mtgox');
-	$bitstampT = getTradeTrend($trade, 'bitstamp')
+	$mtgoxT = getXchgTradeTrend($trade, 'mtgox');
+	$bitstampT = getXchgTradeTrend($trade, 'bitstamp');
 	return ($mtgoxT > 0 && $bitstampT < 0);
 }
 
-*/
  
 ?>
