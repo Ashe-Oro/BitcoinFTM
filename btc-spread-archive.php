@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
+include("utils/database_util.php");
 
 $settings = array();
 
@@ -20,14 +21,11 @@ $settings['min'] = 8;
 //spread delta we will close with.  In this case it's $5 more narrow than the entry spread.
 $settings['ds'] = 2;
 
-<<<<<<< HEAD:steve-btc-spread-archive.php
+
 // allow URL-level overrides of default values
-=======
 #****Not sure what $_GET does****
 #What are we doing here?  Just testing if the array values are set?  
-
 /***** TEST ME ****/
->>>>>>> c3dae9c7be5e8fd1e46ac0f712241fa7e68c2d41:btc-spread-archive.php
 if (isset($_GET['scale'])) {
 	$settings['scale'] = $_GET['scale'];
 }
@@ -77,16 +75,7 @@ doBtcSpreadTrades($settings);
 
 function doBtcSpreadTrades($settings)
 {
-   // SC: this DB will be set up on my server initially 
-	$mysql = mysql_connect('localhost', 'root', 'root');
-	if (!$mysql) {
-		die('Not connected : ' . mysql_error());
-	}
-	//is database FTM available?
-	$db_selected = mysql_select_db('ftm', $mysql);
-	if (!$db_selected) {
-		die ('Can\'t use ftm : ' . mysql_error());
-	}
+	$db = new Database("127.0.0.1", "root", "root", "ftm");
 
     //parses and sets local variables for testing date ranges which were passed in via array
     $startDate = date_parse($settings['start']);
@@ -113,20 +102,25 @@ function doBtcSpreadTrades($settings)
 	//sorting through historical data by time stamp and storing in to array
     $xchg = 'mtgox';
 	$query = "SELECT * FROM {$xchg}_history_{$settings['scale']} WHERE timestamp > {$startTime} AND timestamp < {$endTime} ORDER BY timestamp ASC";
-	$result = mysql_query($query);
+	$result = $db->query($query);
 	$mtgox = array();
-	while($row = mysql_fetch_assoc($result)){
-		$mtgox[$row['timestamp']] = $row;
+	if($db->num_rows($result) > 0){
+		while($row = mysql_fetch_assoc($result)){
+			$mtgox[$row['timestamp']] = $row;
+		}		
 	}
-	
+
 	//sorting through historical data by time stamp and storing in to array
 	$xchg = 'bitstamp';
 	$query = "SELECT * FROM {$xchg}_history_{$settings['scale']} WHERE timestamp > {$startTime} AND timestamp < {$endTime} ORDER BY timestamp ASC";
-	$result = mysql_query($query);
+	$result = $db->query($query);
 	$bitstamp = array();
-	while($row = mysql_fetch_assoc($result)){
-		$bitstamp[$row['timestamp']] = $row;
+	if($db->num_rows($result) > 0){
+		while($row = mysql_fetch_assoc($result)){
+			$bitstamp[$row['timestamp']] = $row;
+		}		
 	}
+
 	
     //defining a trade and its characteristics
 	$trade = array(
@@ -187,7 +181,7 @@ function doBtcSpreadTrades($settings)
 	}
 	
 	echo "<p><b>TOTAL TRADE PROFIT:</b> {$totalProfit}</p>";
-	mysql_close($mysql);
+	$db->close();
 }
 
 function echoTrade($trade)

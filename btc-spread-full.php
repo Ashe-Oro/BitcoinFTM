@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
+include("utils/database_util.php");
 
 ?>
 <style type="text/css">
@@ -118,16 +119,7 @@ doBtcSpreadTrades($settings);
 
 function doBtcSpreadTrades($settings)
 {
-   // SC: this DB will be set up on my server initially 
-	$mysql = mysql_connect('localhost', 'root', 'root');
-	if (!$mysql) {
-		die('Not connected : ' . mysql_error());
-	}
-	//is database FTM available?
-	$db_selected = mysql_select_db('ftm', $mysql);
-	if (!$db_selected) {
-		die ('Can\'t use ftm : ' . mysql_error());
-	}
+	$db = new Database("127.0.0.1", "root", "root", "ftm");
 
     //parses and sets local variables for testing date ranges which were passed in via array
     $startDate = date_parse($settings['start']);
@@ -222,7 +214,7 @@ function doBtcSpreadTrades($settings)
 	}
 	
 	if ($settings['echo']) { echo "<p><b>TOTAL TRADE PROFIT:</b> {$totalProfit}</p>"; }
-	mysql_close($mysql);
+	$db->close();
 	
 	return $totalProfit;
 }
