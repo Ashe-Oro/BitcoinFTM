@@ -50,7 +50,7 @@ class Arbitrer
 		}
 	}
 
-	public function getProfitFor($mi, $mj, $kask, $kbid
+	public function getProfitFor($mi, $mj, $kask, $kbid)
 	{
 		global $config;
 		
@@ -83,7 +83,7 @@ class Arbitrer
 				if ($wBuyPrice == 0){
 					$wBuyPrice = $price;
 				}  else {
-					$wBuyPrice = (($wBuyPrice *($buyTotal - $amount)) + ($price * $amount))) / $buyTotal; 
+					$wBuyPrice = (($wBuyPrice *($buyTotal - $amount)) + ($price * $amount)) / $buyTotal; 
 				}
 			}
 
@@ -99,7 +99,7 @@ class Arbitrer
 				if ($wSellPrice == 0){
 					$wSellPrice = $price;
 				}  else {
-					$wSellPrice = (($wSellPrice *($sellTotal - $amount)) + ($price * $amount))) / $sellTotal; 
+					$wSellPrice = (($wSellPrice *($sellTotal - $amount)) + ($price * $amount)) / $sellTotal; 
 				}
 			}
 
@@ -189,7 +189,7 @@ class Arbitrer
 		$depths = array();
 		$futures = array();
 		foreach($this->markets as $market){
-			array_push($futures, $this->thread pool->submit($this->_getMarketDepth($market), $market, $depths);
+			array_push($futures, $this->threadpool->submit($this->_getMarketDepth($market), $market, $depths));
 		}
 
 		/*** ADD SLEEP INTERVAL HERE
@@ -237,7 +237,7 @@ class Arbitrer
 				$market2 = $this->depths[$kmarket2];
 				if (isset($market1['asks']) && isset($market2['bids']) && array_len($market1['asks']) > 0 && array_len($market2['bids']) > 0){
 					if ($market1['asks'][0]['price'] < $market2['bids'][0]['price']) {
-						$this->arbitrageOpportunity($kmarket1, $market1['asks'][0], $kmarket2, $market2['bids'][0];
+						$this->arbitrageOpportunity($kmarket1, $market1['asks'][0], $kmarket2, $market2['bids'][0]);
 					}
 				}
 			}

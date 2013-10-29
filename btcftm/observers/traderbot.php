@@ -1,7 +1,7 @@
 <?php
 require_once("observer.php");
-require_once("../private_markets/privatemtgoxusd.php");
-require_once("../private_markets/privatebitstampusd.php");
+require_once("./private_markets/privatemtgoxusd.php");
+require_once("./private_markets/privatebitstampusd.php");
 
 class TraderBot extends Observer
 {

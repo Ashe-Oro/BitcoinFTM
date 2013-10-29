@@ -64,11 +64,11 @@ class Arbitrage
 		$this->arbitrer = new Arbitrer(); // register a new arbitrer
 		
 		// initializes arbitrer observers
-		$obs = isset($args['observers'])) ? $args['observers'] : NULL;
+		$obs = isset($args['observers']) ? $args['observers'] : NULL;
 		if ($obs) { $this->arbitrer->initObservers($obs.split(",")); }
 		
 		// initializes arbitrer markets
-		$markets = isset($args['markets'])) ? $args['markets'] : NULL;
+		$markets = isset($args['markets']) ? $args['markets'] : NULL;
 		if ($markets) { $this->arbitrer->initMarkets($markets.split(",")); }
 	}
 	
