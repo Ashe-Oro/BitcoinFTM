@@ -2,6 +2,12 @@
 
 require_once("common.php");
 
-echo 'hello world';
+$args = array();
+
+//var_dump($config);
+
+$arbitrage = new Arbitrage($args);
+$arbitrage->execCommand('watch');
+
 
 ?>

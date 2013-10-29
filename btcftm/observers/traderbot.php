@@ -40,17 +40,17 @@ class TraderBot extends Observer
 	{
 		global $config;
 		if ($profit < $config['profitThresh'] || $perc < $config['percThresh']) {
-			error_log("[TraderBot] Profit or profit percentage lower than thresholds");
+			iLog("[TraderBot] Profit or profit percentage lower than thresholds");
 			return;
 		}
 
 		if (!in_array($kask, $this->clients)) {
-			error_log("[TraderBot] Can't automate this trade, client not available: {$kask}");
+			iLog("[TraderBot] Can't automate this trade, client not available: {$kask}");
 			return;
 		}
 
 		if (!in_array($kbid, $this->clients)) {
-			error_log("[TraderBot] Can't automate this trade, client not available: {$kbid}");
+			iLog("[TraderBot] Can't automate this trade, client not available: {$kbid}");
 			return;
 		}
 
@@ -61,15 +61,15 @@ class TraderBot extends Observer
 		$maxVolume = $this->getMinTradeableVolume($buyPrice, $this->clients[$kask]->usdBalance, $this->clients[$kbid]->btcBalance);
 
 		if ($volume < $config['minTxVolume']) {
-			error_log("[TraderBot] Can't automate this trade, minimum volume transaction not reached {$volume} {$config['minTxVolume']}");
-			error_log("Balance on {$kask}: {$this->clients[$kask]->usdBalance} - Balance on {$kbid}: {$this->clients[$kbid]->btcBalance}");
+			iLog("[TraderBot] Can't automate this trade, minimum volume transaction not reached {$volume} {$config['minTxVolume']}");
+			iLog("Balance on {$kask}: {$this->clients[$kask]->usdBalance} - Balance on {$kbid}: {$this->clients[$kbid]->btcBalance}");
 			return;
 		}
 
 		$currentTime = time();
 		if ($currentTime - $this->lastTrade < $this->tradeWait) {
 			$dT = $currentTime - $this->lastTrade;
-			error_log("[TraderBot] Can't automate this trade, last trade occurred {$dT} seconds ago");
+			iLog("[TraderBot] Can't automate this trade, last trade occurred {$dT} seconds ago");
 			return;
                         }
 
@@ -107,7 +107,7 @@ class TraderBot extends Observer
 	public function executeTrade($volume, $kask, $kbid, $weightedBuyPrice, $weightedSellPrice, $buyPrice, $sellPrice)
 	{
 		$this->lastTrade = time();
-		error_log("[TraderBot] ]Buy {$kask} {$volume} BTC and sell @{$kbid}");
+		iLog("[TraderBot] ]Buy {$kask} {$volume} BTC and sell @{$kbid}");
 		$this->clients[$kask]->buy($volume, $buyPrice);
 		$this->clients[$kbid]->sell($volume, $sellPrice);
 	}

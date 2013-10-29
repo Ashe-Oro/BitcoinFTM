@@ -29,7 +29,7 @@ class PrivateMarket
 		$localPrice = $price;
 		//$localPrice = $this->fc->convert($price, 'USD', $this->currency);
 
-		error_log("Buy {$amount} BTC at {$localPrice} {$this->currency} @{$this->name}");
+		iLog("Buy {$amount} BTC at {$localPrice} {$this->currency} @{$this->name}");
 		$this->_buy($amount, $localPrice);
 	}
 
@@ -38,7 +38,7 @@ class PrivateMarket
 		$localPrice = $price;
 		//$localPrice = $this->fc->convert($price, 'USD', $this->currency);
 
-		error_log("Sell {$amount} BTC at {$localPrice} {$this->currency} @{$this->name}");
+		iLog("Sell {$amount} BTC at {$localPrice} {$this->currency} @{$this->name}");
 		$this->_sell($amount, $localPrice);
 	}
 

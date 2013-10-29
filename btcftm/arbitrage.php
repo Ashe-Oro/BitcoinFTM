@@ -15,22 +15,18 @@ class Arbitrage
 	 */
 	public function __construct($args)
 	{
-		
+		$this->createArbitrer($args);
 	}
 
 	/**
 	 * Executes a command
 	 *
-	 * @param	$args	{array}		arbitrage arguments
+	 * @param	$cmds	{string}		arbitrage commands
 	 */
-	public function execCommand($args)
+	public function execCommand($cmds)
 	{
-		$cmds = '';
-		if (isset($args['commands'])){
-			$cmds = $args['commands'];
-		}
-		
 		if (strlen($cmds)){
+			iLog("[Arbitrage] Execute command: {$cmds}");
 			switch($cmds) {
 				case "watch":
 					$this->arbitrer->loop();
@@ -61,33 +57,48 @@ class Arbitrage
 	 */
 	public function createArbitrer($args)
 	{
+		global $config;
+		
 		$this->arbitrer = new Arbitrer(); // register a new arbitrer
 		
+		iLog("[Arbitrage] New Arbitrer created");
+		
 		// initializes arbitrer observers
-		$obs = isset($args['observers']) ? $args['observers'] : NULL;
-		if ($obs) { $this->arbitrer->initObservers($obs.split(",")); }
+		$obs = isset($args['observers']) ? $args['observers'] : (isset($config['observers'])) ? $config['observers'] : NULL;
+		if ($obs) { $this->arbitrer->initObservers($obs); }
+		
+		iLog("[Arbitrage] Observers loaded");
 		
 		// initializes arbitrer markets
-		$markets = isset($args['markets']) ? $args['markets'] : NULL;
-		if ($markets) { $this->arbitrer->initMarkets($markets.split(",")); }
+		$markets = isset($args['markets']) ? $args['markets'] : (isset($config['markets'])) ? $config['markets'] : NULL;
+		if ($markets) { $this->arbitrer->initMarkets($markets); }
+		
+		iLog("[Arbitrage] Markets loaded");
 	}
 	
 	public function getBalance($markets)
 	{
-		if ($markets && strlen($markets)) {
-			$pmarkets = $markets.split(",");
+		if ($markets) {
             $pmarketsi = array();
-            foreach ($pmarkets as $pmarket) {
-				/* *** REPLACE THIS WITH PHP EVAL ONCE PRIVATE MARKET CLASSES ARE FINISHED
-                exec('import private_markets.' + pmarket.lower())
-                market = eval('private_markets.' + pmarket.lower()
-                              + '.Private' + pmarket + '()')
-                pmarketsi.append(market)
-            for market in pmarketsi:
-                print(market)
-				*/
+            foreach ($markets as $pmarket_name) {
+				$pFile = "./private_markets/private".strtolower($pmarket_name).".php";
+				if (file_exists($pFile)){
+					require_once($pFile);
+					$pName = "private".$pmarket_name;
+					try {
+						$pmarket = new $pName();
+						array_push($pmarketsi, $pmarket);
+						iLog("[Arbitrage] Balance for {$pmarket_name} - USD: ".$pmarket->usdBalance()." BTC: ".$pmarket->btcBalance());
+					} catch (Exception $e) {
+						iLog("[Arbitrage] ERROR: Private market construct function invalid - {$pmarket_name} - ".$e->getMessage());
+					}
+				} else {
+					iLog("[Arbitrage] ERROR: Private market file not found - {$pFile}");
+				}
 			}
+			return $pmarketsi;
 		}
+		return NULL;
 	}
 }
 ?>

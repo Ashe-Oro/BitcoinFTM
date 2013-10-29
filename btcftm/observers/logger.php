@@ -21,7 +21,7 @@ class Logger extends Observer
 
 	public function opportunity($profit, $volume, $buyprice, $kask, $sellprice, $kbid, $perc, $wBuyPrice, $wSellPrice)
 	{
-		 error_log("[Logger] profit: {$profit} USD with volume: {$volume} BTC - buy at {$buyPrice} ({$kask}) sell at {$sellPrice} ({$kbid}) ~{$perc}%");
+		 iLog("[Logger] profit: {$profit} USD with volume: {$volume} BTC - buy at {$buyPrice} ({$kask}) sell at {$sellPrice} ({$kbid}) ~{$perc}%");
 	}
 }
 ?>

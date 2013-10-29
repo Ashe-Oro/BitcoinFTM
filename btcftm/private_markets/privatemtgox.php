@@ -43,9 +43,9 @@ class PrivateMtGox extends PrivateMarket
 	{
 		$retPrice = 0;
 		$curArray = array("USD", "EUR", "GBP", "PLN", "CAD", "AUD", "CHF", "CNY","NZD", "RUB", "DKK", "HKD", "SGD", "THB");
-        		if (in_array($currency, $curArray) {
+        		if (in_array($currency, $curArray)) {
 			$retPrice = (int) ($price * 100000);
-		} else if (in_array($current, array("JPY", "SEK")) {
+		} else if (in_array($current, array("JPY", "SEK"))) {
 			$retPrice = (int) ($price * 1000);
 		}
 		return $retPrice;
@@ -108,7 +108,7 @@ class PrivateMtGox extends PrivateMarket
 
 		$params = array("nonce" => $this->_createNonce(), "amount_int" => $amount, "type" => $ttype);
 		if ($price) {
-			array_push($params, "price_int" => $price);
+			$params["price_int"] = $price;
 		}
 		
 		$response = $this->_sendRequest($buyUrl, $params);
@@ -118,12 +118,12 @@ class PrivateMtGox extends PrivateMarket
 		return NULL;
 	}
 
-	private function _buy($amount, $price)
+	protected function _buy($amount, $price)
 	{
 		return $this->trade($amount, "bid", $price);
 	}
 
-	private function _sell($amount, $price)
+	protected function _sell($amount, $price)
 	{
 		return $this->trade($amount, "ask", $price);
 	}

@@ -2,8 +2,11 @@
 
 abstract class Observer
 {
-	public function __construct($metaclass)
+	public $name;
+	
+	public function __construct()
 	{
+		$this->name = get_class($this);
 	}
 	
 	abstract public function beginOpportunityFinder($depths);

@@ -21,32 +21,43 @@ class Arbitrer
 	
 	public function initMarkets($markets)
 	{
-		$this->market_names = $markets;
-		foreach($markets as $market_name){
-			/** UPDATE ONCE PUBLIC MARKETS ARE COMPLETE **
-			exec('import public_markets.' + market_name.lower())
-            market = eval('public_markets.' + market_name.lower() + '.' +
-                          market_name + '()')
-			
-
-			array_push($this->markets->append(market));
-			***/
-            		
+		if ($markets) {
+			$this->market_names = $markets;
+			foreach($markets as $market_name){
+				$mFile = "./public_markets/".strtolower($market_name).".php";
+				if (file_exists($mFile)){
+					require_once($mFile);
+					try {
+						$market = new $market_name();
+						array_push($this->markets, $market);
+					} catch (Exception $e) {
+						iLog("[Arbitrer] ERROR: Market construct function invalid - {$market_name} - ".$e->getMessage());
+					}
+				} else {
+					iLog("[Arbitrer] ERROR: Market file not found - {$mFile}");
+				}		
+			}
 		}
 	}
 
 	public function initObservers($observers)
 	{
-		$this->observer_names = $observers;
-		foreach($observers as $observer_name) {
-
-			/*** UPDATE ONCE PUBLIC MARKETS ARE COMPLETE **
-			 exec('import observers.' + observer_name.lower())
-            		observer = eval('observers.' + observer_name.lower() + '.' +
-                            		observer_name + '()')
-           			
-			array_push($this->observers, observer);
-			***/
+		if ($observers){
+			$this->observer_names = $observers;
+			foreach($observers as $observer_name) {
+				$oFile = "./observers/".strtolower($observer_name).".php";
+				if (file_exists($oFile)){
+					require_once($oFile);
+					try {
+						$observer = new $observer_name();
+						array_push($this->observers, $observer);
+					} catch (Exception $e) {
+						iLog("[Arbitrer] ERROR: Observer construct function invalid - {$observer_name} - ".$e->getMessage());
+					}
+				} else {
+					iLog("[Arbitrer] ERROR: Observer file not found - {$oFile}");
+				}
+			}
 		}
 	}
 
@@ -69,7 +80,7 @@ class Arbitrer
 				$maxAmountBuy += $this->depths[$kbid]["bids"][$j]["amount"];
 			}
 
-			$maxAmount = min($maxAmountBuy, $maxAmountSell, $config->maxTxVolume);
+			$maxAmount = min($maxAmountBuy, $maxAmountSell, $config['maxTxVolume']);
 
 			$buyTotal = 0;
 			$wBuyPrice = 0;
@@ -186,15 +197,19 @@ class Arbitrer
 
 	public function updateDepths()
 	{
+		iLog("[Arbitrer] Updating market depths...");
+		
 		$depths = array();
 		$futures = array();
 		foreach($this->markets as $market){
-			array_push($futures, $this->threadpool->submit($this->_getMarketDepth($market), $market, $depths));
+			array_push($futures, $this->_getMarketDepth($market));
 		}
 
 		/*** ADD SLEEP INTERVAL HERE
 		wait(futures, timeout=20)
         		*/
+		iLog("[Arbitrer] Market depths updated");
+				
 		return $depths;
 	}
 
@@ -256,7 +271,8 @@ class Arbitrer
 			$this->depths = $this->updateDepths();
 			$this->tickers();
 			$this->tick();
-			sleep($config->refreshRate);
+			
+			sleep($config['refreshRate']);
 		}
 	}
 }
