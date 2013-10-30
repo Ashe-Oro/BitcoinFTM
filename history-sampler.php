@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
+include("utils/database_util.php");
 
 $xchg = "mtgox";
 if (isset($_GET['xchg'])) {
@@ -20,16 +21,7 @@ buildHistorySamples($xchg, $scale, $start, $end);
 
 function buildHistorySamples($xchg, $scale, $start, $end)
 {
-	$mysql = mysql_connect('localhost', 'root', 'root');
-	if (!$mysql) {
-		die('Not connected : ' . mysql_error());
-	}
-	
-	$db_selected = mysql_select_db('ftm', $mysql);
-	if (!$db_selected) {
-		die ('Can\'t use ftm : ' . mysql_error());
-	}
-	
+	$db = new Database("127.0.0.1", "root", "root", "ftm");	
 
 	$startDate = date_parse($start);
 	$endDate = date_parse($end);
@@ -52,9 +44,9 @@ function buildHistorySamples($xchg, $scale, $start, $end)
 	
 	$query = "SELECT * FROM {$xchg}_history_{$scale} WHERE timestamp > {$startTime} AND timestamp < {$endTime} ORDER BY timestamp ASC";
 	echo $query;
-	$result = mysql_query($query);
+	$result = $db->query($query);
 	$samples = array();
-	while($row = mysql_fetch_assoc($result)){
+	while($row = $db->fetch_array_assoc($result)){
 		$samples[$row['timestamp']] = $row;
 	}
 	
@@ -95,7 +87,7 @@ function buildHistorySamples($xchg, $scale, $start, $end)
 			
 			$query = "SELECT * FROM {$xchg}_history WHERE timestamp > {$startTime} AND timestamp < {$endTime} ORDER BY timestamp ASC";
 			//echo $query;
-			$result = mysql_query($query);
+			$result = $db->query($query);
 			$candle = getSampleCandleValues($startTime, $result);
 			//var_dump($candle);
 			echo "<p>Trades for {$day}-{$month}-{$year} [{$startTime}]: {$candle['count']}<br />";
@@ -108,7 +100,7 @@ function buildHistorySamples($xchg, $scale, $start, $end)
 			}
 			echo '<p>'.$query.'</p>';
 			
-			mysql_query($query);
+			$db->($query);
 			
 			$day += $dayInc;
 		}
@@ -121,7 +113,7 @@ function buildHistorySamples($xchg, $scale, $start, $end)
 		}
 	}
 	
-	mysql_close($mysql);
+	$db->($mysql);
 	
 }
 

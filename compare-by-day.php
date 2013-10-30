@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
+include("utils/database_util.php");
 
 $compare = 'high';
 
@@ -43,34 +44,24 @@ if (isset($_GET['scale'])) {
 
 <?php
 
-
-
-$mysql = mysql_connect('localhost', 'root', 'root');
-if (!$mysql) {
-    die('Not connected : ' . mysql_error());
-}
-
-$db_selected = mysql_select_db('ftm', $mysql);
-if (!$db_selected) {
-    die ('Can\'t use ftm : ' . mysql_error());
-}
+$db = new Database("127.0.0.1", "root", "root", "ftm");
 
 $bQuery = "SELECT * FROM bitstamp_history_{$scale} ORDER BY timestamp ASC";
 //echo $bQuery;
 
-$bResult = mysql_query($bQuery);
+$bResult = $db->query($bQuery);
 
 $bArray = array();
-while($row = mysql_fetch_assoc($bResult)){
+while($row = $db->fetch_array_assoc($bResult)){
 	array_push($bArray, $row);
 }
 
 $mQuery = "SELECT * FROM mtgox_history_{$scale} ORDER BY timestamp ASC";
 //echo $mQuery;
-$mResult = mysql_query($mQuery);
+$mResult = $db->query($mQuery);
 
 $mArray = array();
-while($row = mysql_fetch_assoc($mResult)){
+while($row = $db->fetch_array_assoc($mResult)){
 	array_push($mArray, $row);
 }
 

@@ -116,7 +116,7 @@ function doBtcSpreadTrades($settings)
 	$result = $db->query($query);
 	$bitstamp = array();
 	if($db->num_rows($result) > 0){
-		while($row = mysql_fetch_assoc($result)){
+		while($row = $db->fetch_array_assoc($result)){
 			$bitstamp[$row['timestamp']] = $row;
 		}		
 	}

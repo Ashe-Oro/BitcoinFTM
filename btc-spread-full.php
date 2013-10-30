@@ -2,7 +2,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 include("utils/database_util.php");
-
 ?>
 <style type="text/css">
 .info_row {
@@ -119,8 +118,6 @@ doBtcSpreadTrades($settings);
 
 function doBtcSpreadTrades($settings)
 {
-	$db = new Database("127.0.0.1", "root", "root", "ftm");
-
     //parses and sets local variables for testing date ranges which were passed in via array
     $startDate = date_parse($settings['start']);
 	$endDate = date_parse($settings['end']);
@@ -214,7 +211,6 @@ function doBtcSpreadTrades($settings)
 	}
 	
 	if ($settings['echo']) { echo "<p><b>TOTAL TRADE PROFIT:</b> {$totalProfit}</p>"; }
-	$db->close();
 	
 	return $totalProfit;
 }
@@ -418,23 +414,27 @@ function isPriceDivergance($trade)
 
 function getPricesAtTimestamp($timestamp)
 {
+	$db = new Database("127.0.0.1", "root", "root", "ftm");
+
 	$ret = array('mtgox' => -1, 'bitstamp' => -1);
 	
 	$xchg = 'mtgox';
 	$query = "SELECT * FROM {$xchg}_history WHERE timestamp < {$timestamp} ORDER BY timestamp DESC LIMIT 1";
-	$result = mysql_query($query);
-	if($row = mysql_fetch_assoc($result)){
+	$result = $db->query($query);
+	if($row = $db->fetch_array_assoc($result)){
 		$ret['mtgox'] = $row['price'];
 	}
 	
 	$xchg = 'bitstamp';
 	$query = "SELECT * FROM {$xchg}_history WHERE timestamp < {$timestamp} ORDER BY timestamp DESC LIMIT 1";
-	$result = mysql_query($query);
+	$result = $db->query($query);
 	$bitstamp = array();
-	if($row = mysql_fetch_assoc($result)){
+	if($row = $db->fetch_array_assoc($result)){
 		$ret['bitstamp'] = $row['price'];
 	}
 	
+	$db->close();
+
 	return $ret;
 }
 
