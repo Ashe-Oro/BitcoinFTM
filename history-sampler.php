@@ -100,7 +100,7 @@ function buildHistorySamples($xchg, $scale, $start, $end)
 			}
 			echo '<p>'.$query.'</p>';
 			
-			$db->($query);
+			$db->query($query);
 			
 			$day += $dayInc;
 		}
@@ -113,7 +113,7 @@ function buildHistorySamples($xchg, $scale, $start, $end)
 		}
 	}
 	
-	$db->($mysql);
+	$db->close();
 	
 }
 
