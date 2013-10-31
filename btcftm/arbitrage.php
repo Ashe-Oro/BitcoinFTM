@@ -7,6 +7,7 @@ require_once("arbitrer.php");
 class Arbitrage
 {
 	public $arbitrer = NULL; 
+	public $pmarkets = array();
 	
 	/**
 	 * CONSTRUCTOR: Creates new Arbitrage object
@@ -15,6 +16,11 @@ class Arbitrage
 	 */
 	public function __construct($args)
 	{
+		global $config; 
+		
+		iLog("[Arbitrage] PHASE 1: ACQUIRE BITCOINS");
+		iLog("[Arbitrage] Config loaded - refreshRate: {$config['refreshRate']}, marketExpirationTime: {$config['marketExpirationTime']}");
+		iLog("[Arbitrage] Config params set - maxTxVolume: {$config['maxTxVolume']}, minTxVolume: {$config['minTxVolume']}, balanceMargin: {$config['balanceMargin']}, profitThresh: {$config['profitThresh']}, percThresh: {$config['percThresh']}");
 		$this->createArbitrer($args);
 	}
 
@@ -71,13 +77,17 @@ class Arbitrage
 		
 		// initializes arbitrer markets
 		$markets = isset($args['markets']) ? $args['markets'] : (isset($config['markets'])) ? $config['markets'] : NULL;
-		if ($markets) { $this->arbitrer->initMarkets($markets); }
+		if ($markets) { 
+			$this->arbitrer->initMarkets($markets); 
+			$this->pmarkets = $this->getBalance($markets);
+		}
 		
 		iLog("[Arbitrage] Markets loaded");
 	}
 	
 	public function getBalance($markets)
 	{
+		iLog("[Arbitrage] Getting private market balances...");
 		if ($markets) {
             $pmarketsi = array();
             foreach ($markets as $pmarket_name) {
@@ -88,7 +98,7 @@ class Arbitrage
 					try {
 						$pmarket = new $pName();
 						array_push($pmarketsi, $pmarket);
-						iLog("[Arbitrage] Balance for {$pmarket_name} - USD: ".$pmarket->usdBalance()." BTC: ".$pmarket->btcBalance());
+						iLog("[Arbitrage] Balance for {$pmarket_name} - USD: ".$pmarket->getBalance('USD')." BTC: ".$pmarket->getBalance('BTC'));
 					} catch (Exception $e) {
 						iLog("[Arbitrage] ERROR: Private market construct function invalid - {$pmarket_name} - ".$e->getMessage());
 					}
@@ -97,6 +107,8 @@ class Arbitrage
 				}
 			}
 			return $pmarketsi;
+		} else {
+			iLog("[Arbitrage] ERROR: No private markets set.");
 		}
 		return NULL;
 	}

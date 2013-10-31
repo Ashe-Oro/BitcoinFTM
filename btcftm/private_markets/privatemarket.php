@@ -66,6 +66,14 @@ class PrivateMarket
 	{
 		throw NotImplementedError("");
 	}
+	
+	public function getBalance($currency) {
+		switch(strtolower($currency)){
+			case 'btc': { return $this->btcBalance; }
+			case 'usd': { return $this->usdBalance; }
+			case 'eur': { return $this->eurBalance; }
+		}
+	}
 }
 
 class NotImplementedError extends Exception

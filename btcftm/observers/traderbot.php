@@ -21,36 +21,45 @@ class TraderBot extends Observer
 	public function beginOpportunityFinder($depths)
 	{
 		$this->potentialTrades = array();
+		iLog("[TraderBot] Potential trade list cleared");
 	}
 
 	public function endOpportunityFinder()
 	{
-		if (array_len($this->potentialTrades)) {
+		if (count($this->potentialTrades)) {
+			iLog("[TraderBot] ".count($this->potentialTrades)." potential trades FOUND!");
 			usort($this->potentialTrades, array("TraderBot", "sortPotentialTrades"));
 			$this->executeTrade($this->potentialTrades[0]);
+		} else {
+			iLog("[TraderBot] endOpportunityFinder - NO potential trades found");
 		}
 	}
 
 	static public function sortPotentialTrades($a, $b) {
-		if ($a[0] == $b[0]) { return 0; }
-		return ($a[0] > $b[0]) ? 1 : -1;
+		if ($a['profit'] == $b['profit']) { return 0; }
+		return ($a['profit'] > $b['profit']) ? 1 : -1;
 	}
 
 	public function opportunity($profit, $volume, $buyprice, $kask, $sellprice, $kbid, $perc, $wBuyPrice, $wSellPrice)
 	{
 		global $config;
+		iLog("[TraderBot] Searching for trade opportunities...");
+		
+		$askName = $kask['name'];
+		$bidName = $kbid['name'];
+		
 		if ($profit < $config['profitThresh'] || $perc < $config['percThresh']) {
-			iLog("[TraderBot] Profit or profit percentage lower than thresholds");
+			iLog("[TraderBot] WARNING: Profit or profit percentage lower than thresholds - Profit: {$profit} (t: {$config['profitThresh']}) Perc: {$perc} (t: {$config['percThresh']})");
 			return;
 		}
 
-		if (!in_array($kask, $this->clients)) {
-			iLog("[TraderBot] Can't automate this trade, client not available: {$kask}");
+		if (!isset($this->clients[$askName])) {
+			iLog("[TraderBot] WARNING: Can't automate this trade, client not available: {$askName}");
 			return;
 		}
 
-		if (!in_array($kbid, $this->clients)) {
-			iLog("[TraderBot] Can't automate this trade, client not available: {$kbid}");
+		if (!isset($this->clients[$bidName])) {
+			iLog("[TraderBot] WARNING: Can't automate this trade, client not available: {$bidName}");
 			return;
 		}
 
@@ -58,29 +67,34 @@ class TraderBot extends Observer
 
 		$this->updateBalance();
 
-		$maxVolume = $this->getMinTradeableVolume($buyPrice, $this->clients[$kask]->usdBalance, $this->clients[$kbid]->btcBalance);
+		$maxVolume = $this->getMinTradeableVolume($buyPrice, $this->clients[$askName]->usdBalance, $this->clients[$bidName]->btcBalance);
 
 		if ($volume < $config['minTxVolume']) {
-			iLog("[TraderBot] Can't automate this trade, minimum volume transaction not reached {$volume} {$config['minTxVolume']}");
-			iLog("Balance on {$kask}: {$this->clients[$kask]->usdBalance} - Balance on {$kbid}: {$this->clients[$kbid]->btcBalance}");
+			iLog("[TraderBot] WARNING: Can't automate this trade, minimum volume transaction not reached - Vol: {$volume} Min: {$config['minTxVolume']}");
+			iLog("Balance on {$askName}: {$this->clients[$askName]->usdBalance} - Balance on {$bidName}: {$this->clients[$bidName]->btcBalance}");
 			return;
 		}
 
 		$currentTime = time();
 		if ($currentTime - $this->lastTrade < $this->tradeWait) {
 			$dT = $currentTime - $this->lastTrade;
-			iLog("[TraderBot] Can't automate this trade, last trade occurred {$dT} seconds ago");
+			iLog("[TraderBot] WARNING: Can't automate this trade, last trade occurred {$dT}s ago - must wait {$this->tradeWait}s");
 			return;
-                        }
+        }
 
 		$pTrade = array("profit" => $profit,
 						"volume" => $volume,
 						"kask" => $kask,
 						"kbid" => $kbid,
+						"askName" => $askName,
+						"bidName" => $bidName,
 						"wBuyPrice" => $wBuyPrice,
 						"wSellPrice" => $wSellPrice,
 						"buyPrice" => $buyPrice,
 						"sellPrice" => $sellPrice );
+		
+		iLog("[TraderBot] Adding potential trade - Profit: {$profit}USD for {$volume}BTC - Buy {$askName} @{$buyPrice} ({$wBuyPrice}) - Sell {$bidName} @{$sellPrice} ({$wSellPrice})");
+		
 		array_push($this->potentialTrades, $pTrade);
 	}
 
@@ -94,6 +108,7 @@ class TraderBot extends Observer
 
 	public function updateBalance()
 	{
+		iLog("[TraderBot] Updating market balances...");
 		foreach($this->clients as $kclient) {
 			$this->clients[$kclient]->getInfo();
 		}
@@ -104,12 +119,20 @@ class TraderBot extends Observer
 		return true;
 	}
 
-	public function executeTrade($volume, $kask, $kbid, $weightedBuyPrice, $weightedSellPrice, $buyPrice, $sellPrice)
+	public function executeTrade($trade)
 	{
-		$this->lastTrade = time();
-		iLog("[TraderBot] ]Buy {$kask} {$volume} BTC and sell @{$kbid}");
-		$this->clients[$kask]->buy($volume, $buyPrice);
-		$this->clients[$kbid]->sell($volume, $sellPrice);
+		if ($trade) {
+			if (isset($this->clients[$trade['askName']]) && isset($this->clients[$trade['bidName']])) {
+				$this->lastTrade = time();
+		
+				iLog("[TraderBot] Executing Trade of {$trade['volume']}BTC - Buy {$trade['askName']} @{$trade['buyPrice']} - Sell {$trade['bidName']}  @{$kbid}");
+				
+				$this->clients[$trade['askName']]->buy($trade['volume'], $trade['buyPrice']);
+				$this->clients[$trade['bidName']]->sell($trade['volume'], $trade['sellPrice']);
+				
+				/***** NEED TO UPDATE OUR MYSQL RECORDS HERE FOR TRADE *****/
+			}
+		}
 	}
 }
 ?>

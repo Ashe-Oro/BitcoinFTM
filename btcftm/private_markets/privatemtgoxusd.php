@@ -10,7 +10,9 @@ class PrivateMtGoxUSD extends PrivateMtGox
 		parent::__construct("USD");
 		$this->tickerUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/BTCUSD/public/ticker');
 		$this->buyUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/BTCUSD/private/order/add');
-		$this-> sellUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/BTCUSD/private/order/add');
+		$this->sellUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/BTCUSD/private/order/add');
+		
+		$this->getInfo();
 	}
 
 	public function getInfo()
@@ -20,6 +22,7 @@ class PrivateMtGoxUSD extends PrivateMtGox
 		if ($response && isset($response['result']) && $response['result'] == 'success') {
 			$this->btcBalance = $this->_fromIntAmount((int) $response['return']['Wallets']["BTC"]["Balance"]["value_int"]);
 			$this->usdBalance = $this->_fromIntAmount((int) $response['return']['Wallets']["USD"]["Balance"]["value_int"]);
+			iLog("[PrivateMtGoxUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
 			return true;
 		}
 		return false;

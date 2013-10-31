@@ -3,14 +3,18 @@ require_once("privatemarket.php");
 
 class PrivateMtGox extends PrivateMarket
 {
-	private $orderUrl;
-	private $openOrdersUrl;
-	private $infoUrl;
-	private $withdrawUrl;
-	private $depositUrl;
+	protected $orderUrl;
+	protected $openOrdersUrl;
+	protected $infoUrl;
+	protected $withdrawUrl;
+	protected $depositUrl;
+	
+	protected $tickerUrl = '';
+	protected $buyUrl = '';
+	protected $sellUrl = '';
 
-	private $key;
-	private $secret;
+	protected $privatekey;
+	protected $secret;
 
 	public function __construct($currency)
 	{
@@ -19,27 +23,25 @@ class PrivateMtGox extends PrivateMarket
 		parent::__construct($currency);
 		$this->orderUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/private/order/result');
 		$this->openOrdersUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/private/orders');
-		$this-> infoUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/private/info');
-		$this-> withdrawUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/bitcoin/send_simple');
-		$this-> depositUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/bitcoin/address');
+		$this->infoUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/private/info');
+		$this->withdrawUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/bitcoin/send_simple');
+		$this->depositUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/bitcoin/address');
 
-		$this->key = $config['mtGoxKey'];
-		$this->secret = $config['mtGoxSecret'];
-
-		$this->getInfo();
+		$this->privatekey = $config['mtgox_key'];
+		$this->secret = $config['mtgox_secret'];
 	}
 
-	private function _createNonce()
+	protected function _createNonce()
 	{
 		return time() * 1000000;
 	}
 
-	private function _changeCurrencyUrl($url, $currency)
+	protected function _changeCurrencyUrl($url, $currency)
 	{
 		return preg_replace('/BTC\w{3}/', 'BTC'.$currency, $url);
 	}
 
-	private function _toIntPrice($price, $currency)
+	protected function _toIntPrice($price, $currency)
 	{
 		$retPrice = 0;
 		$curArray = array("USD", "EUR", "GBP", "PLN", "CAD", "AUD", "CHF", "CNY","NZD", "RUB", "DKK", "HKD", "SGD", "THB");
@@ -51,23 +53,33 @@ class PrivateMtGox extends PrivateMarket
 		return $retPrice;
            	}
 
-	private function _toIntAmount($amount)
+	protected function _toIntAmount($amount)
 	{
 		return (int) ($amount * 100000000);
 	}
 
-	private function _fromIntAmount($amount)
+	protected function _fromIntAmount($amount)
 	{
 		return (int) ($amount / 100000000);
 	}
 
-	private function _fromIntPrice($amount)
+	protected function _fromIntPrice($amount)
 	{
 		return $amount / 100000;
 	}
 
-	private function _sendRequest($url, $params, $extraHeaders)
+	protected function _sendRequest($url, $params, $extraHeaders=NULL)
 	{
+		$rUrl = $url['url'];
+		iLog("[PrivateMtGox] Sending Request: {$rUrl}");
+		$response = array();
+		$response['result'] = 'success';
+		$response['return'] = false;
+		
+		if ($rUrl != $this->infoUrl['url'] && $rUrl != $this->tickerUrl['url']) {
+			iLog("[PrivateMtGox] WARNING: Request not sent. Live sell and buy functions currently disabled.");
+			return $response; 
+		}
 		/*** PORT THIS OVER TO PHP ***
 		urlparams = bytes(urllib.parse.urlencode(params), "UTF-8")
         secret_from_b64 = base64.b64decode(bytes(self.secret, "UTF-8"))
@@ -95,6 +107,7 @@ class PrivateMtGox extends PrivateMarket
         except Exception as err:
             logging.error('Can\'t request MTGox, %s' % err)
 		**/
+		return $response;
 	}
 
 	public function trade($amount, $ttype, $price=0)
@@ -120,17 +133,19 @@ class PrivateMtGox extends PrivateMarket
 
 	protected function _buy($amount, $price)
 	{
+		iLog("[PrivateMtGox] Create BUY limit order {$amount} @{$price}USD");
 		return $this->trade($amount, "bid", $price);
 	}
 
 	protected function _sell($amount, $price)
 	{
+		iLog("[PrivateMtGox] Create SELL limit order {$amount} @{$price}USD");
 		return $this->trade($amount, "ask", $price);
 	}
 
 	public function withdraw($amount, $address)
 	{
-		$params = array(	"nonce" => $this->_createNonce(), 
+		$params = array("nonce" => $this->_createNonce(), 
 					"amount_int" => $this->_toIntAmount($amount), 
 					"address" => $address);
 		

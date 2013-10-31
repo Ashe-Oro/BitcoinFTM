@@ -12,6 +12,7 @@ class MtGoxUSD extends Market
 
 	public function updateDepth()
 	{
+		iLog("[MtGoxUSD] Updating order depth...");
 		$url = "http://data.mtgox.com/api/2/BTCUSD/money/depth";
 		$res = file_get_contents($url);
 		try {
@@ -20,6 +21,7 @@ class MtGoxUSD extends Market
 				$data = $json->data;
 				$this->depth = $this->formatDepth($data);
 				//var_dump($this->depth);
+				iLog("[MtGoxUSD] Order Depth Updated");
 			}
 		} catch (Exception $e) {
 			iLog("[MtGoxUSD] ERROR: can't parse JSON feed - {$url} - ".$e->getMessage());

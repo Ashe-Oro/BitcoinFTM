@@ -13,12 +13,14 @@ class BitstampUSD extends Market
 
 	public function updateDepth()
 	{
+		iLog("[BitstampUSD] Updating order depth...");
 		$url = 'https://www.bitstamp.net/api/order_book/';
 		$res = file_get_contents($url);
 		try {
 			$json = json_decode($res);
 			$data = $json;
 			$this->depth = $this->formatDepth($data);
+			iLog("[BitstampUSD] Order depth updated");
 		} catch (Exception $e) {
 			iLog("[BitstampUSD] ERROR: can't parse JSON feed - {$url} - ".$e->getMessage());
 		}

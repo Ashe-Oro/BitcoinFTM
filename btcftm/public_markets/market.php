@@ -51,7 +51,7 @@ abstract class Market
 	{
 		$depth = $this->getDepth();
 		$res = array('ask' => 0, 'bid' => 0);
-		if (array_len($depth['asks']) && array_len($depth['bids'])) {
+		if (count($depth['asks']) && count($depth['bids'])) {
 			$res['ask'] = $depth['asks'][0];
 			$res['bid'] = $depth['bids'][0];
 		}
