@@ -70,6 +70,26 @@ class Arbitrer
 			iLog("[Arbitrer] {$oLoaded}/".count($observers)." observers initialized.");
 		}
 	}
+	
+	public function getMarket($market_name)
+	{
+		foreach($this->markets as $mkt) {
+			if ($mkt->name == $market_name) {
+				return $mkt;
+			}
+		}
+		 return NULL;
+	}
+	
+	public function getObserver($observer_name)
+	{
+		foreach($this->observers as $obs) {
+			if ($obs->name == $observers) {
+				return $obs;
+			}
+		}
+		 return NULL;
+	}
 
 	public function getProfitFor($mi, $mj, $kask, $kbid)
 	{

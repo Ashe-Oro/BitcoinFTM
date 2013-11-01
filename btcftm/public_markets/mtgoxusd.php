@@ -3,6 +3,9 @@ require_once('market.php');
 
 class MtGoxUSD extends Market
 {
+	private $depthUrl = "";
+	private $tickerUrl = "";
+	
 	public function __construct()
 	{
 		parent::__construct("USD");
@@ -47,5 +50,19 @@ class MtGoxUSD extends Market
 		$asks = $this->sortAndFormat($depth->asks, false);
 		return array('asks' => $asks, 'bids' => $bids);
 	}	
+	
+	public function getCurrentTicker()
+	{
+		iLog("[MtGoxUSD] Getting current ticker...");
+		$res = file_get_contents($this->tickerUrl);
+		try {
+			$json = json_decode($res);
+			$ticker = new Ticker($json);
+			iLog("[MtGoxUSD] Current ticker - high: {$ticker['high']} low: {$ticker['low']} last: {$ticker['last']} ask: {$ticker['ask']} bid: {$ticker['bid']} volume: {$ticker['volume']}");
+			return $ticker;
+		} catch (Exception $e) {
+			iLog("[MtGoxUSD] ERROR: can't parse JSON feed - {$this->tickerUrl} - ".$e->getMessage());
+		}
+	}
 }
 ?>

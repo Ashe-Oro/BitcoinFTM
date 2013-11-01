@@ -1,4 +1,6 @@
 <?php
+require_once("ticker.php");
+
 abstract class Market
 {
 	public $name = '';
@@ -67,5 +69,7 @@ abstract class Market
 	} 
 
 	abstract public function updateDepth();
+	
+	abstract public function getCurrentTicker();
 }
 ?>

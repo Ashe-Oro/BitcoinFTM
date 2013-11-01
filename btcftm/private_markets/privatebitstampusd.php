@@ -7,14 +7,14 @@ class PrivateBitstampUSD extends PrivateMarket
     private $buyUrl = "https://www.bitstamp.net/api/buy/";
     private $sellUrl = "https://www.bitstamp.net/api/sell/";
 
-    private $username = '';
-    private $password = '';
+    private $privatekey = '';
+    private $secret = '';
 
 	public function __construct()
 	{
 		parent::__construct("USD");
-		$this->username = $config['bitstamp_username'];
-		$this->password = $config['bitstamp_password'];
+		$this->privatekey = $config['bitstamp_key'];
+		$this->secret = $config['bitstamp_secret'];
 		
 		$this->getInfo();
 	}
@@ -38,6 +38,8 @@ class PrivateBitstampUSD extends PrivateMarket
             'Accept' => 'application/json, text/javascript, */*; q=0.01',
             'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT'
         );
+			
+		
         /*
         if extra_headers is not None:
             for k, v in extra_headers.items():

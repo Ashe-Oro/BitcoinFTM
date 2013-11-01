@@ -4,6 +4,8 @@ require_once("market.php");
 class BitstampUSD extends Market
 {
 	public $updateRate;
+	private $depthUrl = "https://www.bitstamp.net/api/order_book/";
+	private $tickerUrl = "https://www.bitstamp.net/api/ticker/";
 
 	public function __construct()
 	{
@@ -14,8 +16,7 @@ class BitstampUSD extends Market
 	public function updateDepth()
 	{
 		iLog("[BitstampUSD] Updating order depth...");
-		$url = 'https://www.bitstamp.net/api/order_book/';
-		$res = file_get_contents($url);
+		$res = file_get_contents($this->depthUrl);
 		try {
 			$json = json_decode($res);
 			$data = $json;
@@ -44,6 +45,22 @@ class BitstampUSD extends Market
 		$bids = $this->sortAndFormat($depth->bids, true);
 		$asks = $this->sortAndFormat($depth->asks, false);
 		return array('asks' => $asks, 'bids' => $bids);
+	}
+	
+	public function getCurrentTicker()
+	{
+		iLog("[BitstampUSD] Getting current ticker...");
+		$res = file_get_contents($this->tickerUrl);
+		try {
+			$json = json_decode($res);
+			$ticker = new Ticker($json);
+			$t = $ticker->getTickerArray();
+
+			iLog("[BitstampUSD] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
+			return $ticker;
+		} catch (Exception $e) {
+			iLog("[MtGoxUSD] ERROR: can't parse JSON feed - {$this->tickerUrl} - ".$e->getMessage());
+		}
 	}
 }
 

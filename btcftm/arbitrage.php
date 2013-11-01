@@ -112,5 +112,10 @@ class Arbitrage
 		}
 		return NULL;
 	}
+	
+	public function getArbitrer()
+	{
+		return $this->arbitrer;
+	}
 }
 ?>
