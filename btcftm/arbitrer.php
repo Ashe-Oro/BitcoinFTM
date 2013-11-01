@@ -126,6 +126,7 @@ class Arbitrer
 				if ($wBuyPrice == 0){
 					$wBuyPrice = $price;
 				}  else {
+					/*** STANDARD MOVING AVG ***/
 					$wBuyPrice = (($wBuyPrice *($buyTotal - $amount)) + ($price * $amount)) / $buyTotal; 
 				}
 			}
@@ -142,6 +143,7 @@ class Arbitrer
 				if ($wSellPrice == 0){
 					$wSellPrice = $price;
 				}  else {
+					/*** STANDARD MOVING AVG ***/
 					$wSellPrice = (($wSellPrice *($sellTotal - $amount)) + ($price * $amount)) / $sellTotal; 
 				}
 			}

@@ -40,6 +40,7 @@ class TraderBot extends Observer
 		return ($a['profit'] > $b['profit']) ? 1 : -1;
 	}
 
+	/*** VERY IMPORTANT: DOUBLE CHECK THIS LOGIC!!! ***/
 	public function opportunity($profit, $volume, $buyprice, $kask, $sellprice, $kbid, $perc, $wBuyPrice, $wSellPrice)
 	{
 		global $config;
@@ -66,7 +67,6 @@ class TraderBot extends Observer
 		$volume = min($config['maxTxVolume'], $volume);
 
 		$this->updateBalance();
-
 		$maxVolume = $this->getMinTradeableVolume($buyPrice, $this->clients[$askName]->usdBalance, $this->clients[$bidName]->btcBalance);
 
 		if ($volume < $config['minTxVolume']) {
@@ -98,6 +98,8 @@ class TraderBot extends Observer
 		array_push($this->potentialTrades, $pTrade);
 	}
 
+	/*** VERY IMPORTANT FUNCTION ***/
+	/** Set out leniency here - balanceMargin == slippage **/
 	public function getMinTradeableVolume($buyPrice, $usdBal, $btcBal)
 	{
 		global $config;
@@ -119,6 +121,7 @@ class TraderBot extends Observer
 		return true;
 	}
 
+	/**** VERY IMPORTANT: modify to have accurate buy/sell info ***/
 	public function executeTrade($trade)
 	{
 		if ($trade) {
