@@ -30,6 +30,9 @@ $config['bitstamp_key'] = "fQvjrXEJ0DeEnwNz0VogJ0c3BKsupr5y";
 $config['bitstamp_secret'] = "JbvTJ084MVGImuGy6IZDHYodAyYE7fRv";
 $config['bitstamp_clientid'] = 73820;
 
+$config['bitfinex_key'] = "Ck5yP2RtPf0t4DMSm804TKatf8ijXA8B8NeI3G2slCc";
+$config['bitfinex_secret'] = "ZEFSGuo7aZ1d429QhUfKKWiRAPsy9NaWAvPd634dkBK";
+$config['bitfinex_clientid'] = 0;
 /**** END PERSONAL KEYS ***/
 
 // SafeGuards

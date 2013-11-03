@@ -7,6 +7,7 @@ require_once("private_markets/privatebitstampusd.php");
 require_once("private_markets/privatemtgoxusd.php");
 require_once("public_markets/bitstampusd.php");
 require_once("public_markets/mtgoxusd.php");
+require_once("public_markets/bitfinexltc.php");
 
 function iLog($msg)
 {
