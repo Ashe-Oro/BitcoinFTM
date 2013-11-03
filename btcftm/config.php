@@ -26,8 +26,8 @@ $config['mtgox_key'] = "eccf3b13-75bb-44e6-8f3f-66a577d05d8d";
 $config['mtgox_secret'] = "R1XAuUGamakYoFSDdKMLjy8hrhqZyfzJTo/gPsdd8ogt7XlpimZbTKHDE6IDM5c0idVJbcNeWUTnyzDgdUcIKg==";
 $config['mtgox_clientid'] = 0;
 
-$config['bitstamp_key'] = "drRD82T04GZqYMJP3zxTXZh3i4HWX1Sm";
-$config['bitstamp_secret'] = "pTO2lm83ogiUiAweuU6yy6sURTAM4J9m";
+$config['bitstamp_key'] = "fQvjrXEJ0DeEnwNz0VogJ0c3BKsupr5y";
+$config['bitstamp_secret'] = "JbvTJ084MVGImuGy6IZDHYodAyYE7fRv";
 $config['bitstamp_clientid'] = 73820;
 
 /**** END PERSONAL KEYS ***/

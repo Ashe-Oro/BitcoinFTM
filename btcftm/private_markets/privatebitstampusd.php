@@ -15,6 +15,8 @@ class PrivateBitstampUSD extends PrivateMarket
 
 	public function __construct()
 	{
+		global $config;
+		
 		parent::__construct("USD");
 		$this->privatekey = $config['bitstamp_key'];
 		$this->secret = $config['bitstamp_secret'];
@@ -23,7 +25,7 @@ class PrivateBitstampUSD extends PrivateMarket
 		$this->getInfo();
 	}
 
-	protected function _sendRequest($url, $params, $extraHeaders=NULL)
+	protected function _sendRequest($url, $params=array(), $extraHeaders=NULL)
 	{
 		$rUrl = $url;		
 		$response = array();
@@ -37,12 +39,11 @@ class PrivateBitstampUSD extends PrivateMarket
 			return $response; 
 		}
 		
-		$params = array();
 		// must have a unique incrementing nonce for every private request
-		$params['nonce'] = $this->_createNonce();
+		$nonce = $this->_createNonce();
+		$params['nonce'] = $nonce;
 		$params['key'] = $this->privatekey;
-		$params['signature'] = $this->_getSignature($params['nonce']);
-		
+		$params['signature'] = $this->_getSignature($nonce);
 		
 		// generate the POST data string
         $post_data = http_build_query($params, '', '&');
@@ -59,6 +60,7 @@ class PrivateBitstampUSD extends PrivateMarket
         curl_setopt($this->ch, CURLOPT_URL, $rUrl);
         curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post_data);
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
+		curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 			
 		// run the query
         $res = curl_exec($this->ch);
@@ -66,7 +68,6 @@ class PrivateBitstampUSD extends PrivateMarket
             throw new Exception('Could not get reply: ' . curl_error($this->ch));
 		}
         $json = json_decode($res, true);
-		var_dump($json);
         if (!$json) {
             throw new Exception('Invalid data received, please make sure connection is working and requested API exists');
 		}
