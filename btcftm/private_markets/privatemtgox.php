@@ -15,6 +15,8 @@ class PrivateMtGox extends PrivateMarket
 
 	protected $privatekey;
 	protected $secret;
+	
+	protected $ch = NULL;
 
 	public function __construct($currency)
 	{
@@ -33,7 +35,8 @@ class PrivateMtGox extends PrivateMarket
 
 	protected function _createNonce()
 	{
-		return time() * 1000000;
+		$mt = explode(' ', microtime());
+		return $mt[1].substr($mt[0], 2, 6);
 	}
 
 	protected function _changeCurrencyUrl($url, $currency)
@@ -60,54 +63,62 @@ class PrivateMtGox extends PrivateMarket
 
 	protected function _fromIntAmount($amount)
 	{
-		return (int) ($amount / 100000000);
+		return (float) ($amount / 100000000);
 	}
 
 	protected function _fromIntPrice($amount)
 	{
-		return $amount / 100000;
+		return ($amount / 100000);
 	}
 
 	protected function _sendRequest($url, $params, $extraHeaders=NULL)
 	{
 		$rUrl = $url['url'];
 		iLog("[PrivateMtGox] Sending Request: {$rUrl}");
-		$response = array();
-		$response['result'] = 'success';
-		$response['return'] = false;
 		
 		if ($rUrl != $this->infoUrl['url'] && $rUrl != $this->tickerUrl['url']) {
 			iLog("[PrivateMtGox] WARNING: Request not sent. Live sell and buy functions currently disabled.");
+			$response = array();
+			$response['result'] = 'error';
+			$response['return'] = NULL;
 			return $response; 
 		}
-		/*** PORT THIS OVER TO PHP ***
-		urlparams = bytes(urllib.parse.urlencode(params), "UTF-8")
-        secret_from_b64 = base64.b64decode(bytes(self.secret, "UTF-8"))
-        hmac_secret = hmac.new(secret_from_b64, urlparams, hashlib.sha512)
+		
+		$params = array();
+		// must have a unique incrementing nonce for every private request
+		$params['nonce'] = $this->_createNonce();
+		
+		// generate the POST data string
+        $post_data = http_build_query($params, '', '&');
 
-        headers = {
-            'Rest-Key': self.key,
-            'Rest-Sign': base64.b64encode(hmac_secret.digest()),
-            'Content-type': 'application/x-www-form-urlencoded', 
-			*/
-            //'Accept': 'application/json, text/javascript, */*; q=0.01',
-            /*'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+        // set up header
+        $headers = array(
+			'Rest-Key : '.$this->privatekey,
+			'Rest-Sign : '.base64_encode(hash_hmac('sha512', $post_data, base64_decode($this->secret), true))
+        );
+		
+		// our curl handle (initialize if required)
+        if (is_null($this->ch)){
+            $this->ch = curl_init();
+            curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($this->ch, CURLOPT_USERAGENT,'Mozilla/4.0 (compatible; Bitstamp PHP client; '.php_uname('s').'; PHP/'.phpversion().')');
         }
-        if extra_headers is not None:
-            for k, v in extra_headers.items():
-                headers[k] = v
-        try:
-            req = urllib.request.Request(url['url'],
-                                         bytes(urllib.parse.urlencode(params),
-                                               "UTF-8"), headers)
-            response = urllib.request.urlopen(req)
-            if response.getcode() == 200:
-                jsonstr = response.read()
-                return json.loads(str(jsonstr, "UTF-8"))
-        except Exception as err:
-            logging.error('Can\'t request MTGox, %s' % err)
-		**/
-		return $response;
+        curl_setopt($this->ch, CURLOPT_URL, $rUrl);
+        curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post_data);
+        curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
+		curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+			
+		// run the query
+        $res = curl_exec($this->ch);
+        if ($res === false) {
+            throw new Exception('Could not get reply: ' . curl_error($this->ch));
+		}
+		
+        $json = json_decode($res, true);
+        if (!$json) {
+            throw new Exception('Invalid data received, please make sure connection is working and requested API exists');
+		}
+        return $json;
 	}
 
 	public function trade($amount, $ttype, $price=0)
@@ -124,9 +135,13 @@ class PrivateMtGox extends PrivateMarket
 			$params["price_int"] = $price;
 		}
 		
-		$response = $this->_sendRequest($buyUrl, $params);
-		if ($response && isset($response['result']) && $response['result'] == 'success'){
-			return $response['return'];
+		try {
+			$response = $this->_sendRequest($buyUrl, $params);
+			if ($response && isset($response['result']) && $response['result'] == 'success'){
+				return $response['return'];
+			}
+		} catch (Exception $e) {
+			iLog("[PrivateMtGox] ERROR: Trade failed - ".$e->getMessage());
 		}
 		return NULL;
 	}
@@ -149,9 +164,13 @@ class PrivateMtGox extends PrivateMarket
 					"amount_int" => $this->_toIntAmount($amount), 
 					"address" => $address);
 		
-		$response = $this->_sendRequest($this->withdrawUrl, $params);
-		if ($response && isset($response['result']) && $response['result'] == 'success') {
-			return $response['return'];
+		try {
+			$response = $this->_sendRequest($this->withdrawUrl, $params);
+			if ($response && isset($response['result']) && $response['result'] == 'success') {
+				return $response['return'];
+			}
+		} catch (Exception $e) {
+			iLog("[PrivateMtGox] ERROR: Withdraw failed - ".$e->getMessage());
 		}
 		return NULL;
 	}
@@ -159,9 +178,13 @@ class PrivateMtGox extends PrivateMarket
 	public function deposit()
 	{
 		$params = array("nonce" => $this->_createNonce());
-		$response = $this->_sendRequest($this->depositUrl, $param);
-		if ($response && isset($response['result']) && $response['result'] == 'success') {
-			return $response['return'];
+		try {
+			$response = $this->_sendRequest($this->depositUrl, $param);
+			if ($response && isset($response['result']) && $response['result'] == 'success') {
+				return $response['return'];
+			}
+		} catch (Exception $e) {
+			iLog("[PrivateMtGox] ERROR: Deposit failed - ".$e->getMessage());
 		}
 		return NULL;
 	}

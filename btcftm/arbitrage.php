@@ -98,7 +98,7 @@ class Arbitrage
 					try {
 						$pmarket = new $pName();
 						array_push($pmarketsi, $pmarket);
-						iLog("[Arbitrage] Balance for {$pmarket_name} - USD: ".$pmarket->getBalance('USD')." BTC: ".$pmarket->getBalance('BTC'));
+						iLog("[Arbitrage] Balance for {$pmarket_name} - ".$pmarket->getBalance('BTC')."BTC, ".$pmarket->getBalance('USD')."USD");
 					} catch (Exception $e) {
 						iLog("[Arbitrage] ERROR: Private market construct function invalid - {$pmarket_name} - ".$e->getMessage());
 					}
