@@ -13,16 +13,17 @@ class PrivateBitstampUSD extends PrivateMarket
 	
 	private $ch = NULL;
 
-	public function __construct()
+	public function __construct($clientID, $key, $secret)
 	{
-		global $config;
-		
-		parent::__construct("USD");
-		$this->privatekey = $config['bitstamp_key'];
-		$this->secret = $config['bitstamp_secret'];
-		$this->clientID = $config['bitstamp_clientid'];
-		
+		parent::__construct("USD", $clientID, $key, $secret);
 		$this->getInfo();
+	}
+	
+	protected function _loadClient($clientID, $key, $secret)
+	{
+		$this->privatekey = $key;
+		$this->secret = $secret;
+		$this->clientID = $clientID;
 	}
 
 	protected function _sendRequest($url, $params=array(), $extraHeaders=NULL)
@@ -96,7 +97,7 @@ class PrivateBitstampUSD extends PrivateMarket
 			$response = $this->_sendRequest($this->buyUrl, $params);
 			if ($response){
 				if (isset($response['error'])) {
-					iLog("[PrivateBitstampUSD] ERROR: Buy failed {$response['error']}");
+					iLog("[PrivateBitstampUSD] ERROR: Buy failed {$response['error']['message']}");
 				} else {
 					alert('BUY'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
 					return true;
@@ -116,7 +117,7 @@ class PrivateBitstampUSD extends PrivateMarket
 			$response = $this->_sendRequest($this->sellUrl, $params);
 			if ($response) {
 				if(isset($response['error'])) {
-					iLog("[PrivateBitstampUSD] ERROR: Sell failed {$response['error']}");
+					iLog("[PrivateBitstampUSD] ERROR: Sell failed {$response['error']['message']}");
 				} else {
 					alert('SELL'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
 					return true;

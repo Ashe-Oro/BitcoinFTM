@@ -18,19 +18,22 @@ class PrivateMtGox extends PrivateMarket
 	
 	protected $ch = NULL;
 
-	public function __construct($currency)
+	public function __construct($currency, $clientID, $key, $secret)
 	{
 		global $config;
 
-		parent::__construct($currency);
+		parent::__construct($currency, $clientID, $key, $secret);
 		$this->orderUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/private/order/result');
 		$this->openOrdersUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/private/orders');
 		$this->infoUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/private/info');
 		$this->withdrawUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/bitcoin/send_simple');
 		$this->depositUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/bitcoin/address');
-
-		$this->privatekey = $config['mtgox_key'];
-		$this->secret = $config['mtgox_secret'];
+	}
+	
+	protected function _loadClient($clientID, $key, $secret)
+	{
+		$this->privatekey = $key;
+		$this->secret = $secret;
 	}
 
 	protected function _createNonce()

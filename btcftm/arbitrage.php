@@ -7,6 +7,7 @@ require_once("arbitrer.php");
 class Arbitrage
 {
 	public $arbitrer = NULL; 
+	public $client = NULL;
 	public $pmarkets = array();
 	
 	/**
@@ -14,14 +15,18 @@ class Arbitrage
 	 *
 	 * @param	$args	{array}		arbitrage arguments
 	 */
-	public function __construct($args)
+	public function __construct($client, $args="")
 	{
 		global $config; 
 		
 		iLog("[Arbitrage] PHASE 1: ACQUIRE BITCOINS");
 		iLog("[Arbitrage] Config loaded - refreshRate: {$config['refreshRate']}, marketExpirationTime: {$config['marketExpirationTime']}");
-		iLog("[Arbitrage] Config params set - maxTxVolume: {$config['maxTxVolume']}, minTxVolume: {$config['minTxVolume']}, balanceMargin: {$config['balanceMargin']}, profitThresh: {$config['profitThresh']}, percThresh: {$config['percThresh']}");
-		$this->createArbitrer($args);
+		
+		$this->client = $client;
+		iLog("[Arbitrage] Client loaded - username: ".$client->getUsername());
+		iLog("[Arbitrage] Client settings loaded - maxTxVolume: ".$client->getMaxTxVolume()." minTxVolume: ".$client->getMinTxVolume()." balanceMargin: ".$client->getBalanceMargin()." profitThresh: ".$client->getProfitThresh()." percThresh: ".$client->getPercThresh());
+		
+		$this->createArbitrer($client, $args);
 	}
 
 	/**
@@ -39,15 +44,19 @@ class Arbitrage
 					break;
 					
 				case "replay-history":
+					/** DO NOTHING NOW
 					if (isset($args['replay_history'])) {
 						$this->arbitrer->replayHistory($args['replay_history']);
 					}
+					*/
 					break;
 					
 				case "get-balance":
+					/** DO NOTHING NOW 
 					if (isset($args['markets'])) {
 						$this->getBalance($args['markets']);
 					}
+					**/
 					break;
 					
 				default:
@@ -61,11 +70,11 @@ class Arbitrage
 	 *
 	 * @param	$args	{array}		arbitrage arguments
 	 */
-	public function createArbitrer($args)
+	public function createArbitrer($client, $args)
 	{
 		global $config;
 		
-		$this->arbitrer = new Arbitrer(); // register a new arbitrer
+		$this->arbitrer = new Arbitrer($client, $args); // register a new arbitrer
 		
 		iLog("[Arbitrage] New Arbitrer created");
 		
@@ -79,38 +88,10 @@ class Arbitrage
 		$markets = isset($args['markets']) ? $args['markets'] : (isset($config['markets'])) ? $config['markets'] : NULL;
 		if ($markets) { 
 			$this->arbitrer->initMarkets($markets); 
-			$this->pmarkets = $this->getBalance($markets);
+			//$this->pmarkets = $this->getBalance($markets);
 		}
 		
 		iLog("[Arbitrage] Markets loaded");
-	}
-	
-	public function getBalance($markets)
-	{
-		iLog("[Arbitrage] Getting private market balances...");
-		if ($markets) {
-            $pmarketsi = array();
-            foreach ($markets as $pmarket_name) {
-				$pFile = "./private_markets/private".strtolower($pmarket_name).".php";
-				if (file_exists($pFile)){
-					require_once($pFile);
-					$pName = "private".$pmarket_name;
-					try {
-						$pmarket = new $pName();
-						array_push($pmarketsi, $pmarket);
-						iLog("[Arbitrage] Balance for {$pmarket_name} - ".$pmarket->getBalance('BTC')."BTC, ".$pmarket->getBalance('USD')."USD");
-					} catch (Exception $e) {
-						iLog("[Arbitrage] ERROR: Private market construct function invalid - {$pmarket_name} - ".$e->getMessage());
-					}
-				} else {
-					iLog("[Arbitrage] ERROR: Private market file not found - {$pFile}");
-				}
-			}
-			return $pmarketsi;
-		} else {
-			iLog("[Arbitrage] ERROR: No private markets set.");
-		}
-		return NULL;
 	}
 	
 	public function getArbitrer()
