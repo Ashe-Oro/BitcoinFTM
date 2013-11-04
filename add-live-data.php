@@ -9,9 +9,18 @@ include("utils/ExchangeDbUtil.php");
 
 $exchangeDb = new ExchangeDbUtil();
 
-$temp = $exchangeDb->addToHistory("mtgox");
-echo "MtGox..." . $temp;
+//$temp = $exchangeDb->addToHistory("mtgox");
+//echo "MtGox..." . $temp;
 
-$temp = $exchangeDb->addToHistory("bitstamp");
-echo "Bitstamp..." . $temp;
+//$temp = $exchangeDb->addToHistory("bitstamp");
+//echo "Bitstamp..." . $temp;
+
+$temp = $exchangeDb->addToTicker("mtgox");
+echo "MtGox Added..." . $temp;
+
+$temp = $exchangeDb->addToTicker("bitstamp");
+echo "<br/>Bitstamp Added..." . $temp;
+
+$temp = $exchangeDb->addToTicker("bitfinex_ltcbtc");
+echo "<br/>Bitfinex Added..." . $temp;
 ?>

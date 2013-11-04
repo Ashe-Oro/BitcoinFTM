@@ -9,9 +9,8 @@ class MtGox {
 	private $last;
 	private $timestamp;
 	private $volume;
-	//these are bitstamp values... not sure what the mtgox equivilant is
-	private $bid = "";
-	private $ask = "";
+	private $buy;
+	private $sell;
 
 	public function getTicker() {
 
@@ -45,12 +44,16 @@ class MtGox {
 							$this->last = $details_value;
 						if($key == "vol" && $details_key == "value")
 							$this->volume = $details_value;
+						if($key == "buy" && $details_key == "value")
+							$this->buy = $details_value;
+						if($key == "sell" && $details_key == "value")
+							$this->sell = $details_value;
 					}
 
 				}
 			}
 
-			$ticker = new Ticker($this->high, $this->low, $this->last, $this->timestamp, $this->bid, $this->volume, $this->ask);
+			$ticker = new Ticker($this->high, $this->low, $this->last, $this->timestamp, $this->buy, $this->volume, $this->sell);
 
 			return $ticker->getTicker();	
 		}

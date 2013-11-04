@@ -1,11 +1,13 @@
 <?php
 include_once("./classes/mtgox.php");
 include_once("./classes/bitstamp.php");
+include_once("./classes/bitfinex_ltcbtc.php");
 include("database_util.php");
 class ExchangeDbUtil {
 	
 	const EXCHANGE_BITSTAMP = "bitstamp";
 	const EXCHANGE_MTGOX = "mtgox";
+	const EXCHANGE_BITFINEX_LTCBTC = "bitfinex_ltcbtc";
 	const HISTORY_SUFFIX = "_history";
 	const HISTORY_DAYS_SUFFIX = "_history_days";
 	const HISTORY_WEEKS_SUFFIX = "_history_weeks";
@@ -50,6 +52,42 @@ class ExchangeDbUtil {
 		$ticker = $bitstamp->getTicker();
 
 		return $ticker;
+	}
+
+	private function getBitfinexTicker() {
+		$bitfinex = new BitfinexLTCBTC();
+		$ticker = $bitfinex->getTicker();
+
+		return $ticker;
+	}
+
+	public function addToTicker($xchg) {
+
+		$db = new Database("127.0.0.1", "root", "root", "ftm");	
+
+		$ticker = "";
+		$query = "";
+
+		if($xchg == self::EXCHANGE_MTGOX) {
+			$ticker = $this->getMtGoxTicker();
+			$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'last'}}, {$ticker->{'low'}}, {$ticker->{'volume'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+		}
+		elseif($xchg == self::EXCHANGE_BITSTAMP) {
+			$ticker = $this->getBitstampTicker();
+			$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'last'}}, {$ticker->{'low'}}, {$ticker->{'volume'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+		}
+		elseif($xchg == self::EXCHANGE_BITFINEX_LTCBTC) {
+			$ticker = $this->getBitfinexTicker();
+			$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'mid'}}, {$ticker->{'last'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+		}
+
+
+		$db->query($query);
+
+		$db->close();
+
+		//TODO Removve the return statment as its not needed.  Can replace this with logging
+		return "<br/>Query Executed: " . $query;	
 	}
 
 }

@@ -7,8 +7,9 @@ class Ticker {
 	private $bid;
 	private $volume;
 	private $ask;
+	private $mid;
 
-	function __construct($high, $low, $last, $timestamp, $bid, $volume, $ask) {
+	function __construct($high, $low, $last, $timestamp, $bid, $volume, $ask, $mid=0) {
         $this -> high = $high;
         $this -> low = $low;
         $this -> last = $last;
@@ -16,6 +17,7 @@ class Ticker {
         $this -> bid = $bid;
         $this -> volume = $volume;
         $this -> ask = $ask;
+        $this -> mid = $mid;
     }
 
     public function getTicker() {
@@ -27,7 +29,8 @@ class Ticker {
 			'timestamp' => $this->timestamp,
 			'bid'       => $this->bid,
 			'volume'    => $this->volume,
-			'ask'       => $this->ask
+			'ask'       => $this->ask,
+			'mid' 		=> $this->mid
 			);
 
 		return $data;
