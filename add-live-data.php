@@ -23,4 +23,7 @@ echo "<br/>Bitstamp Added..." . $temp;
 
 $temp = $exchangeDb->addToTicker("bitfinex_ltcbtc");
 echo "<br/>Bitfinex Added..." . $temp;
+
+$temp = $exchangeDb->addToTicker("btce_ltcbtc");
+echo "<br/>Btce Added..." . $temp;
 ?>

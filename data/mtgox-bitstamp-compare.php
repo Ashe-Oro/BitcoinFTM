@@ -5,6 +5,7 @@ ini_set('display_errors', '1');
 include_once("../classes/mtgox.php");
 include_once("../classes/bitstamp.php");
 include_once("../classes/bitfinex_ltcbtc.php");
+include_once("../classes/btce_ltcbtc.php");
 
 //Get MtGox Data
 $mtgox = new MtGox();
@@ -49,7 +50,7 @@ echo "Ask " . $ask . "<br/>";
 echo "Volume " . $volume . "<br/>";
 echo "Timestamp " . $timestamp . "<br/>";
 
-//Get BitStamp Data
+//Get BitfinexData
 $bitfinex = new BitfinexLTCBTC();
 $ticker = $bitfinex->getTicker();
 
@@ -59,11 +60,33 @@ $bid = $ticker->{'bid'};
 $ask = $ticker->{'ask'};
 $mid = $ticker->{'mid'};
 
-echo "<h3>Bitstamp Data</h3>";
+echo "<h3>Bitfinex Data</h3>";
 echo "Last " . $last . "<br/>";
 echo "Bid " . $bid . "<br/>";
 echo "Ask " . $ask . "<br/>";
 echo "Mid " . $mid . "<br/>";
+echo "Timestamp " . $timestamp . "<br/>";
+
+//Get Btce Data
+$btce = new BtceLTCBTC();
+$ticker = $btce->getTicker();
+
+$high = $ticker->{'high'};
+$last = $ticker->{'last'};
+$timestamp = $ticker->{'timestamp'};
+$bid = $ticker->{'bid'};
+$volume = $ticker->{'volume'};
+$low = $ticker->{'low'};
+$ask = $ticker->{'ask'};
+
+
+echo "<h3>Btce Data</h3>";
+echo "High: " . $high . "<br/>";
+echo "Low: " . $low . "<br/>";
+echo "Last " . $last . "<br/>";
+echo "Bid " . $bid . "<br/>";
+echo "Ask " . $ask . "<br/>";
+echo "Volume " . $volume . "<br/>";
 echo "Timestamp " . $timestamp . "<br/>";
 
 ?>
