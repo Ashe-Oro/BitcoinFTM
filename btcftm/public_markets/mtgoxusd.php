@@ -1,19 +1,11 @@
 <?php
 require_once('market.php');
 
-/**
- * CLASS: MtGoxUSD
- *
- * Public market functions for MtGox USD exchange
- */
 class MtGoxUSD extends Market
 {
 	private $depthUrl = "http://data.mtgox.com/api/2/BTCUSD/money/depth";
 	private $tickerUrl = "http://data.mtgox.com/api/1/BTCUSD/ticker";
 	
-	/**
-	 * Creates a new Mt Gox USD Market
-	 */
 	public function __construct()
 	{
 		parent::__construct("USD");
@@ -21,9 +13,6 @@ class MtGoxUSD extends Market
 		$this->depth = array('asks' => array('price' => 0, 'amount' => 0), 'bids' => array('price' => 0, 'amount' => 0));
 	}
 
-	/**
-	 * Updates the order book market depth
-	 */
 	public function updateDepth()
 	{
 		iLog("[MtGoxUSD] Updating order depth...");
@@ -41,14 +30,7 @@ class MtGoxUSD extends Market
 			iLog("[MtGoxUSD] ERROR: can't parse JSON feed - {$url} - ".$e->getMessage());
 		}
 	}
-	
-	/**
-	 * Sorts order book ask/bid by price
-	 *
-	 * @param	{array}		l			array of asks or bids from order book
-	 * @param	{boolean}	reverse		if true, sort in reverse (desc) order
-	 * @return	{array}					sorted array
-	 */
+
 	public function sortAndFormat($l, $reverse=false)
 	{
 		$r = array();
@@ -62,12 +44,6 @@ class MtGoxUSD extends Market
 		return $r;
 	}
 
-	/**
-	 * Formats ask and bid depth array
-	 *
-	 * @param	{object}	depth	order book depth
-	 * @return	{array}				array of asks and bids sorted by price (Asks sorted ASC, Bids sorted DESC)
-	 */
 	public function formatDepth($depth)
 	{
 		$bids = $this->sortAndFormat($depth->bids, true);
@@ -75,11 +51,6 @@ class MtGoxUSD extends Market
 		return array('asks' => $asks, 'bids' => $bids);
 	}	
 	
-	/**
-	 * Gets the current ticker for the MtGox USD exchange
-	 *
-	 * @return	{object}		Ticker object, or NULL if error
-	 */
 	public function getCurrentTicker()
 	{
 		iLog("[MtGoxUSD] Getting current ticker...");

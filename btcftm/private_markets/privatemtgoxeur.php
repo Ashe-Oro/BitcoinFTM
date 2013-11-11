@@ -3,11 +3,11 @@ require_once("privatemtgox.php");
 
 class PrivateMtGoxEUR extends PrivateMtGox
 {
-	public function __construct()
+	public function __construct($clientID, $key, $secret)
 	{
 		global $config;
 
-		parent::__construct("EUR");
+		parent::__construct("EUR", $clientID, $key, $secret);
 		$this->tickerUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/BTCEUR/public/ticker');
 		$this->buyUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/BTCEUR/private/order/add');
 		$this-> sellUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/BTCEUR/private/order/add');

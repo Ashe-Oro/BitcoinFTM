@@ -1,29 +1,18 @@
 <?php
 require_once("market.php");
 
-/**
- * CLASS: BitstampUSD
- *
- * Public market functions for Bitstamp USD exchange
- */
 class BitstampUSD extends Market
 {
 	public $updateRate;
 	private $depthUrl = "https://www.bitstamp.net/api/order_book/";
 	private $tickerUrl = "https://www.bitstamp.net/api/ticker/";
 
-	/**
-	 * Creates a new Bitstamp USD Market
-	 */
 	public function __construct()
 	{
 		parent::__construct("USD");
 		$this->updateRate = 20;
 	}
 
-	/**
-	 * Updates the order book market depth
-	 */
 	public function updateDepth()
 	{
 		iLog("[BitstampUSD] Updating order depth...");
@@ -38,13 +27,6 @@ class BitstampUSD extends Market
 		}
 	}
 
-	/**
-	 * Sorts order book ask/bid by price
-	 *
-	 * @param	{array}		l			array of asks or bids from order book
-	 * @param	{boolean}	reverse		if true, sort in reverse (desc) order
-	 * @return	{array}					sorted array
-	 */
 	public function sortAndFormat($l, $reverse)
 	{
 		$r = array();

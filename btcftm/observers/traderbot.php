@@ -5,17 +5,15 @@ require_once("./private_markets/privatebitstampusd.php");
 
 class TraderBot extends Observer
 {
-	public $clients = array();
 	public $fc = NULL;
 	
 	public $tradeWait = 120;
 	public $lastTrade = 0;
 	public $potentialTrades = array();
 
-	public function __create()
+	public function __construct($client)
 	{
-		$clients['mtgoxusd'] = new PrivateMtGoxUSD();
-		$clients['bitstampusd'] = new PrivateBitstampUSD();
+		parent::__construct($client);
 	}
 
 	public function beginOpportunityFinder($depths)
@@ -49,29 +47,32 @@ class TraderBot extends Observer
 		$askName = $kask['name'];
 		$bidName = $kbid['name'];
 		
-		if ($profit < $config['profitThresh'] || $perc < $config['percThresh']) {
-			iLog("[TraderBot] WARNING: Profit or profit percentage lower than thresholds - Profit: {$profit} (t: {$config['profitThresh']}) Perc: {$perc} (t: {$config['percThresh']})");
-			return;
-		}
-
-		if (!isset($this->clients[$askName])) {
+		$askMarket = $this->client->getPrivateMarket($askName);
+		if ($askMarket == NULL) {
 			iLog("[TraderBot] WARNING: Can't automate this trade, client not available: {$askName}");
 			return;
 		}
 
-		if (!isset($this->clients[$bidName])) {
+		$bidMarket = $this->client->getPrivateMarket($bidName);
+		if ($bidMarket == NULL) {
 			iLog("[TraderBot] WARNING: Can't automate this trade, client not available: {$bidName}");
 			return;
 		}
 
-		$volume = min($config['maxTxVolume'], $volume);
+		$finalVolume = min($this->client->getMaxTxVolume(), $volume);
 
+		/*** DISABLE until we are ready for real buy/sell action ***
 		$this->updateBalance();
-		$maxVolume = $this->getMinTradeableVolume($buyPrice, $this->clients[$askName]->usdBalance, $this->clients[$bidName]->btcBalance);
+		***/
+		$askBalance = $askMarket->getBalance("USD");
+		$bidBalance = $bidMarket->getBalance("BTC");
+		$maxVolume = $this->getMinTradeableVolume($buyprice, $askBalance, $bidBalance);
+		$finalVolume = min($finalVolume, min($maxVolume, $this->client->getMaxTxVolume()));
 
-		if ($volume < $config['minTxVolume']) {
-			iLog("[TraderBot] WARNING: Can't automate this trade, minimum volume transaction not reached - Vol: {$volume} Min: {$config['minTxVolume']}");
-			iLog("Balance on {$askName}: {$this->clients[$askName]->usdBalance} - Balance on {$bidName}: {$this->clients[$bidName]->btcBalance}");
+		$minTxVol = $this->client->getMinTxVolume();
+		if ($finalVolume < $minTxVol) {
+			iLog("[TraderBot] WARNING: Can't automate this trade, minimum volume transaction not reached - Vol: {$volume} Min: {$minTxVol}");
+			iLog("[TraderBot] Balance on {$askName}: {$askBalance} - Balance on {$bidName}: {$bidBalance}");
 			return;
 		}
 
@@ -81,19 +82,27 @@ class TraderBot extends Observer
 			iLog("[TraderBot] WARNING: Can't automate this trade, last trade occurred {$dT}s ago - must wait {$this->tradeWait}s");
 			return;
         }
+		
+		$finalProfit = ($profit / $volume) * $finalVolume;
+		$finalPerc = (1 - ($finalVolume - ($finalProfit / $buyprice)) / $finalVolume) * 100;
+		
+		if ($finalProfit < $this->client->getProfitThresh() || $finalPerc < $this->client->getPercThresh()) {
+			iLog("[TraderBot] WARNING: Profit or profit percentage lower than thresholds - Profit: {$finalProfit} (t: ".$this->client->getProfitThresh().") Perc: {$finalPerc} (t: ".$this->client->getPercThresh().")");
+			return;
+		}
 
-		$pTrade = array("profit" => $profit,
-						"volume" => $volume,
+		$pTrade = array("profit" => $finalProfit,
+						"volume" => $finalVolume,	
 						"kask" => $kask,
 						"kbid" => $kbid,
 						"askName" => $askName,
 						"bidName" => $bidName,
 						"wBuyPrice" => $wBuyPrice,
 						"wSellPrice" => $wSellPrice,
-						"buyPrice" => $buyPrice,
-						"sellPrice" => $sellPrice );
+						"buyPrice" => $buyprice,
+						"sellPrice" => $sellprice );
 		
-		iLog("[TraderBot] Adding potential trade - Profit: {$profit}USD for {$volume}BTC - Buy {$askName} @{$buyPrice} ({$wBuyPrice}) - Sell {$bidName} @{$sellPrice} ({$wSellPrice})");
+		iLog("[TraderBot] Adding potential trade - Profit: {$finalProfit}USD for {$finalVolume}BTC - Buy {$askName} @{$buyprice} ({$wBuyPrice}) - Sell {$bidName} @{$sellprice} ({$wSellPrice}) - ~{$finalPerc}%");
 		
 		array_push($this->potentialTrades, $pTrade);
 	}
@@ -103,17 +112,17 @@ class TraderBot extends Observer
 	public function getMinTradeableVolume($buyPrice, $usdBal, $btcBal)
 	{
 		global $config;
-		$min1 = $usdBal / ((1 + $config['balanceMargin']) * $buyPrice);
-		$min2 = $btcBal / (1 + $config['balanceMargin']);
+		iLog("[TraderBot] getMinTradeableVolume - buy: {$buyPrice} usd: {$usdBal} btc: {$btcBal}");
+		$bMargin = $this->client->getBalanceMargin();
+		$min1 = $usdBal / ((1 + $bMargin) * $buyPrice);
+		$min2 = $btcBal / (1 + $bMargin);
 		return min($min1, $min2);
 	}
 
 	public function updateBalance()
 	{
 		iLog("[TraderBot] Updating market balances...");
-		foreach($this->clients as $kclient) {
-			$this->clients[$kclient]->getInfo();
-		}
+		$this->client->updateBalances();
 	}
 
 	public function watchBalances()
@@ -122,18 +131,21 @@ class TraderBot extends Observer
 	}
 
 	/**** VERY IMPORTANT: modify to have accurate buy/sell info ***/
-	public function executeTrade($trade)
+	public function executeTrade($trade, $state='open')
 	{
 		if ($trade) {
-			if (isset($this->clients[$trade['askName']]) && isset($this->clients[$trade['bidName']])) {
+			$buyMarket = $this->client->getPrivateMarket($trade['askName']);
+			$sellMarket = $this->client->getPrivateMarket($trade['bidName']);
+			if ($buyMarket && $sellMarket) {
 				$this->lastTrade = time();
 		
-				iLog("[TraderBot] Executing Trade of {$trade['volume']}BTC - Buy {$trade['askName']} @{$trade['buyPrice']} - Sell {$trade['bidName']}  @{$kbid}");
+				iLog("[TraderBot] Executing Trade of {$trade['volume']}BTC: Buy {$trade['askName']} @{$trade['buyPrice']} - Sell {$trade['bidName']} @{$trade['sellPrice']}");
 				
-				$this->clients[$trade['askName']]->buy($trade['volume'], $trade['buyPrice']);
-				$this->clients[$trade['bidName']]->sell($trade['volume'], $trade['sellPrice']);
+				$buyMarket->buy($trade['volume'], $trade['buyPrice']);
+				$sellMarket->sell($trade['volume'], $trade['sellPrice']);
 				
 				/***** NEED TO UPDATE OUR MYSQL RECORDS HERE FOR TRADE *****/
+				//addOpenTransactions();
 			}
 		}
 	}

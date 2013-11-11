@@ -1,8 +1,10 @@
 <?php
-require_once("config.php");
+require_once("config/config.php");
 
 class Arbitrer
 {
+	public $client = NULL;
+	
 	public $markets = array();
 	public $market_names = "";
 
@@ -12,8 +14,9 @@ class Arbitrer
 	public $depths = array();
 	public $threadpool = NULL;
 
-	public function __construct()
+	public function __construct($client, $args)
 	{
+		$this->client = $client;
 		/*global $config;
 		$this->initMarkets($config->markets);
 		$this->initObservers($config->observers);*/
@@ -57,7 +60,7 @@ class Arbitrer
 				if (file_exists($oFile)){
 					require_once($oFile);
 					try {
-						$observer = new $observer_name();
+						$observer = new $observer_name($this->client);
 						array_push($this->observers, $observer);
 						$oLoaded++;
 					} catch (Exception $e) {
@@ -110,8 +113,7 @@ class Arbitrer
 				$maxAmountSell += $kbid["bids"][$j]["amount"];
 			}
 
-			//echo "maxAmount: {$maxAmountBuy} {$maxAmountSell} {$config['maxTxVolume']}";
-			$maxAmount = min(min($maxAmountBuy, $maxAmountSell), $config['maxTxVolume']);
+			$maxAmount = min(min($maxAmountBuy, $maxAmountSell), $this->client->getMaxTxVolume());
 
 			$buyTotal = 0;
 			$wBuyPrice = 0;
@@ -219,7 +221,7 @@ class Arbitrer
 							'wBuyPrice' => $best_wBuyPrice, 
 							'wSellPrice' => $best_wSellPrice); 
 		
-		iLog("[Arbitrer] Best profit opportunity: {$bestProfit}USD ({$bestVolume}BTC - Buy @{$retArray['buyPrice']} wBuy @{$best_wBuyPrice} {$retArray['buyXchg']}  - Sell @{$retArray['sellPrice']} wSell @{$best_wSellPrice} {$retArray['sellXchg']})");
+		iLog("[Arbitrer] Best profit opportunity: {$bestProfit}USD {$bestVolume}BTC - Buy {$retArray['buyXchg']} @{$retArray['buyPrice']} (wBuy @{$best_wBuyPrice}) - Sell {$retArray['sellXchg']} @{$retArray['sellPrice']} (wSell @{$best_wSellPrice})");
 		
 		return $retArray;
 
@@ -227,7 +229,7 @@ class Arbitrer
 
 	public function arbitrageOpportunity($kask, $ask, $kbid, $bid)
 	{
-		iLog("[Arbitrer] Arbitraging opportunity - Buy @{$ask['price']} Sell @{$bid['price']}");
+		iLog("[Arbitrer] Arbitraging opportunity - Buy {$kask['name']} @{$ask['price']} Sell {$kbid['name']} @{$bid['price']}");
 		$perc = (($bid['price'] - $ask['price']) / $bid['price']) * 100;
 		
 		$aArray = $this->arbitrageDepthOpportunity($kask, $kbid);

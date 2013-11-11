@@ -9,7 +9,17 @@ class Ticker {
 	private $ask;
 
 	function __construct($timestamp=0, $high=0, $low=0, $last=0, $ask=0, $bid=0, $volume=0) {
-       if (is_array($timestamp)) {
+       if (is_object($timestamp)) {
+		   	$t = $timestamp;
+			$this->high = $t->high;
+			$this->low = $t->low;
+			$this->last = $t->last;
+			$this->timestamp = $t->timestamp;
+			$this->bid = $t->bid;
+			$this->volume = $t->volume;
+			$this->ask = $t->ask;
+	   } else
+	   if (is_array($timestamp)) {
 		   	$t = $timestamp;
 			$this->high = $t['high'];
 			$this->low = $t['low'];

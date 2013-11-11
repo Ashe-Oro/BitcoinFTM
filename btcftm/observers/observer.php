@@ -3,9 +3,11 @@
 abstract class Observer
 {
 	public $name;
+	protected $client;
 	
-	public function __construct()
+	public function __construct($client)
 	{
+		$this->client = $client;
 		$this->name = get_class($this);
 	}
 	

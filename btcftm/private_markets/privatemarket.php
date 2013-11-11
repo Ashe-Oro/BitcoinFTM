@@ -9,13 +9,15 @@ class PrivateMarket
 
 	public $fc = NULL; // future currency converter
 
-	public function __construct($currency)
+	public function __construct($currency, $clientID, $key, $secret)
 	{
 		$this->name = get_class($this);
 		$this->currency = $currency;
 		$this->btcBalance = 0;
 		$this->eurBalance = 0;
 		$this->usdBalance = 0;
+		
+		$this->_loadClient($clientID, $key, $secret);
 	}
 
 	protected function _str()
@@ -29,7 +31,7 @@ class PrivateMarket
 		$localPrice = $price;
 		//$localPrice = $this->fc->convert($price, 'USD', $this->currency);
 
-		iLog("Buy {$amount} BTC at {$localPrice} {$this->currency} @{$this->name}");
+		iLog("[PrivateMarket] Buy {$amount}BTC at {$this->name} @{$localPrice}{$this->currency}");
 		$this->_buy($amount, $localPrice);
 	}
 
@@ -38,7 +40,7 @@ class PrivateMarket
 		$localPrice = $price;
 		//$localPrice = $this->fc->convert($price, 'USD', $this->currency);
 
-		iLog("Sell {$amount} BTC at {$localPrice} {$this->currency} @{$this->name}");
+		iLog("[PrivateMarket] Sell {$amount} BTC at {$this->name} @{$localPrice}{$this->currency}");
 		$this->_sell($amount, $localPrice);
 	}
 
@@ -63,6 +65,11 @@ class PrivateMarket
 	}
 
 	public function getInfo()
+	{
+		throw NotImplementedError("");
+	}
+	
+	protected function _loadClient($clientID, $key, $secret)
 	{
 		throw NotImplementedError("");
 	}

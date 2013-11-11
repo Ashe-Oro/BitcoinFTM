@@ -3,10 +3,9 @@ require_once("observer.php");
 
 class Logger extends Observer
 {
-	public function __create()
+	public function __construct($client)
 	{
-		$clients['mtgoxusd'] = new PrivateMtGoxUSD();
-		$clients['bitstampusd'] = new PrivateBitstampUSD();
+		parent::__construct($client);
 	}
 
 	public function beginOpportunityFinder($depths)

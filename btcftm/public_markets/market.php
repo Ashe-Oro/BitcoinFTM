@@ -1,11 +1,6 @@
 <?php
 require_once("ticker.php");
 
-/**
- * CLASS: Market
- *
- * Represents an exchange market in a given currency
- */
 abstract class Market
 {
 	public $name = '';
@@ -15,20 +10,12 @@ abstract class Market
 
 	public $fc = NULL; // currency converter object, not yet needed
 
-	/**
-	 * Creates a new Market
-	 *
-	 * @param	{string}	currency	market currency (ie USD)
-	 */
 	public function __construct($currency)
 	{
 		$this->name = get_class($this);
 		$this->currency = $currency;
 	}
 
-	/**
-	 * Attempts to get the market depth based on the market order book
-	 */
 	public function getDepth()
 	{
 		global $config;
@@ -45,18 +32,12 @@ abstract class Market
 		return $this->depth;
 	}
 
-	/**
-	 * Converts other currencies to USD
-	 */
 	public function convertToUSD()
 	{
 		if($this->currency == 'USD') { return; }
 		// otherwise do other stuff, but we're only in USD right now
 	}
 
-	/**
-	 * Updates market depth
-	 */
 	public function askUpdateDepth()
 	{
 		try {
@@ -68,9 +49,6 @@ abstract class Market
 		}
 	}
 
-	/**
-	 * Gets the best ask/bid pairs from the order book
-	 */
 	public function getTicker()
 	{
 		$depth = $this->getDepth();
@@ -82,13 +60,6 @@ abstract class Market
 		return $res;
 	}
 	
-	/**
-	 * Compares two objects with prices against each other
-	 *
-	 * @param	{object}	a	first price object
-	 * @param	{object}	b	second price object
-	 * @return	{int}			1 if a > b, -1 if a < b, 0 if a == b
-	 */
 	static public function comparePrice($a, $b)
 	{
 		if ($a['price'] == $b['price']) {
@@ -97,8 +68,8 @@ abstract class Market
 		return ($a['price'] > $b['price']) ? 1 : -1;
 	} 
 
-	/** ABSTRACT FUNCTIONS **/
 	abstract public function updateDepth();
+	
 	abstract public function getCurrentTicker();
 }
 ?>
