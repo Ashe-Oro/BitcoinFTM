@@ -72,7 +72,8 @@ class ExchangeDbUtil {
 
 	public function addToTicker($xchg) {
 
-		$db = new Database("127.0.0.1", "root", "root", "ftm");	
+
+		$db = new Database("btcftmpub.db.8986864.hostedresource.com", "btcftmpub", "Wolfpack1!", "btcftmpub");	
 
 		$ticker = "";
 		$query = "";
