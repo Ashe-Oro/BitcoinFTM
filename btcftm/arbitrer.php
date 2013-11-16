@@ -325,7 +325,7 @@ class Arbitrer
 	{
 		global $config;
 		
-		while(true) {
+		//while(true) {
 			if ($config['echoLog']) { echo "<hr />\n"; }
 			iLog("[Arbitrer] PHASE 2: ???");
 			iLog("[Arbitrer] Executing main loop at timestamp = ".time());
@@ -333,9 +333,11 @@ class Arbitrer
 			$this->tickers();
 			$this->tick();
 			
-			iLog("[Arbitrer] Main loop complete - sleeping for {$config['refreshRate']}s");
-			sleep($config['refreshRate']);
-		}
+			iLog("[Arbitrer] Main loop complete for ".$this->client->getUsername());
+			
+			/*** DISABLE THIS - USE CRON JOB INSTEAD !!! ***/
+			//sleep($config['refreshRate']);
+		//}
 	}
 }
 ?>

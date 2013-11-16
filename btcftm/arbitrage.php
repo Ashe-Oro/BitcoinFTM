@@ -19,6 +19,7 @@ class Arbitrage
 	{
 		global $config; 
 		
+		if ($config['echoLog']) { echo "<hr />\n"; }
 		iLog("[Arbitrage] PHASE 1: ACQUIRE BITCOINS");
 		iLog("[Arbitrage] Config loaded - refreshRate: {$config['refreshRate']}, marketExpirationTime: {$config['marketExpirationTime']}");
 		

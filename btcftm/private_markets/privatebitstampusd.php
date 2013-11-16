@@ -110,7 +110,7 @@ class PrivateBitstampUSD extends PrivateMarket
 	}
 
 	protected function _sell($amount, $price)
-	{
+	{	
 		iLog("[PrivateBitstampUSD] Create SELL limit order {$amount} @{$price}USD");
 		$params = array('amount' => $amount, 'price' => $price);
 		try { 
@@ -131,21 +131,39 @@ class PrivateBitstampUSD extends PrivateMarket
 
 	public function getInfo()
 	{
-		$params = array();
-		try {
-			$response = $this->_sendRequest($this->balanceUrl, $params);
-			if($response && isset($response['btc_available']) && isset($response['usd_available'])) {
-				$this->btcBalance = (float) $response['btc_available'];
-				$this->usdBalance = (float) $response['usd_available'];
-				iLog("[PrivateBitstampUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
-				return true;
-			} else if ($response && isset($response['error'])) {
-				iLog("[PrivateBitstampUSD] ERROR: Get info failed - {$response['error']}");
+		global $config;
+		global $DB;
+		
+		if ($config['live']) { // LIVE TRADING USES LIVE DATA
+			$params = array();
+			try {
+				$response = $this->_sendRequest($this->balanceUrl, $params);
+				if($response && isset($response['btc_available']) && isset($response['usd_available'])) {
+					$this->btcBalance = (float) $response['btc_available'];
+					$this->usdBalance = (float) $response['usd_available'];
+					iLog("[PrivateBitstampUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+					return true;
+				} else if ($response && isset($response['error'])) {
+					iLog("[PrivateBitstampUSD] ERROR: Get info failed - {$response['error']}");
+					return false;
+				}
+			} catch (Exception $e) {
+				iLog("[PrivateBitstampUSD] ERROR: Get info failed - ".$e->getMessage());
 				return false;
 			}
-		} catch (Exception $e) {
-			iLog("[PrivateBitstampUSD] ERROR: Get info failed - ".$e->getMessage());
-			return false;
+		} else {	// SIMULATED TRADING USES DATABASE DATA
+			try {
+				$result = $DB->query("SELECT * FROM clients WHERE bitstampkey = '{$this->privatekey}'");
+				if ($client = $DB->fetch_array_assoc($result)){
+					$this->btcBalance = $client['bitstampbtc'];
+					$this->usdBalance = $client['bitstampusd'];
+					iLog("[PrivateBitstampUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+					return true;
+				}
+			} catch (Exception $e){
+				iLog("[PrivateBitstampUSD] ERROR: Get info failed - ".$e->getMessage());
+				return false;
+			}
 		}
 		return false;
 	}

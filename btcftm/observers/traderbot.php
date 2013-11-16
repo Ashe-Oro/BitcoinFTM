@@ -9,11 +9,14 @@ class TraderBot extends Observer
 	
 	public $tradeWait = 120;
 	public $lastTrade = 0;
+	
 	public $potentialTrades = array();
+	public $currentTrade = NULL;
 
 	public function __construct($client)
 	{
 		parent::__construct($client);
+		$this->currentTrade = $this->client->getPortfolio()->getCurrentTrade();
 	}
 
 	public function beginOpportunityFinder($depths)
@@ -61,9 +64,10 @@ class TraderBot extends Observer
 
 		$finalVolume = min($this->client->getMaxTxVolume(), $volume);
 
-		/*** DISABLE until we are ready for real buy/sell action ***
-		$this->updateBalance();
-		***/
+		if ($config['live']) {
+			$this->updateBalance(); // only do this on live trading
+		}
+		
 		$askBalance = $askMarket->getBalance("USD");
 		$bidBalance = $bidMarket->getBalance("BTC");
 		$maxVolume = $this->getMinTradeableVolume($buyprice, $askBalance, $bidBalance);
@@ -136,6 +140,7 @@ class TraderBot extends Observer
 		if ($trade) {
 			$buyMarket = $this->client->getPrivateMarket($trade['askName']);
 			$sellMarket = $this->client->getPrivateMarket($trade['bidName']);
+			
 			if ($buyMarket && $sellMarket) {
 				$this->lastTrade = time();
 		

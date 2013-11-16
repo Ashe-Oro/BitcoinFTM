@@ -1,6 +1,5 @@
 <?php
-require_once("./private_markets/privatemtgoxusd.php");
-require_once("./private_markets/privatebitstampusd.php");
+require_once("portfolio.php");
 
 class Client
 {
@@ -8,7 +7,7 @@ class Client
 	private $firstName = '';
 	private $lastName = '';
 	private $userName = '';
-	private $privateMarkets = array();
+	private $portfolio = NULL;
 	
 	private $maxTxVolume = 10;
 	private $minTxVolume = 1;
@@ -16,19 +15,31 @@ class Client
 	private $profitThresh = 1;
 	private $percThresh = 2;
 	
+	private $active = 0;
+	private $trading = 0;
+	
 	public function __construct($clientID)
 	{
 		global $DB;
 		global $config;
 		
-		if (is_int($clientID) || is_string($clientID)){
+		if (is_int($clientID) || is_string($clientID) || is_array($clientID)){
 			try {
+				$res = NULL;
+				if (is_array($clientID)) {
+					$client = $clientID;
+				} else
 				if (is_int($clientID)){
 					$res = $DB->query("SELECT * FROM clients WHERE clientID = {$clientID} LIMIT 1");
 				} else if (is_string($clientID)){
 					$res = $DB->query("SELECT * FROM clients WHERE username = '{$clientID}' LIMIT 1");
 				}
-				if ($client = $DB->fetch_array_assoc($res)) {
+				
+				if ($res) {
+					$client = $DB->fetch_array_assoc($res);
+				}
+				
+				if ($client) {
 					iLog("[Clients] Initializing client - ID: {$client['clientid']}, username: {$client['username']}");
 					$this->clientID = $client['clientid'];
 					$this->firstName = $client['firstname'];
@@ -41,7 +52,10 @@ class Client
 					$this->profitThresh = $client['profitthresh'];
 					$this->percThresh = $client['percthresh'];
 					
-					$this->_initPrivateMarkets($config['markets'], $client);
+					$this->active = $client['active'];
+					$this->trading = $client['trading'];
+					
+					$this->_initPortfolio($client);
 				}
 			} catch (Exception $e) {
 				iLog("[Clients] ERROR: Couldn't initialize client {$cid} - ".$e->getMessage());
@@ -52,52 +66,28 @@ class Client
 		}
 	}
 	
-	private function _initPrivateMarkets($markets, $client)
+	private function _initPortfolio($clientArray)
 	{
-		foreach ($markets as $mname) {
-			$lowername = strtolower($mname);
-			$lowernameEx = str_replace("usd", "", $lowername);
-			$pFile = "./private_markets/private{$lowername}.php";
-			if (file_exists($pFile)){
-				require_once($pFile);
-				$pName = "private".$mname;
-				try {
-					$cid = (int) (isset($client["{$lowernameEx}id"])) ? $client["{$lowernameEx}id"] : $this->clientID;
-					$ckey = (isset($client["{$lowernameEx}key"])) ? $client["{$lowernameEx}key"] : "";
-					$csecret = (isset($client["{$lowernameEx}secret"])) ? $client["{$lowernameEx}secret"] : "";
-					
-					if ($cid && strlen($ckey) && strlen($csecret)) {
-						$this->privateMarkets[$mname] = new $pName($cid, $ckey, $csecret);
-					} else {
-						//var_dump($client);
-						if (!strlen($ckey)){
-							iLog("[Clients] ERROR: Private market {$mname} missing key in client DB {$lowernameEx}key - ".$client["{$lowernameEx}key"]);
-						} else
-						if (!strlen($csecret)){
-							iLog("[Clients] ERROR: Private market {$mname} missing secret in client DB - ".$client["{$lowernameEx}secret"]);
-						}
-						
-					}
-				} catch (Exception $e) {
-					iLog("[Clients] ERROR: Private market construct function invalid - {$pmarket_name} - ".$e->getMessage());
-				}
-			} else {
-				iLog("[Clients] ERROR: Private market file not found - {$pFile}");
-			}
-		}
+		$p = new Portfolio($this, $clientArray);
+		$this->portfolio = $p;
+	}
+	
+	public function getPortfolio()
+	{
+		return $this->portfolio;
 	}
 	
 	public function getPrivateMarket($mname)
 	{
-		if (isset($this->privateMarkets[$mname])){
-			return $this->privateMarkets[$mname];
+		if ($pmarket = $this->portfolio->getPrivateMarket($mname)){
+			return $pmarket;
 		}
 		return NULL;
 	}
 	
 	public function getMarketBalance($mname, $currency)
 	{
-		if ($mkt = getPrivateMarket($mname)){
+		if ($mkt = $this->getPrivateMarket($mname."USD")){
 			return $mkt->getBalance($currency);
 		}
 		return -1;
@@ -105,19 +95,12 @@ class Client
 	
 	public function getBalances() 
 	{
-		$balances = array();
-		foreach($this->privateMarkets as $pname => $pmarket){
-			$balances[$pname] = array("BTC" => $this->privateMarkets->getBalance("BTC"), "USD" => $this->privateMarkets->getBalance("USD"));
-			iLog("[Clients] Balance at {$pname} - {$balances[$pname]['BTC']}BTC, {$balances[$pname]['USD']}USD");
-		}
-		return $balances;
+		return $this->portfolio->getBalances();
 	}
 	
 	public function updateBalances()
 	{
-		foreach($this->privateMarkets as $pname => $pmarket){
-			$this->privateMarkets[$pname]->getInfo();
-		}
+		return $this->portfolio->updateBalances();
 	}
 	
 	public function getID()
@@ -158,6 +141,16 @@ class Client
 	public function getPercThresh()
 	{
 		return $this->percThresh;
+	}
+	
+	public function isActive()
+	{
+		return $this->active;
+	}
+	
+	public function isTrading()
+	{
+		return $this->trading;
 	}
 }
 

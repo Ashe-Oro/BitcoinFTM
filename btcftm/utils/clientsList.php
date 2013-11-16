@@ -5,8 +5,10 @@ class ClientsList
 {
 	private $cList = array();
 	
-	public function __construct($idList)
+	public function __construct($idList=NULL)
 	{
+		global $DB;
+		
 		if (is_string($idList)){
 			$idList = explode(',', $idList);
 		}
@@ -20,7 +22,19 @@ class ClientsList
 					iLog("[ClientsList] ERROR: Couldn't add client {$id} - ".$e->getMessage());
 				}
 			}
-		} 
+		} else {
+			$result = $DB->query("SELECT * FROM clients WHERE active = 1 ORDER BY username ASC");
+			iLog("[ClientsList] Loading client list from DB...");
+			while($row = $DB->fetch_array_assoc($result)){
+				iLog("[ClientsList] Loading client {$row['username']}...");
+				try {
+					$c = new Client($row['username']);
+					$this->cList[$c->getID()] = $c;
+				} catch(Exception $e){
+					iLog("[ClientsList] ERROR: Couldn't add client {$id} - ".$e->getMessage());
+				}
+			}
+		}
 		
 	}
 	
