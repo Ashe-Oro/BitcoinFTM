@@ -29,7 +29,7 @@ class MtGox {
 
 				//TODO we're only getting the obvious values that match the ticker object, but should we get more?  These are what's common with Bitstamp
 				if($key == "now") {
-					$this->timestamp = $value;
+					$this->timestamp = round($value/1000000);
 				}
 				elseif($key == "item") {
 					//DO NOTHING (for now)...
