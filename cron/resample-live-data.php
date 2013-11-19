@@ -15,12 +15,12 @@ $end;
 $now = getdate();
 $nowFormated = date('Y-m-d H:i:s', strtotime($now['year'] . '-' . $now['mon'] . '-' . $now['mday'] . " " . $now['hours'] . ":" . $now['minutes'] . ":" . $now['seconds']));
 
-if (isset($_GET['xchg'])) {
-	$xchg = $_GET['xchg'];
+if (isset($_POST['xchg'])) {
+	$xchg = $_POST['xchg'];
 }
 
-if (isset($_GET['scale'])) {
-	$scale = $_GET['scale'];
+if (isset($_POST['scale'])) {
+	$scale = $_POST['scale'];
 }
 
 if (isset($_GET['start'])) {
@@ -37,12 +37,12 @@ else {
 	$end = date('Y-m-d H:i:s', strtotime($nowFormated));
 }
 
-if(isset($_GET['xchg']) && isset($_GET['scale'])) {
+if( (isset($_GET['xchg']) || $xchg != null) && (isset($_GET['scale']) || $scale != null ) ) {
 	echo "<br /><br />Building HIstory with " . $xchg . " scale: " . $scale . " start: " . $start . " end: " . $end . "<br /><br/>";
-
 	$exchangeDb->buildHistorySamples($xchg, $scale, $start, $end);
 }
 else {
+	echo "<br /><br />FaiLED HIstory with " . $xchg . " scale: " . $scale . " start: " . $start . " end: " . $end . "<br /><br/>";
 	echo "Cannot resample data... Missing required parameters!";
 }
 
