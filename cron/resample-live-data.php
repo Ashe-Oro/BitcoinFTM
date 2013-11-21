@@ -53,7 +53,7 @@ function subtractTime($time, $scale) {
 		case "mins":
 			$toSubtract = 60;
 			break;
-		case "halfhours":
+		case "half_hours":
 			$toSubtract = 1800;
 			break;
 		case "hours":

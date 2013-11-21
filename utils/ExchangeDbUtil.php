@@ -46,37 +46,57 @@ class ExchangeDbUtil {
 
 	public function addToTicker($xchg) {
 
-		$db = new Database("btcftmpub.db.8986864.hostedresource.com", "btcftmpub", "Wolfpack1!", "btcftmpub");	
+		$db = new Database("btcftmpub.db.8986864.hostedresource.com", "btcftmpub", "Wolfpack1!", "btcftmpub");
+		//$db = new Database("127.0.0.1", "root", "root", "ftm");	
 
 		$ticker = "";
 		$query = "";
+		$ret = "";
 
 		if($xchg == self::EXCHANGE_MTGOX) {
 			$ticker = $this->getMtGoxTicker();
-			$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'last'}}, {$ticker->{'low'}}, {$ticker->{'volume'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+
+			if($ticker != null && $ticker->{'timestamp'} > 0) {
+				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'last'}}, {$ticker->{'low'}}, {$ticker->{'volume'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+			}
 		}
 		elseif($xchg == self::EXCHANGE_BITSTAMP) {
 			$ticker = $this->getBitstampTicker();
-			$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'last'}}, {$ticker->{'low'}}, {$ticker->{'volume'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+			
+			if($ticker != null && $ticker->{'timestamp'} > 0) {
+				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'last'}}, {$ticker->{'low'}}, {$ticker->{'volume'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+			}
 		}
 		elseif($xchg == self::EXCHANGE_BITFINEX_LTCBTC) {
 			$ticker = $this->getBitfinexTicker();
-			$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'mid'}}, {$ticker->{'last'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+			
+			if($ticker != null && $ticker->{'timestamp'} > 0) {
+				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'mid'}}, {$ticker->{'last'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+			}
 		}
 		elseif($xchg == self::EXCHANGE_BTCE_LTCBTC) {
 			$ticker = $this->getBtceLTCBTCTicker();
-			$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'low'}}, {$ticker->{'mid'}}, {$ticker->{'volume'}}, {$ticker->{'last'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+			
+			if($ticker != null && $ticker->{'timestamp'} > 0) {
+				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'low'}}, {$ticker->{'mid'}}, {$ticker->{'volume'}}, {$ticker->{'last'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+			}
 		}
 
-		$db->query($query);
+		if($query != ""){
+			$db->query($query);
+			$ret = "<br/>Query Executed: " . $query;
+		}
+		else {
+			$ret = "<br/>Query NOT Executed: Bad data for Exchange " . $xchg;
+		}
 
 		$db->close();
 
 		//TODO Removve the return statment as its not needed.  Can replace this with logging
-		return "<br/>Query Executed: " . $query;	
+		return 	$ret;
 	}
 
-		public function buildHistorySamples($xchg, $scale, $start, $end)
+	public function buildHistorySamples($xchg, $scale, $start, $end)
 	{
 		$db = new Database("btcftmpub.db.8986864.hostedresource.com", "btcftmpub", "Wolfpack1!", "btcftmpub");	
 
