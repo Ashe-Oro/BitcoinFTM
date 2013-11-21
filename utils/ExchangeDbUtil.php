@@ -99,7 +99,8 @@ class ExchangeDbUtil {
 	public function buildHistorySamples($xchg, $scale, $start, $end)
 	{
 		$db = new Database("btcftmpub.db.8986864.hostedresource.com", "btcftmpub", "Wolfpack1!", "btcftmpub");	
-
+		//$db = new Database("127.0.0.1", "root", "root", "ftm");	
+		
 		$startDate = date_parse($start);
 		$endDate = date_parse($end);
 
@@ -160,26 +161,45 @@ class ExchangeDbUtil {
 		$candle = array('timestamp' => $timestamp, 'high' => -1, 'low' => -1, 'open' => -1, 'close' => -1, 'total' => 0, 'volume' => 0, 'avgvolume' => 0, 'count' => 0);
 		
 		$candle['count'] = mysql_num_rows($result);
-		
+		$decrement = 0;
+		$openPos = 0;
+		$lastSuccessfulPos = 0;
+
 		$i = 0;
+		
 		while($row = mysql_fetch_assoc($result)){
-			if ($i == 0) {
-				$candle['open'] = round($row['last'], 2);
-			}
-			if ($row['last'] > $candle['high'] || $candle['high'] == -1) {
-				$candle['high'] = round($row['last'], 2);
-			}
-			if ($row['last'] < $candle['low'] || $candle['low'] == -1) {
-				$candle['low'] = round($row['last'], 2);
-			}
-			$candle['total'] += round(round($row['last'], 2) * round($row['volume'], 4), 4);
-			$candle['volume'] += round($row['volume'], 4);
-			$i++;
-			if ($i == $candle['count']){
+			if($row['last'] > 0) {
+				if ($i == $openPos) {
+					echo "OPen Position is: " . $openPos;
+					$candle['open'] = round($row['last'], 2);
+				}
+				if ($row['last'] > $candle['high'] || $candle['high'] == -1) {
+					$candle['high'] = round($row['last'], 2);
+				}
+				if ($row['last'] < $candle['low'] || $candle['low'] == -1) {
+					$candle['low'] = round($row['last'], 2);
+				}
+				$candle['total'] += round(round($row['last'], 2) * round($row['volume'], 4), 4);
+				$candle['volume'] += round($row['volume'], 4);
+				$i++;
+				
+				//since we're not certain where the last good row is, we'll alway set close to the last one processed
 				$candle['close'] = round($row['last'], 2);
+					
+			}
+			else{
+				//if we're in this case, we can't count the row towards the total count
+				$decrement++;
+				//if we haven't found a successful open position, lets try the next one
+				if($i == $openPos) {
+					$openPos++;
+				}
 			}
 		}
-		
+
+		//for an accurate count we have to subtract total rows minus the bad rows
+		$candle['count'] = $candle['count'] - $decrement;
+
 		if ($candle['volume'] != 0) {
 			$candle['avg'] = round($candle['total'] / $candle['volume'], 2);
 			$candle['avgvolume'] = round($candle['volume'] / $candle['count'], 4);

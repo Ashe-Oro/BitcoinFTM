@@ -15,14 +15,22 @@ $end;
 $now = getdate();
 $nowFormated = date('Y-m-d H:i:s', strtotime($now['year'] . '-' . $now['mon'] . '-' . $now['mday'] . " " . $now['hours'] . ":" . $now['minutes'] . ":" . $now['seconds']));
 
+//when checking query params, we'll only be doing a POST from the cron job and that will only pass in xchg and scale.  Start and end will be based off of scale and the now time in that case.
 if (isset($_POST['xchg'])) {
 	$xchg = $_POST['xchg'];
+}
+elseif (isset($_GET['xchg'])) {
+	$xchg = $_GET['xchg'];
 }
 
 if (isset($_POST['scale'])) {
 	$scale = $_POST['scale'];
 }
+elseif (isset($_GET['scale'])) {
+	$scale = $_GET['scale'];
+}
 
+//Start and end will only come through a Get if passed in by query param (and not via cron)  Otherwise we base them off the now time
 if (isset($_GET['start'])) {
 	$start = $_GET['start'];
 }
@@ -37,12 +45,19 @@ else {
 	$end = date('Y-m-d H:i:s', strtotime($nowFormated));
 }
 
+//if start == end date then we're querying a day in the past so we set teh end date to be 1 day ahead of the start date which starts at the 0:00:00 time
+if($start == $end) {
+	$start = date('Y-m-d H:i:s', strtotime($start));
+	$end = strtotime($end) + 86400;
+	$end = date('Y-m-d H:i:s', $end);
+}
+
 if( (isset($_GET['xchg']) || $xchg != null) && (isset($_GET['scale']) || $scale != null ) ) {
-	echo "<br /><br />Building HIstory with " . $xchg . " scale: " . $scale . " start: " . $start . " end: " . $end . "<br /><br/>";
+	echo "Building HIstory with " . $xchg . " scale: " . $scale . " start: " . $start . " end: " . $end . "<br/>";
 	$exchangeDb->buildHistorySamples($xchg, $scale, $start, $end);
 }
 else {
-	echo "<br /><br />FaiLED HIstory with " . $xchg . " scale: " . $scale . " start: " . $start . " end: " . $end . "<br /><br/>";
+	echo "FaiLED HIstory with " . $xchg . " scale: " . $scale . " start: " . $start . " end: " . $end . "<br/>";
 	echo "Cannot resample data... Missing required parameters!";
 }
 
@@ -64,6 +79,9 @@ function subtractTime($time, $scale) {
 			break;
 		case "weeks":
 			$toSubtract = 604800;
+			break;
+		case "biweeks":
+			$toSubtract = 1209600;
 			break;
 		case "months":
 			$toSubtract = 2592000;
