@@ -1,6 +1,8 @@
 <?php
 include_once("../classes/mtgox.php");
+include_once("../classes/mtgoxOrderbook.php");
 include_once("../classes/bitstamp.php");
+include_once("../classes/bitstampOrderbook.php");
 include_once("../classes/bitfinex_ltcbtc.php");
 include_once("../classes/btce_ltcbtc.php");
 include("database_util.php");
@@ -44,6 +46,20 @@ class ExchangeDbUtil {
 		return $ticker;
 	}
 
+	private function getMtGoxOrderbook($maxVolume) {
+		$mtgox = new MtGoxOrderbook();
+		$orderbook = $mtgox->getOrderbook($maxVolume);
+
+		return $orderbook;
+	}
+
+	private function getBitstampOrderbook($maxVolume) {
+		$bitstamp = new BitStampOrderbook();
+		$orderbook = $bitstamp->getOrderbook($maxVolume);
+
+		return $orderbook;
+	}
+
 	public function addToTicker($xchg) {
 
 		$db = new Database("btcftmpub.db.8986864.hostedresource.com", "btcftmpub", "Wolfpack1!", "btcftmpub");
@@ -79,6 +95,44 @@ class ExchangeDbUtil {
 			
 			if($ticker != null && $ticker->{'timestamp'} > 0) {
 				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'low'}}, {$ticker->{'mid'}}, {$ticker->{'volume'}}, {$ticker->{'last'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+			}
+		}
+
+		if($query != ""){
+			$db->query($query);
+			$ret = "<br/>Query Executed: " . $query;
+		}
+		else {
+			$ret = "<br/>Query NOT Executed: Bad data for Exchange " . $xchg;
+		}
+
+		$db->close();
+
+		//TODO Removve the return statment as its not needed.  Can replace this with logging
+		return 	$ret;
+	}
+
+	public function addToOrderbooks($xchg, $maxVolume) {
+
+		$db = new Database("btcftmpub.db.8986864.hostedresource.com", "btcftmpub", "Wolfpack1!", "btcftmpub");
+		//$db = new Database("127.0.0.1", "root", "root", "ftm");	
+
+		$orderbook = "";
+		$query = "";
+		$ret = "";
+
+		if($xchg == self::EXCHANGE_MTGOX) {
+			$orderbook = $this->getMtGoxOrderbook($maxVolume);
+			
+			if($orderbook != null && $orderbook->{'timestamp'} > 0) {
+				$query = "INSERT INTO {$xchg}_orderbook VALUES ({$orderbook->{'timestamp'}}, {$orderbook->{'bids'}}, {$orderbook->{'asks'}})";
+			}
+		}
+		elseif($xchg == self::EXCHANGE_BITSTAMP) {
+			$orderbook = $this->getBitstampOrderbook($maxVolume);
+			
+			if($orderbook != null && $orderbook->{'timestamp'} > 0) {
+				$query = "INSERT INTO {$xchg}_orderbook VALUES ({$orderbook->{'timestamp'}}, {$orderbook->{'bids'}}, {$orderbook->{'asks'}})";
 			}
 		}
 
