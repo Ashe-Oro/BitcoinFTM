@@ -1,5 +1,5 @@
 <?php
-require_once("utils/database_util.php");
+require_once("./core/utils/database_util.php");
 
 $localhosts = array('127.0.0.1', "::1");
 

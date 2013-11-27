@@ -9,7 +9,7 @@ $config['live'] = 0; // IMPORTANT! Turn this to true to activate LIVE trading!!!
 $config['markets'] = array("MtGoxUSD", "BitstampUSD");
 
 // observers if any ["Logger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer"]
-$config['observers'] = array("Logger", "TraderBot");
+$config['observers'] = array("Logger", "Emailer");
 
 $config['marketExpirationTime'] = 120;  // in seconds: 2 minutes
 $config['refreshRate'] = 20;
@@ -24,7 +24,7 @@ if (isset($noErrorLog)) {
 	$config['errorLog'] = 0;
 }
 
-require_once("clients_config.php");
+//require_once("clients_config.php");
 
 function iLog($msg)
 {
@@ -37,6 +37,6 @@ function iLog($msg)
 	}
 }
 
-iLog("[Config] BTC FTM Configuration Loaded");
+iLog("[Config] BTC FTM Configuration Loaded - MODE: ".($config['live'] ? "LIVE" : "TESTING"));
 
 ?>

@@ -30,7 +30,7 @@ class Portfolio
 		foreach ($markets as $mname) {
 			$lowername = strtolower($mname);
 			$lowernameEx = str_replace("usd", "", $lowername);
-			$pFile = "./private_markets/private{$lowername}.php";
+			$pFile = "./core/private_markets/private{$lowername}.php";
 			if (file_exists($pFile)){
 				require_once($pFile);
 				$pName = "private".$mname;
@@ -43,7 +43,7 @@ class Portfolio
 						$this->privateMarkets[$mname] = new $pName($cid, $ckey, $csecret);
 					} else {
 						//var_dump($client);
-						if (!strlen($ckey)){
+						if (!strlen($ckey)){	
 							iLog("[Portfolio] ERROR: Private market {$mname} missing key in client DB {$lowernameEx}key - ".$client["{$lowernameEx}key"]);
 						} else
 						if (!strlen($csecret)){

@@ -1,7 +1,5 @@
 <?php
 require_once("observer.php");
-require_once("./private_markets/privatemtgoxusd.php");
-require_once("./private_markets/privatebitstampusd.php");
 
 class TraderBot extends Observer
 {
@@ -9,31 +7,27 @@ class TraderBot extends Observer
 	
 	public $tradeWait = 120;
 	public $lastTrade = 0;
+	public $settings;
 	
 	public $potentialTrades = array();
 	public $currentTrade = NULL;
 
-	public function __construct($client)
+	public function __construct($client, $settings=NULL)
 	{
 		parent::__construct($client);
+		$this->_loadSettings($settings);
 		$this->currentTrade = $this->client->getPortfolio()->getCurrentTrade();
+	}
+	
+	protected function _loadSettings($settings)
+	{
+		// load settings here
 	}
 
 	public function beginOpportunityFinder($depths)
 	{
 		$this->potentialTrades = array();
 		iLog("[TraderBot] Potential trade list cleared");
-	}
-
-	public function endOpportunityFinder()
-	{
-		if (count($this->potentialTrades)) {
-			iLog("[TraderBot] ".count($this->potentialTrades)." potential trades FOUND!");
-			usort($this->potentialTrades, array("TraderBot", "sortPotentialTrades"));
-			$this->executeTrade($this->potentialTrades[0]);
-		} else {
-			iLog("[TraderBot] endOpportunityFinder - NO potential trades found");
-		}
 	}
 
 	static public function sortPotentialTrades($a, $b) {
@@ -50,13 +44,13 @@ class TraderBot extends Observer
 		$askName = $kask['name'];
 		$bidName = $kbid['name'];
 		
-		$askMarket = $this->client->getPrivateMarket($askName);
+		$askMarket = $this->getPrivateMarket($askName);
 		if ($askMarket == NULL) {
 			iLog("[TraderBot] WARNING: Can't automate this trade, client not available: {$askName}");
 			return;
 		}
 
-		$bidMarket = $this->client->getPrivateMarket($bidName);
+		$bidMarket = $this->getPrivateMarket($bidName);
 		if ($bidMarket == NULL) {
 			iLog("[TraderBot] WARNING: Can't automate this trade, client not available: {$bidName}");
 			return;
@@ -65,7 +59,7 @@ class TraderBot extends Observer
 		$finalVolume = min($this->client->getMaxTxVolume(), $volume);
 
 		if ($config['live']) {
-			$this->updateBalance(); // only do this on live trading
+			$this->updatePrivateMarketBalance(); // only do this on live trading
 		}
 		
 		$askBalance = $askMarket->getBalance("USD");
@@ -110,6 +104,17 @@ class TraderBot extends Observer
 		
 		array_push($this->potentialTrades, $pTrade);
 	}
+	
+	public function endOpportunityFinder()
+	{
+		if (count($this->potentialTrades)) {
+			iLog("[TraderBot] ".count($this->potentialTrades)." potential trades FOUND!");
+			usort($this->potentialTrades, array("TraderBot", "sortPotentialTrades"));
+			$this->executeTrade($this->potentialTrades[0]);
+		} else {
+			iLog("[TraderBot] endOpportunityFinder - NO potential trades found");
+		}
+	}
 
 	/*** VERY IMPORTANT FUNCTION ***/
 	/** Set out leniency here - balanceMargin == slippage **/
@@ -122,8 +127,18 @@ class TraderBot extends Observer
 		$min2 = $btcBal / (1 + $bMargin);
 		return min($min1, $min2);
 	}
+	
+	public function getPrivateMarket($mname)
+	{
+		return $this->client->getPrivateMarket($mname);
+	}
+	
+	public function getPrivateMarketBalance($mname, $currency)
+	{
+		return $this->client->getPrivateMarket($mname)->getBalance($currency);
+	}
 
-	public function updateBalance()
+	public function updatePrivateMarketBalances()
 	{
 		iLog("[TraderBot] Updating market balances...");
 		$this->client->updateBalances();

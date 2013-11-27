@@ -17,6 +17,7 @@ class Client
 	
 	private $active = 0;
 	private $trading = 0;
+	private $bots = array();
 	
 	public function __construct($clientID)
 	{
@@ -46,15 +47,10 @@ class Client
 					$this->lastName = $client['lastname'];
 					$this->userName = $client['username'];
 					
-					$this->maxTxVolume = $client['maxtxvolume'];
-					$this->minTxVolume = $client['mintxvolume'];
-					$this->balanceMargin = $client['balancemargin'];
-					$this->profitThresh = $client['profitthresh'];
-					$this->percThresh = $client['percthresh'];
-					
 					$this->active = $client['active'];
 					$this->trading = $client['trading'];
 					
+					$this->_initTraderBots($client);
 					$this->_initPortfolio($client);
 				}
 			} catch (Exception $e) {
@@ -63,6 +59,15 @@ class Client
 			}
 		} else {
 			throw new BadClientException("No client ID");
+		}
+	}
+	
+	private function _initTraderBots($clientArray)
+	{
+		global $DB;
+		$q = $DB->query("SELECT * FROM traderbots WHERE clientid = {$clientArray['clientid']} AND active = 1 ORDER BY traderbotid ASC");
+		while($res = $DB->fetch_array_assoc($q)){
+			array_push($this->bots, $res);
 		}
 	}
 	
@@ -118,31 +123,6 @@ class Client
 		return $this->userName;
 	}
 	
-	public function getMaxTxVolume()
-	{
-		return $this->maxTxVolume;
-	}
-	
-	public function getMinTxVolume()
-	{
-		return $this->minTxVolume;
-	}
-	
-	public function getBalanceMargin()
-	{
-		return $this->balanceMargin;
-	}
-	
-	public function getProfitThresh()
-	{
-		return $this->profitThresh;
-	}
-	
-	public function getPercThresh()
-	{
-		return $this->percThresh;
-	}
-	
 	public function isActive()
 	{
 		return $this->active;
@@ -151,6 +131,11 @@ class Client
 	public function isTrading()
 	{
 		return $this->trading;
+	}
+	
+	public function getTraderBots()
+	{
+		return $this->bots;
 	}
 }
 
