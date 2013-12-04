@@ -6,7 +6,7 @@ $config = array();
 $config['live'] = 0; // IMPORTANT! Turn this to true to activate LIVE trading!!!!!
 
 // watch the following markets: ["MtGoxEUR", "BitcoinCentralEUR", "IntersangoEUR", "Bitcoin24EUR", "BitstampEUR", "BtceUSD", "MtGoxUSD", "BitfloorUSD", "BitstampUSD"]
-$config['markets'] = array("MtGoxUSD", "BitstampUSD");
+$config['markets'] = array("MtGoxUSD", "BitstampUSD", "KrakenUSD", "BTCeUSD", "BitfinexUSD", "CryptoTradeUSD", "CampBXUSD");
 
 // observers if any ["Logger", "TraderBot", "TraderBotSim", "HistoryDumper", "Emailer"]
 $config['observers'] = array("Logger", "Emailer");

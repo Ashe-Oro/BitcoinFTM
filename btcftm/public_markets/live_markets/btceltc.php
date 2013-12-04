@@ -1,64 +1,91 @@
 <?php
-require_once("market.php");
+require_once("livemarket.php");
 
-class BtceLTC extends Market
+class BTCeLTC extends LiveMarket
 {	
-	private $depthUrl = "https://btc-e.com/api/2/btc_usd/depth";
-	private $tickerUrl = "https://btc-e.com/api/2/btc_usd/ticker";
-
 	public function __construct()
 	{
 		parent::__construct("LTC");
 		//TODO This updateRate is a random guess... Find out real update rate
 		$this->updateRate = 100;
+		$this->depthUrl = "https://btc-e.com/api/2/ltc_btc/depth";
+		$this->tickerUrl = "https://btc-e.com/api/2/ltc_btc/ticker";
 	}
 
-	public function updateDepth()
+	public function updateOrderBookData()
 	{
-		iLog("[BtceLTC] Updating order depth...");
+		iLog("[BTCeLTC] Updating order depth...");
 		$res = file_get_contents($this->depthUrl);
 		try {
 			$json = json_decode($res);
 			$data = $json;
-			$this->depth = $this->formatDepth($data);
-			iLog("[BtceLTC] Order depth updated");
+			$this->orderBook = $this->formatOrderBook($data);
+			iLog("[BTCeLTC] Order depth updated");
 		} catch (Exception $e) {
-			iLog("[BtceLTC] ERROR: can't parse JSON feed - {$url} - ".$e->getMessage());
+			iLog("[BTCeLTC] ERROR: can't parse JSON feed - {$url} - ".$e->getMessage());
 		}
-	}
-
-	public function sortAndFormat($l, $reverse)
-	{
-		$r = array();
-		foreach($l as $i) {
-			array_push($r, array('price' => (float) $i[0], 'amount' => (float) $i[1]));
-		}
-		usort($r, array("BtceLTC", "comparePrice"));
-		if ($reverse) {
-			$r = array_reverse($r);
-		}
-		return $r;
-	}
-
-	public function formatDepth($depth)
-	{
-		$bids = $this->sortAndFormat($depth->bids, true);
-		$asks = $this->sortAndFormat($depth->asks, false);
-		return array('asks' => $asks, 'bids' => $bids);
 	}
 
 	public function getCurrentTicker()
 	{
-		iLog("[BtceLTC] Getting current ticker...");
+		iLog("[BTCeLTC] Getting current ticker...");
 		$res = file_get_contents($this->tickerUrl);
 		try {
 			$json = json_decode($res);
-			$ticker = new Ticker($json);
-			iLog("[BtceLTC] Current ticker - high: {$ticker['high']} low: {$ticker['low']} avg: {$ticker['avg']} vol: {$ticker['vol']} last: {$ticker['last_price']} sell: {$ticker['sell']} buy: {$ticker['buy']}");
+			$ticker = new Ticker($json['ticker']);
+			$t = $ticker->getTickerArray();
+			iLog("[BTCeLTC] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
 			return $ticker;
 		} catch (Exception $e) {
-			iLog("[BtceLTC] ERROR: can't parse JSON feed - {$this->tickerUrl} - ".$e->getMessage());
+			iLog("[BTCeLTC] ERROR: can't parse JSON feed - {$this->tickerUrl} - ".$e->getMessage());
 		}
+	}
+	
+	public function getHistoryTickers($startDate, $endDate="")
+	{
+		global $DB;
+		$tickers = NULL;
+		
+		if (is_string($startDate)){ $startDate = strtotime($startDate); }
+		if (empty($endDate)){ $endDate = time(); }
+		if (is_string($endDate)){ $endDate = strtotime($endDate); }
+		
+		if (is_int($startDate) && is_int($endDate)){
+			iLog("[BTCeLTC] Get History Tickers...");
+			try {
+				$ret = $DB->query("SELECT * FROM btceltc_ticker WHERE timestamp >= {$startDate} AND timestamp < {$endDate} ORDER BY timestamp DESC");
+				$rowcount = $DB->num_rows($ret);
+				if ($rowcount > 0){
+					$tickers = array();
+					while ($row = $DB->fetch_array_assoc($ret)){
+						array_push($tickers, new Ticker($row));
+					}
+				}
+				iLog("[BTCeLTC] {$rowcount} Tickers retrieved");
+			} catch (Exception $e) {
+				iLog("[BTCeLTC] ERROR: History ticker query failed: ".$e->getMessage());
+			}
+		}
+		
+		return $tickers;
+	}
+	
+	public function getHistoryTicker($timestamp) {
+		global $DB;
+		$ticker = NULL;
+		
+		if (is_string($timestamp)){ $timestamp = strtotime($timestamp); }
+		if(is_int($timestamp)){
+			$qid = $DB->query("SELECT * FROM btceltc_ticker WHERE timestamp <= {$timestamp} ORDER BY timestamp DESC LIMIT 1");
+			$result = $DB->fetch_array_assoc($qid);
+			return new Ticker($result);
+		}
+	}
+	
+	public function getHistorySamples($startDate, $endDate="", $sampling="day")
+	{
+		global $DB;
+		iLog("[BTCeLTC] Getting history samples...");
 	}
 }
 ?>

@@ -1,5 +1,6 @@
 <?php
 require_once("./core/public_markets/ticker/tickerCalculator.php");
+require_once("./core/public_markets/mob/marketorderbook.php");
 
 abstract class Market
 {
@@ -7,6 +8,7 @@ abstract class Market
 	public $currency = '';
 	public $depthUpdated = 0;
 	public $updateRate = 60;
+	public $orderBook = NULL;
 	
 	protected $live = false;
 
@@ -17,33 +19,45 @@ abstract class Market
 		$this->name = get_class($this);
 		$this->currency = $currency;
 	}
-
-	public function getDepth()
+	
+	abstract public function getHistoryTickers($startDate, $endDate="");
+	abstract public function getHistoryTicker($timestamp);
+	abstract public function getHistorySamples($startDate, $endDate="", $sampling="day");
+	abstract public function updateOrderBookData();
+	abstract public function getCurrentTicker();
+	
+	public function updateMarketDepth()
 	{
 		global $config;
 
 		$timeDiff = time() - $this->depthUpdated;
 		if ($timeDiff > $this->updateRate) {
-			$this->askUpdateDepth();
+			$this->updateMarketOrderBooks();
 		}
 		$timeDiff = time() - $this->depthUpdated;
 		if ($timeDiff > $config['marketExpirationTime']) {
 			iLog("[Market] WARNING: Market {$this->name} order book is expired");
-			$this->depth = array('asks' => array('price' => 0, 'amount' => 0), 'bids' => array('price' => 0, 'amount' => 0));
+			$this->orderBook = new MarketOrderBook();
 		}
-		return $this->depth;
+		return $this->orderBook;
 	}
-
-	public function convertToUSD()
+	
+	public function formatOrderBook($depth)
 	{
-		if($this->currency == 'USD') { return; }
-		// otherwise do other stuff, but we're only in USD right now
+		iLog("[Market] Formating Order Book...");
+		return new MarketOrderBook($depth->asks, $depth->bids);
+	}	
+	
+	public function getOrderBook()
+	{
+		return $this->orderBook;
 	}
 
-	public function askUpdateDepth()
+
+	public function updateMarketOrderBooks()
 	{
 		try {
-			$this->updateDepth();
+			$this->updateOrderBookData();
 			$this->convertToUSD();
 			$this->depthUpdated = time();
 		} catch (Exception $e) {
@@ -53,21 +67,13 @@ abstract class Market
 
 	public function getTicker()
 	{
-		$depth = $this->getDepth();
+		$orderBook = $this->updateMarketDepth();
 		$res = array('ask' => 0, 'bid' => 0);
 		if (count($depth['asks']) && count($depth['bids'])) {
-			$res['ask'] = $depth['asks'][0];
-			$res['bid'] = $depth['bids'][0];
+			$res['ask'] = $orderBook->getAskTopOrder();
+			$res['bid'] = $orderBook->getBidTopOrder();
 		}
 		return $res;
-	}
-	
-	static public function comparePrice($a, $b)
-	{
-		if ($a['price'] == $b['price']) {
-			return 0;
-		}
-		return ($a['price'] > $b['price']) ? 1 : -1;
 	}
 	
 	private function _getNewSMA($history)
@@ -227,14 +233,11 @@ abstract class Market
 		return $this->live;
 	}
 	
-	abstract public function getHistoryTickers($startDate, $endDate="");
+	public function convertToUSD()
+	{
+		if($this->currency == 'USD') { return; }
+		// otherwise do other stuff, but we're only in USD right now
+	}
 	
-	abstract public function getHistoryTicker($timestamp);
-	
-	abstract public function getHistorySamples($startDate, $endDate="", $sampling="day");
-
-	abstract public function updateDepth();
-	
-	abstract public function getCurrentTicker();
 }
 ?>

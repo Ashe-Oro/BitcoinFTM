@@ -21,19 +21,88 @@ class TraderBot extends Observer
 	
 	protected function _loadSettings($settings)
 	{
-		// load settings here
+		$default = array("minTxVolume" => 0.01, "maxTxVolume" => 1, "balanceMargin" => 0.005, "profitThresh" => 5, "percThresh" => 2);
+		if ($settings) {
+			array_merge($default, $settings);
+		}
+		$this->settings = $default;
 	}
 
-	public function beginOpportunityFinder($depths)
+	public function beginOpportunityFinder($markets, $mob)
 	{
 		$this->potentialTrades = array();
-		iLog("[TraderBot] Potential trade list cleared");
+		iLog("[TraderBot] beginOpportunityFinder - Potential trade list cleared");
+	}
+	
+	public function opportunityFinder($markets, $mob)
+	{
+		iLog("[TraderBot] opportunityFinder...");
+		$matrix = $mob->getExchangeMatrix();
+		if ($config['live']) {
+			$this->updatePrivateMarketBalance(); // only do this on live trading
+		}
+		
+		$ops = array();
+		foreach($matrix as $askMarketName => $askMarket){
+			if ($mx['profit'] > 0){		// for now, only consider positive profit
+				if ($this->privateMarketHasCapital($mname)){
+					$askMarket = $this->getPrivateMarket($mname);
+					$bidMarket = $this->getPrivateMarket($mx['market']);
+					
+					$usd = $askMarket->getBalance('USD');
+					$btc = $bidMarket->getBalance('BTC');
+					
+					$trade = $mob->getTradeOpportunity($mname, $mx, $usd, $btc);
+					$ops[$mname] = array("market" => $mx['market'], "trade" => $trade);
+					iLog("[TraderBot] Trade opportunity for {$mname} -> {$mx['market']} -  profit: {$trade['profit']}USD");
+				}
+			}
+		}
+		
+		// for existing opportunities, get depth opportunity for each one
+		// sort by best depth opportunity
+		
+	}
+	
+	public function endOpportunityFinder($markest, $mob)
+	{
+		if (count($this->potentialTrades)) {
+			iLog("[TraderBot] ".count($this->potentialTrades)." potential trades FOUND!");
+			//usort($this->potentialTrades, array("TraderBot", "sortPotentialTrades"));
+			$this->executeTrade($this->potentialTrades[0]);
+		} else {
+			iLog("[TraderBot] endOpportunityFinder - NO potential trades found");
+		}
 	}
 
 	static public function sortPotentialTrades($a, $b) {
 		if ($a['profit'] == $b['profit']) { return 0; }
 		return ($a['profit'] > $b['profit']) ? 1 : -1;
 	}
+	
+	
+	
+	public function privateMarketHasCapital($mname)
+	{
+		$balance = $this->getPrivateMarketBalances($mname);
+		return ($balance['usd'] != 0 || $balance['btc'] != 0);
+	}
+	
+	public function getPrivateMarketBalances($mname)
+	{
+		iLog("[TraderBot] Getting market balances for {$mname}...");
+		$pmarket = $this->getPrivateMarket($mname);
+		$balance = array('usd' => 0, 'btc' => 0);
+		if ($pmarket){
+			$balance['usd'] = $pmarket->getBalance("USD");
+			$balance['btc'] = $pmarket->getBalance("BTC");
+			iLog("[TraderBot] Market balance for {$mname}: {$balance['usd']}USD  {$balance['btc']}BTC.");
+		}
+		return $balance;
+	}
+
+
+	/***** THIS FUNCTION IS DEPRECIATED BUT I NEED TO KEEP IT AROUND FOR FUTURE REFERENCE!! *****/
 
 	/*** VERY IMPORTANT: DOUBLE CHECK THIS LOGIC!!! ***/
 	public function opportunity($profit, $volume, $buyprice, $kask, $sellprice, $kbid, $perc, $wBuyPrice, $wSellPrice)
@@ -105,16 +174,6 @@ class TraderBot extends Observer
 		array_push($this->potentialTrades, $pTrade);
 	}
 	
-	public function endOpportunityFinder()
-	{
-		if (count($this->potentialTrades)) {
-			iLog("[TraderBot] ".count($this->potentialTrades)." potential trades FOUND!");
-			usort($this->potentialTrades, array("TraderBot", "sortPotentialTrades"));
-			$this->executeTrade($this->potentialTrades[0]);
-		} else {
-			iLog("[TraderBot] endOpportunityFinder - NO potential trades found");
-		}
-	}
 
 	/*** VERY IMPORTANT FUNCTION ***/
 	/** Set out leniency here - balanceMargin == slippage **/
@@ -168,6 +227,11 @@ class TraderBot extends Observer
 				//addOpenTransactions();
 			}
 		}
+	}
+	
+	public function getSetting($setting)
+	{
+		return isset($this->settings[$setting]) ? $this->settings[$setting] : NULL;
 	}
 }
 ?>

@@ -3,26 +3,24 @@ require_once('livemarket.php');
 
 class MtGoxUSD extends LiveMarket
 {
-	private $depthUrl = "http://data.mtgox.com/api/2/BTCUSD/money/depth";
-	private $tickerUrl = "http://data.mtgox.com/api/1/BTCUSD/ticker";
-	
 	public function __construct()
 	{
 		parent::__construct("USD");
 		$this->updateRate = 20;
-		$this->depth = array('asks' => array('price' => 0, 'amount' => 0), 'bids' => array('price' => 0, 'amount' => 0));
+		$this->depthUrl = "http://data.mtgox.com/api/2/BTCUSD/money/depth";
+		$this->tickerUrl = "http://data.mtgox.com/api/1/BTCUSD/ticker";
 	}
 
-	public function updateDepth()
+	public function updateOrderBookData()
 	{
-		iLog("[MtGoxUSD] Updating order depth...");
+		iLog("[MtGoxUSD] Updating order book data...");
 		$url = "";
 		$res = file_get_contents($this->depthUrl);
 		try {
 			$json = json_decode($res);
 			if ($json->result == 'success') {
 				$data = $json->data;
-				$this->depth = $this->formatDepth($data);
+				$this->orderBook = $this->formatOrderBook($data);
 				//var_dump($this->depth);
 				iLog("[MtGoxUSD] Order Depth Updated");
 			}
@@ -30,26 +28,6 @@ class MtGoxUSD extends LiveMarket
 			iLog("[MtGoxUSD] ERROR: can't parse JSON feed - {$url} - ".$e->getMessage());
 		}
 	}
-
-	public function sortAndFormat($l, $reverse=false)
-	{
-		$r = array();
-		foreach($l as $i) {
-			array_push($r, array('price' => $i->price, 'amount' => $i->amount));
-		}
-		usort($r, array("MtGoxUSD", "comparePrice"));
-		if ($reverse) {
-			$r = array_reverse($r);
-		}
-		return $r;
-	}
-
-	public function formatDepth($depth)
-	{
-		$bids = $this->sortAndFormat($depth->bids, true);
-		$asks = $this->sortAndFormat($depth->asks, false);
-		return array('asks' => $asks, 'bids' => $bids);
-	}	
 	
 	public function getCurrentTicker()
 	{

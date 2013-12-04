@@ -10,10 +10,10 @@ class HistoryMtGoxUSD extends HistoryMarket
 	{
 		parent::__construct("USD");
 		$this->updateRate = 20;
-		$this->depth = array('asks' => array('price' => 0, 'amount' => 0), 'bids' => array('price' => 0, 'amount' => 0));
+		$this->orderBook = new MarketOrderBook();
 	}
 
-	public function updateDepth()
+	public function updateOrderBookData()
 	{
 		iLog("[MtGoxUSD] Updating order depth...");
 		$url = "";
@@ -22,7 +22,7 @@ class HistoryMtGoxUSD extends HistoryMarket
 			$json = json_decode($res);
 			if ($json->result == 'success') {
 				$data = $json->data;
-				$this->depth = $this->formatDepth($data);
+				$this->orderBook = $this->formatOrderBook($data);
 				//var_dump($this->depth);
 				iLog("[MtGoxUSD] Order Depth Updated");
 			}
@@ -30,26 +30,6 @@ class HistoryMtGoxUSD extends HistoryMarket
 			iLog("[MtGoxUSD] ERROR: can't parse JSON feed - {$url} - ".$e->getMessage());
 		}
 	}
-
-	public function sortAndFormat($l, $reverse=false)
-	{
-		$r = array();
-		foreach($l as $i) {
-			array_push($r, array('price' => $i->price, 'amount' => $i->amount));
-		}
-		usort($r, array("MtGoxUSD", "comparePrice"));
-		if ($reverse) {
-			$r = array_reverse($r);
-		}
-		return $r;
-	}
-
-	public function formatDepth($depth)
-	{
-		$bids = $this->sortAndFormat($depth->bids, true);
-		$asks = $this->sortAndFormat($depth->asks, false);
-		return array('asks' => $asks, 'bids' => $bids);
-	}	
 	
 	public function getCurrentTicker()
 	{

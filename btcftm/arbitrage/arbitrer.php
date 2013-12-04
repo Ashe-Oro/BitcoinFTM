@@ -1,5 +1,6 @@
 <?php
-require_once("./core/public_markets/depthCalculator.php");
+//require_once("./core/public_markets/depthCalculator.php");
+require_once("./core/public_markets/mob/mob.php");
 
 class Arbitrer
 {
@@ -11,7 +12,9 @@ class Arbitrer
 	public $bots = array();
 	public $bots_data = NULL;
 	
-	public $depths = NULL;
+	public $markets = NULL;
+	public $mob = NULL;
+	
 	public $threadpool = NULL;
 
 	public function __construct($client, $args)
@@ -88,10 +91,11 @@ class Arbitrer
 		return $this->bots;
 	}
 	
-	public function watchMarkets($depths)
+	public function watchMarkets($markets, $mob)
 	{
 		global $config;
-		$this->depths = $depths;
+		$this->markets = $markets;
+		$this->mob = $mob;
 		
 		if ($config['echoLog']) { echo "<hr />\n"; }
 		iLog("[Arbitrer] PHASE 2: ???");
@@ -106,16 +110,16 @@ class Arbitrer
 	{
 		global $config;
 		
-		foreach($this->observers as $observer) {
-			$observer->beginOpportunityFinder($this->depths);
-		}
-		foreach($this->bots as $bot) {
-			$bot->beginOpportunityFinder($this->depths);
-		}
-
-		if ($config['echoLog']) { echo "<hr />\n"; }
+		$this->_beginOpportunityTick();
 		
+		if ($config['echoLog']) { echo "<hr />\n"; }
 		iLog("[Arbitrer] PHASE 3: PROFIT!");
+		$this->_opportunityTick();
+		
+		/***** 
+		
+		CUT ALL THIS SHIT OUT AND MOVE IT INTO TRADER BOT LOGIC NOW BITCHES !!!! 
+		
 		$dClone = $this->depths;
 		//var_dump($this->depths);
 		foreach($this->depths as $km1 => $kmarket1) {
@@ -136,14 +140,42 @@ class Arbitrer
 				}
 			}
 		}
-
+		******/
+		
+		$this->_endOpportunityTick();
+	}
+	
+	private function _beginOpportunityTick()
+	{
 		foreach($this->observers as $observer) {
-			$observer->endOpportunityFinder();
+			$observer->beginOpportunityFinder($this->markets, $this->mob);
 		}
 		foreach($this->bots as $bot) {
-			$bot->endOpportunityFinder();
+			$bot->beginOpportunityFinder($this->markets, $this->mob);
 		}
 	}
+	
+	private function _opportunityTick()
+	{
+		foreach($this->observers as $observer) {
+			$observer->opportunityFinder($this->markets, $this->mob);
+		}
+		foreach($this->bots as $bot) {
+			$bot->opportunityFinder($this->markets, $this->mob);
+		}
+	}
+	
+	private function _endOpportunityTick()
+	{
+		foreach($this->observers as $observer) {
+			$observer->endOpportunityFinder($this->markets, $this->mob);
+		}
+		foreach($this->bots as $bot) {
+			$bot->endOpportunityFinder($this->markets, $this->mob);
+		}
+	}
+
+	/***** NOPE, CUT THIS SHIT OUT TOO! THIS IS TRADER BOT OR MOB LOGIC ONLY BITCHES!!!!
 
 	public function arbitrageOpportunity($kask, $ask, $kbid, $bid)
 	{
@@ -167,6 +199,8 @@ class Arbitrer
 			$bot->opportunity($aArray['profit'], $aArray['volume'], $aArray['buyPrice'], $kask, $aArray['sellPrice'], $kbid, $perc2, $aArray['wBuyPrice'], $aArray['wSellPrice']);
 		}
 	}
+	
+	*******/
 
 }
 ?>

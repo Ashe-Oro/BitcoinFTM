@@ -1,5 +1,6 @@
 <?php
 require_once("./core/utils/clientsList.php");
+require_once("./core/public_markets/mob/mob.php");
 require_once("arbitrer.php");
 
 /**
@@ -39,6 +40,10 @@ class Arbitrage
 		
 		// load the markets
 		$this->_loadMarkets($args);
+		
+		
+		// load the MOB
+		$this->_loadMOB();
 		
 		// load the client list
 		$this->clients = ($clientsList == NULL) ? new ClientsList() : $clientsList;
@@ -90,10 +95,11 @@ class Arbitrage
 		iLog("[Arbitrage] ".count($markets)." markets loaded");
 	}
 	
-	private function _initMOB()
+	private function _loadMOB()
 	{
-		// build the MOB here
-		
+		iLog("[Arbitrage] Loading the MOB...");
+		$this->mob = new MOB($this->markets);
+		iLog("[Arbitrage] MOB loaded!");
 	}
 	
 	public function updateMarketDepths()
@@ -112,7 +118,7 @@ class Arbitrage
 	
 	private function _getMarketDepth($market)
 	{
-		$this->depths[$market->name] = $market->getDepth();
+		$this->depths[$market->name] = $market->updateMarketDepth();
 		return $this->depths[$market->name];
 	}
 	
@@ -167,7 +173,7 @@ class Arbitrage
 				case "watch":
 					$this->updateMarketDepths();
 					foreach($this->arbitrers as $clientID => $arb) {
-						$arb->watchMarkets($this->depths);
+						$arb->watchMarkets($this->markets, $this->mob);
 					}
 					break;
 					

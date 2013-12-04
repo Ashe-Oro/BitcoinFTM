@@ -8,15 +8,9 @@ class Emailer extends Observer
 		parent::__construct($client);
 	}
 
-	public function beginOpportunityFinder($depths)
-	{
-		
-	}
-
-	public function endOpportunityFinder()
-	{
-		
-	}
+	public function beginOpportunityFinder($markets, $mob) { }
+	public function opportunityFinder($markets, $mob) { }
+	public function endOpportunityFinder($markets, $mob) { }
 
 	public function opportunity($profit, $volume, $buyprice, $kask, $sellprice, $kbid, $perc, $wBuyPrice, $wSellPrice)
 	{
