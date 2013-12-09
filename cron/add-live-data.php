@@ -21,6 +21,9 @@ echo "MtGox Added..." . $temp;
 $temp = $exchangeDb->addToTicker("bitstamp");
 echo "<br/>Bitstamp Added..." . $temp;
 
+$temp = $exchangeDb->addToTicker("btce_btcusd");
+echo "<br/>Btce Added (BTCUSD)..." . $temp;
+
 $temp = $exchangeDb->addToTicker("bitfinex_ltcbtc");
 echo "<br/>Bitfinex Added..." . $temp;
 

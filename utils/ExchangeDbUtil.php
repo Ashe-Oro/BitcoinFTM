@@ -5,6 +5,7 @@ include_once("../classes/bitstamp.php");
 include_once("../classes/bitstampOrderbook.php");
 include_once("../classes/bitfinex_ltcbtc.php");
 include_once("../classes/btce_ltcbtc.php");
+include_once("../classes/btce_btcusd.php");
 include("database_util.php");
 class ExchangeDbUtil {
 	
@@ -12,6 +13,7 @@ class ExchangeDbUtil {
 	const EXCHANGE_MTGOX = "mtgox";
 	const EXCHANGE_BITFINEX_LTCBTC = "bitfinex_ltcbtc";
 	const EXCHANGE_BTCE_LTCBTC = "btce_ltcbtc";
+	const EXCHANGE_BTCE_BTCUSD = "btce_btcusd";
 	const HISTORY_SUFFIX = "_history";
 	const HISTORY_DAYS_SUFFIX = "_history_days";
 	const HISTORY_WEEKS_SUFFIX = "_history_weeks";
@@ -35,6 +37,13 @@ class ExchangeDbUtil {
 	private function getBitfinexTicker() {
 		$bitfinex = new BitfinexLTCBTC();
 		$ticker = $bitfinex->getTicker();
+
+		return $ticker;
+	}
+
+	private function getBtceBTCUSDTicker() {
+		$btce = new BtceBTCUSD();
+		$ticker = $btce->getTicker();
 
 		return $ticker;
 	}
@@ -81,6 +90,13 @@ class ExchangeDbUtil {
 			
 			if($ticker != null && $ticker->{'timestamp'} > 0) {
 				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'last'}}, {$ticker->{'low'}}, {$ticker->{'volume'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+			}
+		}
+		elseif($xchg == self::EXCHANGE_BTCE_BTCUSD) {
+			$ticker = $this->getBtceBTCUSDTicker();
+
+			if($ticker != null && $ticker->{'timestamp'} > 0) {
+				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'low'}}, {$ticker->{'mid'}}, {$ticker->{'volume'}}, {$ticker->{'last'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
 			}
 		}
 		elseif($xchg == self::EXCHANGE_BITFINEX_LTCBTC) {
