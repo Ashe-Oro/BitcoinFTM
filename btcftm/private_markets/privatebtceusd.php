@@ -3,10 +3,13 @@ require_once('privatemarket.php');
 
 class PrivateBTCeUSD extends PrivateMarket
 {
-	//TODO this is just a shell, these need to be updated/removed as necessary
-	private $balanceUrl = "";
-    private $buyUrl = "";
-    private $sellUrl = "";
+	const API_URL = "https://btc-e.com/tapi/";
+	const METHOD_GET_INFO = "getInfo";
+	const METHOD_TRANS_HISTORY = "TransHistory";
+	const METHOD_TRADE_HISTORY = "TradeHistory";
+	const METHOD_ACTIVE_ORDERS = "ActiveOrders";
+	const METHOD_TRADE = "Trade";
+	const METHOD_CANCEL_ORDER = "CancelOrder";
 
     private $privatekey = '';
     private $secret = '';
@@ -27,23 +30,23 @@ class PrivateBTCeUSD extends PrivateMarket
 		$this->clientID = $clientID;
 	}
 
-	protected function _sendRequest($url, $params=array(), $extraHeaders=NULL)
+	protected function _sendRequest($url, $params=array(), $method, $extraHeaders=NULL)
 	{
 		$rUrl = $url;		
 		$response = array();
 		
 		$response['result'] = 'success';
 		$response['return'] = false;
-		iLog("[PrivateBTCeUSD] Sending Request: {$rUrl}");
+		iLog("[PrivateBTCeUSD] Sending Request: {$rUrl} using method {$method}");
 		
-		
-		if ($rUrl == $this->buyUrl['url'] || $rUrl == $this->sellUrl['url']) {
+		if ($method == self::METHOD_TRADE) {
 			iLog("[PrivateBTCeUSD] WARNING: Request not sent. Live sell and buy functions currently disabled.");
 			return $response; 
 		}
 		
 		// must have a unique incrementing nonce for every private request
 		$nonce = $this->_createNonce();
+		$params['method'] = $method;
 		$params['nonce'] = $nonce;
 		$params['key'] = $this->privatekey;
 		$params['signature'] = $this->_getSignature($nonce);
@@ -94,9 +97,11 @@ class PrivateBTCeUSD extends PrivateMarket
 	protected function _buy($amount, $price)
 	{
 		iLog("[PrivateBTCeUSD] Create BUY limit order {$amount} @{$price}USD");
-		$params = array('amount' => $amount, 'price' => $price);
+		
+	   	//BTCe requires specifying the pair (what currencies are being traded), in this case we just do btc_usd
+		$params = array('amount' => $amount, 'pair' => 'btc_usd', 'type' => 'buy', 'rate' => $price);
 		try {
-			$response = $this->_sendRequest($this->buyUrl, $params);
+			$response = $this->_sendRequest(self::API_URL, $params, self::METHOD_TRADE);
 			if ($response){
 				if (isset($response['error'])) {
 					iLog("[PrivateBTCeUSD] ERROR: Buy failed {$response['error']['message']}");
@@ -114,9 +119,11 @@ class PrivateBTCeUSD extends PrivateMarket
 	protected function _sell($amount, $price)
 	{	
 		iLog("[PrivateBTCeUSD] Create SELL limit order {$amount} @{$price}USD");
-		$params = array('amount' => $amount, 'price' => $price);
+
+	   	//BTCe requires specifying the pair (what currencies are being traded), in this case we just do btc_usd
+		$params = array('amount' => $amount, 'pair' => 'btc_usd', 'type' => 'sell', 'rate' => $price);
 		try { 
-			$response = $this->_sendRequest($this->sellUrl, $params);
+			$response = $this->_sendRequest(self::API_URL, $params, self::METHOD_TRADE);
 			if ($response) {
 				if(isset($response['error'])) {
 					iLog("[PrivateBTCeUSD] ERROR: Sell failed {$response['error']['message']}");
@@ -136,7 +143,59 @@ class PrivateBTCeUSD extends PrivateMarket
 		global $config;
 		global $DB;
 		
-		//TODO fill out info
+/*
+EXAMPLE GET INFO RESPONSE:
+	"success":1,
+		"return":{
+		"funds":{
+			"usd":325,
+			"btc":23.998,
+			"sc":121.998,
+			"ltc":0,
+			"ruc":0,
+			"nmc":0
+		},
+		"rights":{
+			"info":1,
+			"trade":1
+		},
+		"transaction_count":80,
+		"open_orders":1,
+		"server_time":1342123547
+	}
+*/
+		//TODO Finish adjusting logic for BTCe info...
+		if ($config['live']) { // LIVE TRADING USES LIVE DATA
+			$params = array();
+			try {
+				$response = $this->_sendRequest(self::API_URL, $params, slef::METHOD_GET_INFO);
+				if($response && isset($response['success']) && $response['success'] == 1) {
+					$this->btcBalance = (float) $response['btc_available'];
+					$this->usdBalance = (float) $response['usd_available'];
+					iLog("[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+					return true;
+				} else if ($response) {
+					iLog("[PrivateBTCeUSD] ERROR: Get info failed - {$response}");
+					return false;
+				}
+			} catch (Exception $e) {
+				iLog("[PrivateBTCeUSD] ERROR: Get info failed - ".$e->getMessage());
+				return false;
+			}
+		} else {	// SIMULATED TRADING USES DATABASE DATA
+			try {
+				$result = $DB->query("SELECT * FROM clients WHERE bitstampkey = '{$this->privatekey}'");
+				if ($client = $DB->fetch_array_assoc($result)){
+					$this->btcBalance = $client['bitstampbtc'];
+					$this->usdBalance = $client['bitstampusd'];
+					iLog("[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+					return true;
+				}
+			} catch (Exception $e){
+				iLog("[PrivateBTCeUSD] ERROR: Get info failed - ".$e->getMessage());
+				return false;
+			}
+		}
 		return false;
 	}
 }
