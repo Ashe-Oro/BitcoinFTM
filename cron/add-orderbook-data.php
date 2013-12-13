@@ -12,4 +12,7 @@ echo "<br/>MtGox Orderbook Added..." . $temp;
 $temp = $exchangeDb->addToOrderbooks("bitstamp", 10);
 echo "<br/>Bitstamp Orderbook Added..." . $temp;
 
+$temp = $exchangeDb->addToOrderbooks("btce_btcusd", 10);
+echo "<br/>Btc-e Orderbook Added...(BTCUSD)" . $temp;
+
 ?>
