@@ -3,6 +3,7 @@ include_once("../classes/mtgox.php");
 include_once("../classes/mtgoxOrderbook.php");
 include_once("../classes/bitstamp.php");
 include_once("../classes/bitstampOrderbook.php");
+include_once("../classes/bitfinexOrderbook.php");
 include_once("../classes/btce_btcusdOrderbook.php");
 include_once("../classes/bitfinex_btcusd.php");
 include_once("../classes/bitfinex_ltcbtc.php");
@@ -82,6 +83,13 @@ class ExchangeDbUtil {
 	private function getBTCeBTCUSDOrderbook($maxVolume) {
 		$btce = new BTCeBTCUSDOrderBook();
 		$orderbook = $btce->getOrderbook($maxVolume);
+
+		return $orderbook;
+	}
+
+	private function getBitfinexBTCUSDTOrderbook($maxVolume) {
+		$bitfinex = new BitFinexOrderBook();
+		$orderbook = $bitfinex->getOrderbook($maxVolume);
 
 		return $orderbook;
 	}
@@ -177,6 +185,13 @@ class ExchangeDbUtil {
 		}
 		elseif($xchg == self::EXCHANGE_BTCE_BTCUSD) {
 			$orderbook = $this->getBTCeBTCUSDOrderbook($maxVolume);
+
+			if($orderbook != null && $orderbook->{'timestamp'} > 0) {
+				$query = "INSERT INTO {$xchg}_orderbook VALUES ({$orderbook->{'timestamp'}}, {$orderbook->{'bids'}}, {$orderbook->{'asks'}})";
+			}
+		}
+		elseif($xchg == self::EXCHANGE_BITFINEX_BTCUSD) {
+			$orderbook = $this->getBitfinexBTCUSDTOrderbook($maxVolume);
 
 			if($orderbook != null && $orderbook->{'timestamp'} > 0) {
 				$query = "INSERT INTO {$xchg}_orderbook VALUES ({$orderbook->{'timestamp'}}, {$orderbook->{'bids'}}, {$orderbook->{'asks'}})";
