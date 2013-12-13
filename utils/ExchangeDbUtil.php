@@ -3,6 +3,7 @@ include_once("../classes/mtgox.php");
 include_once("../classes/mtgoxOrderbook.php");
 include_once("../classes/bitstamp.php");
 include_once("../classes/bitstampOrderbook.php");
+include_once("../classes/bitfinex_btcusd.php");
 include_once("../classes/bitfinex_ltcbtc.php");
 include_once("../classes/btce_ltcbtc.php");
 include_once("../classes/btce_btcusd.php");
@@ -12,6 +13,7 @@ class ExchangeDbUtil {
 	const EXCHANGE_BITSTAMP = "bitstamp";
 	const EXCHANGE_MTGOX = "mtgox";
 	const EXCHANGE_BITFINEX_LTCBTC = "bitfinex_ltcbtc";
+	const EXCHANGE_BITFINEX_BTCUSD = "bitfinex_btcusd";
 	const EXCHANGE_BTCE_LTCBTC = "btce_ltcbtc";
 	const EXCHANGE_BTCE_BTCUSD = "btce_btcusd";
 	const HISTORY_SUFFIX = "_history";
@@ -34,8 +36,15 @@ class ExchangeDbUtil {
 		return $ticker;
 	}
 
-	private function getBitfinexTicker() {
+	private function getBitfinexLTCBTCTicker() {
 		$bitfinex = new BitfinexLTCBTC();
+		$ticker = $bitfinex->getTicker();
+
+		return $ticker;
+	}
+
+	private function getBitfinexBTCUSDTicker() {
+		$bitfinex = new BitfinexBTCUSD();
 		$ticker = $bitfinex->getTicker();
 
 		return $ticker;
@@ -99,8 +108,15 @@ class ExchangeDbUtil {
 				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'low'}}, {$ticker->{'mid'}}, {$ticker->{'volume'}}, {$ticker->{'last'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
 			}
 		}
+		elseif($xchg == self::EXCHANGE_BITFINEX_BTCUSD) {
+			$ticker = $this->getBitfinexBTCUSDTicker();
+			
+			if($ticker != null && $ticker->{'timestamp'} > 0) {
+				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'mid'}}, {$ticker->{'last'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+			}
+		}
 		elseif($xchg == self::EXCHANGE_BITFINEX_LTCBTC) {
-			$ticker = $this->getBitfinexTicker();
+			$ticker = $this->getBitfinexLTCBTCTicker();
 			
 			if($ticker != null && $ticker->{'timestamp'} > 0) {
 				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'mid'}}, {$ticker->{'last'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
