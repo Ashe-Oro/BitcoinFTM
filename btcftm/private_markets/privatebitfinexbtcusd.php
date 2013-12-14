@@ -1,12 +1,11 @@
 <?php
 require_once('privatemarket.php');
 
-class PrivateBitfinexUSD extends PrivateMarket
+class PrivateBitfinexBTCUSD extends PrivateMarket
 {
-	//TODO this is just a shell, these need to be updated/removed as necessary
-	private $balanceUrl = "";
-    private $buyUrl = "";
-    private $sellUrl = "";
+	const API_URL = "https://api.bitfinex.com";
+	const METHOD_BALANCES = "/v1/balances";
+	const METHOD_NEW_ORDER = "/v1/order/new";
 
     private $privatekey = '';
     private $secret = '';
@@ -27,32 +26,43 @@ class PrivateBitfinexUSD extends PrivateMarket
 		$this->clientID = $clientID;
 	}
 
-	protected function _sendRequest($url, $params=array(), $extraHeaders=NULL)
+	protected function _sendRequest($url, $params=array(), $method)
 	{
 		$rUrl = $url;		
 		$response = array();
 		
 		$response['result'] = 'success';
 		$response['return'] = false;
-		iLog("[PrivateBitfinexUSD] Sending Request: {$rUrl}");
+		
+		echo "[PrivateBitfinexUSD] Sending Request: {$rUrl}";
+		//iLog("[PrivateBitfinexUSD] Sending Request: {$rUrl}");
 		
 		
-		if ($rUrl == $this->buyUrl['url'] || $rUrl == $this->sellUrl['url']) {
-			iLog("[PrivateBitfinexUSD] WARNING: Request not sent. Live sell and buy functions currently disabled.");
+		if ($method == METHOD_NEW_ORDER) {
+			echo "[PrivateBitfinexUSD] WARNING: Request not sent. Live sell and buy functions currently disabled.";
+			//iLog("[PrivateBitfinexUSD] WARNING: Request not sent. Live sell and buy functions currently disabled.");
 			return $response; 
 		}
 		
 		// must have a unique incrementing nonce for every private request
 		$nonce = $this->_createNonce();
-		$params['nonce'] = $nonce;
-		$params['key'] = $this->privatekey;
-		$params['signature'] = $this->_getSignature($nonce);
-		
+		$payload['request'] = $method;
+		$payload['nonce'] = $nonce;
+		$payload['options'] = $params;
+
 		// generate the POST data string
         $post_data = http_build_query($params, '', '&');
 
+        //CANT QUITE FIGURE OUT HOW TO USE PHP JSON_ENCODE FOR THIS SO BULDING THE JSON MANUALLY FOR NOW...
+        //$payload = json_encode($payload);
+        $payload = base64_encode("{\"request\":\"".$method."\",\"nonce\":\"". $nonce . "\", \"options\":{}}");
+
         // set up header
-        $headers = array();
+        $headers = array(
+            'X-BFX-APIKEY: '.$this->privatekey,
+            'X-BFX-PAYLOAD: '.$payload,
+            'X-BFX-SIGNATURE: '.$this->_getSignature($payload),
+        );
 		
 		// our curl handle (initialize if required)
         if (is_null($this->ch)){
@@ -60,8 +70,8 @@ class PrivateBitfinexUSD extends PrivateMarket
             curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($this->ch, CURLOPT_USERAGENT,'Mozilla/4.0 (compatible; Bitfinex PHP client; '.php_uname('s').'; PHP/'.phpversion().')');
         }
-        curl_setopt($this->ch, CURLOPT_URL, $rUrl);
-        curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post_data);
+        curl_setopt($this->ch, CURLOPT_URL, $rUrl . $method);
+        //curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post_data);
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 			
@@ -85,10 +95,9 @@ class PrivateBitfinexUSD extends PrivateMarket
 		return $mt[1] . substr($mt[0], 2, 6);
 	}
 	
-	protected function _getSignature($nonce)
+	protected function _getSignature($payload)
 	{
-		$message = $nonce.$this->clientID.$this->privatekey;
-		return strtoupper(hash_hmac('sha256', $message, $this->secret));
+		return hash_hmac('sha384', $payload, $this->secret);
 	}
 
 	protected function _buy($amount, $price)
@@ -135,8 +144,39 @@ class PrivateBitfinexUSD extends PrivateMarket
 	{
 		global $config;
 		global $DB;
-		
-		//TODO fill out info
+
+		//if ($config['live']) { // LIVE TRADING USES LIVE DATA
+			try {
+				//no params need to be sent, that is the empty string param below
+				$response = $this->_sendRequest(self::API_URL, "", self::METHOD_BALANCES);
+
+				//TODO find a better way to see if we have success then the size of the response array
+				if($response && sizeof($response) == 6) {
+					
+					//TODO Automatically find the right array, don't just guess 0,1 etc
+					$btcArr = $response[0];
+					$btcAvailable = (float)$btcArr->{'available'};
+
+					$usdArr = $response[1];
+					$usdAvailable = (float)$usdArr->{'available'};
+
+					
+					$this->btcBalance = $btcAvailable;
+					$this->usdBalance = $usdAvailable;
+					echo "[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD";
+					//iLog("[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+					return true;
+				}
+				else {
+					//iLog("[PrivateBTCeUSD] ERROR: Get info failed - {$response}");
+					return false;
+				}			
+			} catch (Exceptin $e){
+				//iLog("[PrivateBTCeUSD] ERROR: Get info failed - ".$e->getMessage());
+				return false;			
+			}
+		//}
+
 		return false;
 	}
 }
