@@ -10,6 +10,7 @@ include_once("../classes/bitfinex_ltcbtc.php");
 include_once("../classes/btce_ltcbtc.php");
 include_once("../classes/btce_btcusd.php");
 include_once("../classes/kraken_btcusd.php");
+include_once("../classes/kraken_btcusdOrderbook.php");
 include("database_util.php");
 class ExchangeDbUtil {
 	
@@ -99,6 +100,13 @@ class ExchangeDbUtil {
 	private function getBitfinexBTCUSDTOrderbook($maxVolume) {
 		$bitfinex = new BitFinexOrderBook();
 		$orderbook = $bitfinex->getOrderbook($maxVolume);
+
+		return $orderbook;
+	}
+	
+	private function getKrakenBTCUSDTOrderbook($maxVolume) {
+		$kraken = new KrakenBTCUSDOrderBook();
+		$orderbook = $kraken->getOrderbook($maxVolume);
 
 		return $orderbook;
 	}
@@ -213,10 +221,17 @@ class ExchangeDbUtil {
 				$query = "INSERT INTO {$xchg}_orderbook VALUES ({$orderbook->{'timestamp'}}, {$orderbook->{'bids'}}, {$orderbook->{'asks'}})";
 			}
 		}
+		elseif($xchg == self::EXCHANGE_KRAKEN_BTCUSD) {
+			$orderbook = $this->getKrakenBTCUSDTOrderbook($maxVolume);
+
+			if($orderbook != null && $orderbook->{'timestamp'} > 0) {
+				$query = "INSERT INTO {$xchg}_orderbook VALUES ({$orderbook->{'timestamp'}}, {$orderbook->{'bids'}}, {$orderbook->{'asks'}})";
+			}
+		}
 
 		if($query != ""){
 			$db->query($query);
-			$ret = "<br/>Query Executed: " . $query;
+			$ret = "<br/>Query Executed Successful for Exchange " . $xchg;
 		}
 		else {
 			$ret = "<br/>Query NOT Executed: Bad data for Exchange " . $xchg;

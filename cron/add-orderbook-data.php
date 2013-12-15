@@ -18,4 +18,7 @@ echo "<br/>Btc-e Orderbook Added...(BTCUSD)" . $temp;
 $temp = $exchangeDb->addToOrderbooks("bitfinex_btcusd", 10);
 echo "<br/>Bitfinex Orderbook Added...(BTCUSD)" . $temp;
 
+$temp = $exchangeDb->addToOrderbooks("kraken_btcusd", 10);
+echo "<br/>Kraken Orderbook Added...(BTCUSD)" . $temp;
+
 ?>
