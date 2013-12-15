@@ -53,9 +53,9 @@ class PrivateBitfinexBTCUSD extends PrivateMarket
 		// generate the POST data string
         $post_data = http_build_query($params, '', '&');
 
-        //CANT QUITE FIGURE OUT HOW TO USE PHP JSON_ENCODE FOR THIS SO BULDING THE JSON MANUALLY FOR NOW...
-        //$payload = json_encode($payload);
-        $payload = base64_encode("{\"request\":\"".$method."\",\"nonce\":\"". $nonce . "\", \"options\":{}}");
+        //Payload must be in JSON format and base64 encoded
+        $payload = json_encode($payload);
+        $payload = base64_encode($payload);
 
         // set up header
         $headers = array(
@@ -102,21 +102,41 @@ class PrivateBitfinexBTCUSD extends PrivateMarket
 
 	protected function _buy($amount, $price)
 	{
-		iLog("[PrivateBitfinexUSD] Create BUY limit order {$amount} @{$price}USD");
-		$params = array('amount' => $amount, 'price' => $price);
+		$symbol = "btcusd";
+		$exchange = "bitfinex";
+		$side = "buy";
+		//Type of Limit means the trade when only happen when the desired price is reached: https://community.bitfinex.com/showwiki.php?title=Bitfinex+Documentation:Orders+type
+		$type = "limit";
+
+		$payload = array(
+			'symbol' => $symbol,
+			'amount' => $amount, 
+			'price' => $price,
+			'exchange' => $exchange,
+			'side' => $side,
+			'type' => $type,
+			'is_hidden' => false
+			);
+
 		try {
-			$response = $this->_sendRequest($this->buyUrl, $params);
+			$response = $this->_sendRequest(self::API_URL, "", self::METHOD_NEW_ORDER);
+			echo "<br/><br/>RESPONSE: ";
+			var_dump($response);
 			if ($response){
+				//TODO NOT SURE THERE"S A GOOD WAY TO CATCH THIS CASE, BUT LEAVING IT IN FOR NOW TO NOT FORGET IT
 				if (isset($response['error'])) {
-					iLog("[PrivateBitfinexUSD] ERROR: Buy failed {$response['error']['message']}");
+					//iLog("[PrivateBitfinexUSD] ERROR: Buy failed {$response['error']['message']}");
+					echo "[PrivateBitfinexUSD] ERROR: Buy failed {$response['error']['message']}";
 				} else {
 					alert('BUY'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
 					return true;
 				}
 			}
 		} catch (Exception $e) {
-			iLog("[PrivateBitfinexUSD] ERROR: Buy failed - ".$e->getMessage());
+			//iLog("[PrivateBitfinexUSD] ERROR: Buy failed - ".$e->getMessage());
+			echo "[PrivateBitfinexUSD] ERROR: Buy failed - ".$e->getMessage();
 		}
+
 		return false;
 	}
 
