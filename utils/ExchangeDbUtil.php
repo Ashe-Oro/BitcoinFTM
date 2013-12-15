@@ -9,6 +9,7 @@ include_once("../classes/bitfinex_btcusd.php");
 include_once("../classes/bitfinex_ltcbtc.php");
 include_once("../classes/btce_ltcbtc.php");
 include_once("../classes/btce_btcusd.php");
+include_once("../classes/kraken_btcusd.php");
 include("database_util.php");
 class ExchangeDbUtil {
 	
@@ -16,6 +17,7 @@ class ExchangeDbUtil {
 	const EXCHANGE_MTGOX = "mtgox";
 	const EXCHANGE_BITFINEX_LTCBTC = "bitfinex_ltcbtc";
 	const EXCHANGE_BITFINEX_BTCUSD = "bitfinex_btcusd";
+	const EXCHANGE_KRAKEN_BTCUSD = "kraken_btcusd";
 	const EXCHANGE_BTCE_LTCBTC = "btce_ltcbtc";
 	const EXCHANGE_BTCE_BTCUSD = "btce_btcusd";
 	const HISTORY_SUFFIX = "_history";
@@ -55,6 +57,13 @@ class ExchangeDbUtil {
 	private function getBtceBTCUSDTicker() {
 		$btce = new BtceBTCUSD();
 		$ticker = $btce->getTicker();
+
+		return $ticker;
+	}
+
+	private function getKrakenBTCUSDTicker() {
+		$kraken = new KrakenBTCUSD();
+		$ticker = $kraken->getTicker();
 
 		return $ticker;
 	}
@@ -129,6 +138,13 @@ class ExchangeDbUtil {
 			
 			if($ticker != null && $ticker->{'timestamp'} > 0) {
 				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'mid'}}, {$ticker->{'last'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+			}
+		}
+		elseif($xchg == self::EXCHANGE_KRAKEN_BTCUSD) {
+			$ticker = $this->getKrakenBTCUSDTicker();
+			
+			if($ticker != null && $ticker->{'timestamp'} > 0) {
+				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'last'}},{$ticker->{'low'}}, {$ticker->{'volume'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
 			}
 		}
 		elseif($xchg == self::EXCHANGE_BITFINEX_LTCBTC) {

@@ -20,6 +20,9 @@ echo "<br/>Btce Added (BTCUSD)..." . $temp;
 
 $temp = $exchangeDb->addToTicker("bitfinex_btcusd");
 echo "<br/>Bitfinex Added (BTCUSD)..." . $temp;
+
+$temp = $exchangeDb->addToTicker("kraken_btcusd");
+echo "<br/>Kraken Added (BTCUSD)..." . $temp;
 ?>
 <h3>LTC/BTC</h3>
 <?php
