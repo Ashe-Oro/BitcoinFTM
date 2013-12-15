@@ -3,10 +3,13 @@ require_once('privatemarket.php');
 
 class PrivateKrakenUSD extends PrivateMarket
 {
-	//TODO this is just a shell, these need to be updated/removed as necessary
-	private $balanceUrl = "";
-    private $buyUrl = "";
-    private $sellUrl = "";
+	
+	const API_URL = "https://api.kraken.com";
+	const METHOD_BALANCE = "Balance";
+	const METHOD_TRADE_BALANCE = "TradeBalance";
+	const PRIVATE = "private";
+
+	private $apiVersion = 0;
 
     private $privatekey = '';
     private $secret = '';
@@ -60,11 +63,13 @@ class PrivateKrakenUSD extends PrivateMarket
             curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($this->ch, CURLOPT_USERAGENT,'Mozilla/4.0 (compatible; Kraken PHP client; '.php_uname('s').'; PHP/'.phpversion().')');
         }
+        curl_setopt($this->ch, CURLOPT_URL, $rUrl . '/' . $version . '/' . self::PRIVATE . '/' . $method);
         curl_setopt($this->ch, CURLOPT_URL, $rUrl);
         curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post_data);
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($this->ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-			
+		curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST, FALSE);			
+
 		// run the query
         $res = curl_exec($this->ch);
         if ($res === false) {
@@ -136,6 +141,8 @@ class PrivateKrakenUSD extends PrivateMarket
 		global $config;
 		global $DB;
 		
+		$response = $this->_sendRequest(self::API_URL, "", self::METHOD_BALANCE);
+
 		//TODO fill out info
 		return false;
 	}
