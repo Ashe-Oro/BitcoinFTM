@@ -1,0 +1,27 @@
+* * * * * /home/john/scripts/lit2bit_add_data
+* * * * * /home/john/scripts/lit2bit_add_orderbook
+0 * * * * /home/john/scripts/lit2bit_resample_bitstamp_hours
+0,30 * * * * /home/john/scripts/lit2bit_resample_bitstamp_half_hours
+0 0 * * * /home/john/scripts/lit2bit_resample_bitstamp_days
+0 0 1 * * /home/john/scripts/lit2bit_resample_bitstamp_months
+0 0 * * 0 /home/john/scripts/lit2bit_resample_bitstamp_weeks
+#0 0 * * 0 [ `expr \`date +\%s\` / 86400 \% 2` -eq 1 ] && /home/john/scripts/lit2bit_resample_bitstamp_weeks
+0 * * * * /home/john/scripts/lit2bit_resample_mtgox_hours
+0,30 * * * * /home/john/scripts/lit2bit_resample_mtgox_half_hours
+0 0 * * * /home/john/scripts/lit2bit_resample_mtgox_days
+0 0 1 * * /home/john/scripts/lit2bit_resample_mtgox_months
+0 0 * * 0 /home/john/scripts/lit2bit_resample_mtgox_weeks
+#0 0 * * 0 [ `expr \`date +\%s\` / 86400 \% 2` -eq 1 ] && /home/john/scripts/lit2bit_resample_mtgox_weeks
+0 * * * * /home/john/scripts/lit2bit_resample_btce_btcusd_hours
+0,30 * * * * /home/john/scripts/lit2bit_resample_btce_btcusd_half_hours
+0 0 * * * /home/john/scripts/lit2bit_resample_btce_btcusd_days
+0 0 1 * * /home/john/scripts/lit2bit_resample_btce_btcusd_months
+0 0 * * 0 /home/john/scripts/lit2bit_resample_btce_btcusd_weeks
+#0 0 * * 0 [ `expr \`date +\%s\` / 86400 \% 2` -eq 1 ] && /home/john/scripts/lit2bit_resample_btce_btcusd_weeks
+0 * * * * /home/john/scripts/lit2bit_resample_bitfinex_btcusd_hours
+0,30 * * * * /home/john/scripts/lit2bit_resample_bitfinex_btcusd_half_hours
+0 0 * * * /home/john/scripts/lit2bit_resample_bitfinex_btcusd_days
+0 0 1 * * /home/john/scripts/lit2bit_resample_bitfinex_btcusd_months
+0 0 * * 0 /home/john/scripts/lit2bit_resample_bitfinex_btcusd_weeks
+#0 0 * * 0 [ `expr \`date +\%s\` / 86400 \% 2` -eq 1 ] && /home/john/scripts/lit2bit_resample_bitfinex_btcusd_weeks
+

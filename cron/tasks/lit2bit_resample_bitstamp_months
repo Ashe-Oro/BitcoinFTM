@@ -1,0 +1,2 @@
+#!/bin/bash
+curl --data "xchg=bitstamp&scale=months" http://lit2bit.com/cron/resample-live-data.php
