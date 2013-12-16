@@ -9,6 +9,7 @@ $exchangeDb = new ExchangeDbUtil();
 ?>
 <h3>BTC/USD</h3>
 <?php
+
 $temp = $exchangeDb->addToTicker("mtgox");
 echo "MtGox Added..." . $temp;
 
@@ -23,6 +24,10 @@ echo "<br/>Bitfinex Added (BTCUSD)..." . $temp;
 
 $temp = $exchangeDb->addToTicker("kraken_btcusd");
 echo "<br/>Kraken Added (BTCUSD)..." . $temp;
+
+$temp = $exchangeDb->addToTicker("cryptotrade_btcusd");
+echo "<br/>CryptoTrade Added (BTCUSD)..." . $temp;
+
 ?>
 <h3>LTC/BTC</h3>
 <?php
