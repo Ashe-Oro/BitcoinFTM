@@ -3,11 +3,12 @@ require_once('privatemarket.php');
 
 class PrivateCryptoTradeUSD extends PrivateMarket
 {
-	//TODO this is just a shell, these need to be updated/removed as necessary
-	private $balanceUrl = "";
-    private $buyUrl = "";
-    private $sellUrl = "";
+	const API_URL = "https://crypto-trade.com/";
+	const API = "api/";
+	const METHOD_GET_INFO = "/private/getinfo/";
+	const METHOD_TRADE = "/private/trade/";
 
+	private $apiVersion = 1;
     private $privatekey = '';
     private $secret = '';
 	private $clientID = '';
@@ -27,9 +28,9 @@ class PrivateCryptoTradeUSD extends PrivateMarket
 		$this->clientID = $clientID;
 	}
 
-	protected function _sendRequest($url, $params=array(), $extraHeaders=NULL)
+	protected function _sendRequest($url, $params=array(), $method)
 	{
-		$rUrl = $url;		
+		$rUrl = $url . self::API . $this->apiVersion . $method;		
 		$response = array();
 		
 		$response['result'] = 'success';
@@ -37,22 +38,22 @@ class PrivateCryptoTradeUSD extends PrivateMarket
 		iLog("[PrivateCryptoTradeUSD] Sending Request: {$rUrl}");
 		
 		
-		if ($rUrl == $this->buyUrl['url'] || $rUrl == $this->sellUrl['url']) {
+		if ($method == self::METHOD_TRADE) {
 			iLog("[PrivateCryptoTradeUSD] WARNING: Request not sent. Live sell and buy functions currently disabled.");
 			return $response; 
 		}
-		
+
 		// must have a unique incrementing nonce for every private request
-		$nonce = $this->_createNonce();
-		$params['nonce'] = $nonce;
-		$params['key'] = $this->privatekey;
-		$params['signature'] = $this->_getSignature($nonce);
+		$params['nonce'] = $this->_createNonce();
 		
 		// generate the POST data string
         $post_data = http_build_query($params, '', '&');
-
+        
         // set up header
-        $headers = array();
+        $headers = array(
+        	'AuthKey: '.$this->privatekey,
+        	'AuthSign: '.$this->_getSignature($post_data)
+        );
 		
 		// our curl handle (initialize if required)
         if (is_null($this->ch)){
@@ -79,26 +80,29 @@ class PrivateCryptoTradeUSD extends PrivateMarket
 	
 	protected function _createNonce()
 	{
-		// SC: picked this up from http://stackoverflow.com/questions/19470698/php-implementation-of-bitstamp-api
-		// generate a nonce as microtime, with as-string handling to avoid problems with 32bits systems
-		$mt = explode(' ', microtime());
-		return $mt[1] . substr($mt[0], 2, 6);
+		return round(microtime(true) * 1000);
 	}
 	
-	protected function _getSignature($nonce)
+	protected function _getSignature($post_data)
 	{
-		$message = $nonce.$this->clientID.$this->privatekey;
-		return strtoupper(hash_hmac('sha256', $message, $this->secret));
+		return hash_hmac('sha512', $post_data, $this->secret);
 	}
 
 	protected function _buy($amount, $price)
 	{
 		iLog("[PrivateCryptoTradeUSD] Create BUY limit order {$amount} @{$price}USD");
-		$params = array('amount' => $amount, 'price' => $price);
+
+		$params = array(
+			'pair' => 'btc_usd',
+			'type' => 'Buy', 
+			'amount' => $amount, 
+			'rate' => $price
+		);
+
 		try {
-			$response = $this->_sendRequest($this->buyUrl, $params);
+			$response = $this->_sendRequest(self::API_URL, $params, self::METHOD_TRADE);
 			if ($response){
-				if (isset($response['error'])) {
+				if (isset($response['status']) && $response['status'] == "error") {
 					iLog("[PrivateCryptoTradeUSD] ERROR: Buy failed {$response['error']['message']}");
 				} else {
 					alert('BUY'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
@@ -113,12 +117,19 @@ class PrivateCryptoTradeUSD extends PrivateMarket
 
 	protected function _sell($amount, $price)
 	{	
-		iLog("[PrivateCryptoTradeUSD] Create SELL limit order {$amount} @{$price}USD");
-		$params = array('amount' => $amount, 'price' => $price);
-		try { 
-			$response = $this->_sendRequest($this->sellUrl, $params);
-			if ($response) {
-				if(isset($response['error'])) {
+		iLog("[PrivateCryptoTradeUSD] Create BUY limit order {$amount} @{$price}USD");
+		
+		$params = array(
+			'pair' => 'btc_usd',
+			'type' => 'Sell', 
+			'amount' => $amount, 
+			'rate' => $price
+		);
+
+		try {
+			$response = $this->_sendRequest(self::API_URL, $params, self::METHOD_TRADE);
+			if ($response){
+				if (isset($response['status']) && $response['status'] == "error") {
 					iLog("[PrivateCryptoTradeUSD] ERROR: Sell failed {$response['error']['message']}");
 				} else {
 					alert('SELL'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
@@ -136,7 +147,28 @@ class PrivateCryptoTradeUSD extends PrivateMarket
 		global $config;
 		global $DB;
 		
-		//TODO fill out info
+		if ($config['live']) { // LIVE TRADING USES LIVE DATA
+			try {
+				$response = $this->_sendRequest(self::API_URL, array(), self::METHOD_GET_INFO);
+
+				if($response &&  $response['status'] == "success") {
+					$data = $response['data'];
+					$funds = $data['funds'];
+					
+					$this->btcBalance = $funds['btc'];
+					$this->usdBalance = $funds['usd'];
+					iLog("[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+					return true;
+				}
+				else {
+					iLog("[PrivateBTCeUSD] ERROR: Get info failed - {$response}");
+					return false;
+				}			
+			} catch (Exceptin $e){
+				iLog("[PrivateBTCeUSD] ERROR: Get info failed - ".$e->getMessage());
+				return false;			
+			}
+		}
 		return false;
 	}
 }
