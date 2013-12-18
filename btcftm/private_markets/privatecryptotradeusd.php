@@ -103,7 +103,7 @@ class PrivateCryptoTradeUSD extends PrivateMarket
 			$response = $this->_sendRequest(self::API_URL, $params, self::METHOD_TRADE);
 			if ($response){
 				if (isset($response['status']) && $response['status'] == "error") {
-					iLog("[PrivateCryptoTradeUSD] ERROR: Buy failed {$response['error']['message']}");
+					iLog("[PrivateCryptoTradeUSD] ERROR: Buy failed {$response['error']}");
 				} else {
 					alert('BUY'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
 					return true;
@@ -130,7 +130,7 @@ class PrivateCryptoTradeUSD extends PrivateMarket
 			$response = $this->_sendRequest(self::API_URL, $params, self::METHOD_TRADE);
 			if ($response){
 				if (isset($response['status']) && $response['status'] == "error") {
-					iLog("[PrivateCryptoTradeUSD] ERROR: Sell failed {$response['error']['message']}");
+					iLog("[PrivateCryptoTradeUSD] ERROR: Sell failed {$response['error']}");
 				} else {
 					alert('SELL'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
 					return true;

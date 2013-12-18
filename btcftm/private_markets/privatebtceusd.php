@@ -39,15 +39,14 @@ class PrivateBTCeUSD extends PrivateMarket
 		$response['return'] = false;
 
 		iLog("[PrivateBTCeUSD] Sending Request: {$rUrl} using method {$method}");
-		
+
 		if ($method == self::METHOD_TRADE) {
 			iLog("[PrivateBTCeUSD] WARNING: Request not sent. Live sell and buy functions currently disabled.");
 			return $response; 
 		}
 		
 		$params['method'] = $method;
-        $params['nonce'] = $this->_createNonce();
-		
+		$params['nonce'] = $this->_createNonce();
 		// generate the POST data string
         $post_data = http_build_query($params, '', '&');
 
@@ -82,8 +81,9 @@ class PrivateBTCeUSD extends PrivateMarket
 	
 	protected function _createNonce()
 	{
-        $mt = explode(' ', microtime());
-        return $mt[1];
+		//TODO this nonce creation may need some tweaking.. it has to be exactly 10 in length and less then 4294967294
+		//Below will have problems if executed too quickly in succession with the last call generating a nonce.
+		return substr(round(microtime(true) * 1000), 0, 10);
 	}
 	
 	protected function _getSignature($post_data)
@@ -104,7 +104,7 @@ class PrivateBTCeUSD extends PrivateMarket
 					alert('BUY'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
 					return true;
 				} else {
-					iLog("[PrivateBTCeUSD] ERROR: Buy failed {$response['error']['message']}");
+					iLog("[PrivateBTCeUSD] ERROR: Buy failed {$response['error']}");
 				}
 			}
 		} catch (Exception $e) {
@@ -126,7 +126,7 @@ class PrivateBTCeUSD extends PrivateMarket
 					alert('SELL'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
 					return true;
 				} else {
-					iLog("[PrivateBTCeUSD] ERROR: Sell failed {$response['error']['message']}");
+					iLog("[PrivateBTCeUSD] ERROR: Sell failed {$response['error']}");
 				}
 			}
 		} catch (Exception $e) {
@@ -150,16 +150,15 @@ class PrivateBTCeUSD extends PrivateMarket
 					
 					$this->btcBalance = (float) $funds['btc'];
 					$this->usdBalance = (float) $funds['usd'];
-					echo "[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD";
-					//iLog("[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+					iLog("[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
 					return true;
 				}
 				else {
-					//iLog("[PrivateBTCeUSD] ERROR: Get info failed - {$response}");
+					iLog("[PrivateBTCeUSD] ERROR: Get info failed - {$response}");
 					return false;
 				}			
 			} catch (Exceptin $e){
-				//iLog("[PrivateBTCeUSD] ERROR: Get info failed - ".$e->getMessage());
+				iLog("[PrivateBTCeUSD] ERROR: Get info failed - ".$e->getMessage());
 				return false;			
 			}
 		}
