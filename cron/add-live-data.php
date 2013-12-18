@@ -28,6 +28,9 @@ echo "<br/>Kraken Added (BTCUSD)..." . $temp;
 $temp = $exchangeDb->addToTicker("cryptotrade_btcusd");
 echo "<br/>CryptoTrade Added (BTCUSD)..." . $temp;
 
+$temp = $exchangeDb->addToTicker("campbx_btcusd");
+echo "<br/>CampBX Added (BTCUSD)..." . $temp;
+
 ?>
 <h3>LTC/BTC</h3>
 <?php

@@ -13,6 +13,7 @@ include_once("../classes/kraken_btcusd.php");
 include_once("../classes/kraken_btcusdOrderbook.php");
 include_once("../classes/cryptotrade_btcusd.php");
 include_once("../classes/cryptotrade_btcusdOrderbook.php");
+include_once("../classes/campbx_btcusd.php");
 include("database_util.php");
 class ExchangeDbUtil {
 	
@@ -24,6 +25,7 @@ class ExchangeDbUtil {
 	const EXCHANGE_BTCE_LTCBTC = "btce_ltcbtc";
 	const EXCHANGE_BTCE_BTCUSD = "btce_btcusd";
 	const EXCHANGE_CRYPTOTRADE_BTCUSD = "cryptotrade_btcusd";
+	const EXCHANGE_CAMPBX_BTCUSD = "campbx_btcusd";
 	const HISTORY_SUFFIX = "_history";
 	const HISTORY_DAYS_SUFFIX = "_history_days";
 	const HISTORY_WEEKS_SUFFIX = "_history_weeks";
@@ -75,6 +77,13 @@ class ExchangeDbUtil {
 	private function getCryptoTradeBTCUSDTicker() {
 		$crypto = new CryptoTradeBTCUSD();
 		$ticker = $crypto->getTicker();
+
+		return $ticker;
+	}
+
+	private function getCampBXBTCUSDTicker() {
+		$campbx = new CampBXBTCUSD();
+		$ticker = $campbx->getTicker();
 
 		return $ticker;
 	}
@@ -191,6 +200,13 @@ class ExchangeDbUtil {
 			
 			if($ticker != null && $ticker->{'timestamp'} > 0) {
 				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'high'}}, {$ticker->{'low'}}, {$ticker->{'volume'}}, {$ticker->{'last'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
+			}
+		}
+		elseif($xchg == self::EXCHANGE_CAMPBX_BTCUSD) {
+			$ticker = $this->getCampBXBTCUSDTicker();
+			
+			if($ticker != null && $ticker->{'timestamp'} > 0) {
+				$query = "INSERT INTO {$xchg}_ticker VALUES ({$ticker->{'timestamp'}}, {$ticker->{'last'}}, {$ticker->{'bid'}}, {$ticker->{'ask'}})";
 			}
 		}
 
