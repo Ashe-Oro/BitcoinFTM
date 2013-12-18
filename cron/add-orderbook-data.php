@@ -24,4 +24,7 @@ echo "<br/>Kraken Orderbook Added...(BTCUSD)" . $temp;
 $temp = $exchangeDb->addToOrderbooks("cryptotrade_btcusd", 10);
 echo "<br/>CryptoTrade Orderbook Added...(BTCUSD)" . $temp;
 
+$temp = $exchangeDb->addToOrderbooks("campbx_btcusd", 10);
+echo "<br/>CampBX Orderbook Added...(BTCUSD)" . $temp;
+
 ?>

@@ -14,6 +14,7 @@ include_once("../classes/kraken_btcusdOrderbook.php");
 include_once("../classes/cryptotrade_btcusd.php");
 include_once("../classes/cryptotrade_btcusdOrderbook.php");
 include_once("../classes/campbx_btcusd.php");
+include_once("../classes/campbx_btcusdOrderbook.php");
 include("database_util.php");
 class ExchangeDbUtil {
 	
@@ -133,6 +134,13 @@ class ExchangeDbUtil {
 	private function getCryptoTradeBTCUSDTOrderbook($maxVolume) {
 		$crypto = new CryptoTradeBTCUSDOrderBook();
 		$orderbook = $crypto->getOrderbook($maxVolume);
+
+		return $orderbook;
+	}
+
+	private function getCampBXBTCUSDTOrderbook($maxVolume) {
+		$campbx = new CampBXBTCUSDOrderBook();
+		$orderbook = $campbx->getOrderbook($maxVolume);
 
 		return $orderbook;
 	}
@@ -270,6 +278,13 @@ class ExchangeDbUtil {
 		}
 		elseif($xchg == self::EXCHANGE_CRYPTOTRADE_BTCUSD) {
 			$orderbook = $this->getCryptoTradeBTCUSDTOrderbook($maxVolume);
+
+			if($orderbook != null && $orderbook->{'timestamp'} > 0) {
+				$query = "INSERT INTO {$xchg}_orderbook VALUES ({$orderbook->{'timestamp'}}, {$orderbook->{'bids'}}, {$orderbook->{'asks'}})";
+			}
+		}
+		elseif($xchg == self::EXCHANGE_CAMPBX_BTCUSD) {
+			$orderbook = $this->getCampBXBTCUSDTOrderbook($maxVolume);
 
 			if($orderbook != null && $orderbook->{'timestamp'} > 0) {
 				$query = "INSERT INTO {$xchg}_orderbook VALUES ({$orderbook->{'timestamp'}}, {$orderbook->{'bids'}}, {$orderbook->{'asks'}})";
