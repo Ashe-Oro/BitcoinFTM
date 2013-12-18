@@ -42,4 +42,9 @@
 0 0 1 * * /home/john/scripts/lit2bit_resample_cryptotrade_btcusd_months
 0 0 * * 0 /home/john/scripts/lit2bit_resample_cryptotrade_btcusd_weeks
 #0 0 * * 0 [ `expr \`date +\%s\` / 86400 \% 2` -eq 1 ] && /home/john/scripts/lit2bit_resample_cryptotrade_btcusd_weeks
-
+0 * * * * /home/john/scripts/lit2bit_resample_campbx_btcusd_hours
+0,30 * * * * /home/john/scripts/lit2bit_resample_campbx_btcusd_half_hours
+0 0 * * * /home/john/scripts/lit2bit_resample_campbx_btcusd_days
+0 0 1 * * /home/john/scripts/lit2bit_resample_campbx_btcusd_months
+0 0 * * 0 /home/john/scripts/lit2bit_resample_campbx_btcusd_weeks
+#0 0 * * 0 [ `expr \`date +\%s\` / 86400 \% 2` -eq 1 ] && /home/john/scripts/lit2bit_resample_campbx_btcusd_weeks
