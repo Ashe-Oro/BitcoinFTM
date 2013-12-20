@@ -9,25 +9,47 @@ class HistoryMtGoxUSD extends HistoryMarket
 	public function __construct()
 	{
 		parent::__construct("USD");
-		$this->updateRate = 20;
 		$this->orderBook = new MarketOrderBook();
 	}
 
 	public function updateOrderBookData()
 	{
-		iLog("[HistoryMtGoxUSD] Updating order depth...");
-		$url = "";
-		$res = file_get_contents($this->depthUrl);
-		try {
-			$json = json_decode($res);
-			if ($json->result == 'success') {
-				$data = $json->data;
-				$this->orderBook = $this->formatOrderBook($data);
-				//var_dump($this->depth);
-				iLog("[MtGoxUSD] Order Depth Updated");
+		global $DB;
+		
+		if ($this->timestamp > 0) {
+			iLog("[HistoryMtGoxUSD] Updating order depth for TS: {$this->timestamp} P: {$this->period}...");
+			try{
+				$res = $DB->query("SELECT * FROM mtgox_orderbook WHERE timestamp <= {$this->timestamp} ORDER BY timestamp DESC LIMIT 1");
+				if ($row = $DB->fetch_array_assoc($res)){
+					$this->orderBook = $this->formatOrderBook($row);
+					iLog("[HistoryMtGoxUSD] Historical order depth updated");
+				} else {
+					iLog("[HistoryMtGoxUSD] WARNING: No historical order depth found! Using ticker data...");
+					$ticker = $this->getCurrentTicker();
+					$data = new stdClass();
+					$data->asks = array(array($ticker->getAvg(), 10));
+					$data->bids = array(array($ticker->getAvg(), 10));
+					$this->orderBook = $this->formatOrderBook($data);
+					iLog("[HistoryMtGoxUSD] Historical order depth updated");
+				}
+			} catch (Exception $e) {
+				iLog("[HistoryMtGoxUSD] ERROR: historical orderbook error - ".$e->getMessage());
 			}
-		} catch (Exception $e) {
-			iLog("[MtGoxUSD] ERROR: can't parse JSON feed - {$url} - ".$e->getMessage());
+		} else {
+			iLog("[HistoryMtGoxUSD] Updating current order depth...");
+			$url = "";
+			$res = file_get_contents($this->depthUrl);
+			try {
+				$json = json_decode($res);
+				if ($json->result == 'success') {
+					$data = $json->data;
+					$this->orderBook = $this->formatOrderBook($data);
+					//var_dump($this->depth);
+					iLog("[MtGoxUSD] Order Depth Updated");
+				}
+			} catch (Exception $e) {
+				iLog("[MtGoxUSD] ERROR: can't parse JSON feed - {$url} - ".$e->getMessage());
+			}
 		}
 	}
 	
@@ -39,9 +61,9 @@ class HistoryMtGoxUSD extends HistoryMarket
 		try {
 			$res = $DB->query("SELECT * FROM mtgox_".$this->getPeriodTable()." WHERE timestamp <= {$this->timestamp} ORDER BY timestamp DESC LIMIT 1");
 			if($row = $DB->fetch_array_assoc($res)){
-				$ticker = new Ticker($row);
+				$ticker = new PeriodTicker($row);
 				$t = $ticker->getTickerArray();
-				iLog("[HistoryMtGoxUSD] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
+				iLog("[HistoryMtGoxUSD] Ticker @ ".date("d M Y H:i:s", $t['timestamp'])." - high: {$t['high']} low: {$t['low']} avg: {$t['avg']} open: {$t['open']} close: {$t['close']} volume: {$t['volume']} avgvolume: {$t['avgvolume']} total: {$t['total']} count: {$t['count']}");
 				return $ticker;
 			} else {
 				iLog("[HistoryMtGoxUSD] ERROR: no historical ticker found for for TS: {$this->timestamp} P: {$this->period}");

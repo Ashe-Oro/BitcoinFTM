@@ -104,7 +104,7 @@ class Arbitrage
 	
 	public function updateMarketDepths()
 	{
-		iLog("[Arbitrer] Updating market depths...");
+		iLog("[Arbitrage] Updating market depths...");
 		
 		$this->depths = array();
 		foreach($this->markets as $market){
@@ -130,9 +130,17 @@ class Arbitrage
 		}
 	}
 	
+	public function setTimestamp($timestamp, $period)
+	{
+		$this->timestamp = $timestamp;
+		$this->period = $period;
+		$this->updateMarketTimestamps();
+	}
+	
 	public function updateMarketTimestamps()
 	{
 		if ($this->useHistorical){
+			iLog("[Arbitrage] Updating market timestamps to ".date("d M Y H:i:s", $this->timestamp)."...");
 			foreach($this->markets as $market){
 				$market->updateTimestamp($this->timestamp, $this->period);
 			}
@@ -194,15 +202,17 @@ class Arbitrage
 					
 					$tick = $start;
 					while($tick < $end) {
+						iLog("<hr />");
+						iLog("PHASE 1: ACQUIRE BITCOINS...");
+						iLog("[Arbitrage] Running sim for ".date("d M Y H:i:s", $tick));
+						
 						$next = $tick + $period;
-						$this->timestamp = $tick;
-						$this->updateMarketTimestamps();
-						$this->updateMarketDepths();
+						$this->setTimestamp($tick, $period);
+						//$this->updateMarketDepths();
 						$this->_loadMob();
 						
-						iLog("[ARBITRAGE] Running sim for ".date("d M Y H:i:s", $tick));
 						foreach($this->arbitrers as $clientID => $arb){
-							$arb->setTimestamp($tick);
+							$arb->setTimestamp($tick, $this->period);
 							$arb->watchMarkets($this->markets, $this->mob);
 						}
 						

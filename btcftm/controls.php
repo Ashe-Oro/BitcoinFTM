@@ -23,7 +23,7 @@ if (isset($_GET['signout'])){
 <body>
 <?php
 if ($signedIn == 1) {
-	require_once("common.php");
+	require_once("core/include.php");
 		
 	$settingsUpdateMessage = "";
 	if (isset($_POST['submit-settings'])){
@@ -54,7 +54,8 @@ if ($signedIn == 1) {
 	$arb = NULL;
 	
 	if ($client->isActive()) {
-		$arb = new Arbitrage($client);
+		$cList = new ClientsList(array($client->getID()));
+		$arb = new Arbitrage($cList);
 	}
 	
 	$range = "1-day";

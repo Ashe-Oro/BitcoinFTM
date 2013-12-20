@@ -18,6 +18,7 @@ class Arbitrer
 	public $threadpool = NULL;
 	
 	protected $timestamp = 0;
+	protected $period = 0;
 
 	public function __construct($client, $args)
 	{
@@ -89,9 +90,10 @@ class Arbitrer
 		}
 	}
 	
-	public function setTimestamp($timestamp)
+	public function setTimestamp($timestamp, $period)
 	{
 		$this->timestamp = $timestamp;
+		$this->period = $period;
 	}
 	
 	public function getTraderBots()
@@ -107,7 +109,7 @@ class Arbitrer
 		
 		if ($config['echoLog']) { echo "<hr />\n"; }
 		iLog("[Arbitrer] PHASE 2: ???");
-		iLog("[Arbitrer] Executing main loop at timestamp = {$this->timestamp} for ".$this->client->getUsername());
+		iLog("[Arbitrer] Executing main loop at timestamp = ".date("d M Y H:i:s", $this->timestamp)." for ".$this->client->getUsername());
 			
 		$this->tick();
 			

@@ -10,24 +10,34 @@ class HistoryBitstampUSD extends HistoryMarket
 	public function __construct()
 	{
 		parent::__construct("USD");
-		$this->updateRate = 20;
+		$this->orderBook = new MarketOrderBook();
 	}
 
 	public function updateOrderBookData()
 	{
 		global $DB;
 		
-		if ($this->period) {
+		if ($this->timestamp > 0) {
 			iLog("[HistoryBitstampUSD] Updating order depth for TS: {$this->timestamp} P: {$this->period}...");
 			try{
 				$res = $DB->query("SELECT * FROM bitstamp_orderbook WHERE timestamp <= {$this->timestamp} ORDER BY timestamp DESC LIMIT 1");
 				if ($row = $DB->fetch_array_assoc($res)){
-					var_dump($row);
+					$this->orderBook = $this->formatOrderBook($row);
+					iLog("[HistoryBitstampUSD] Historical order depth updated");
+				} else {
+					iLog("[HistoryBitstampUSD] WARNING: No historical order depth found! Using ticker data...");
+					$ticker = $this->getCurrentTicker();
+					$data = new stdClass();
+					$data->asks = array(array($ticker->getAvg(), 10)); // single item array for asks
+					$data->bids = array(array($ticker->getAvg(), 10)); // single item array for bids
+					$this->orderBook = $this->formatOrderBook($data);
+					iLog("[HistoryBitstampUSD] Historical order depth updated");
 				}
 			} catch (Exception $e) {
 				iLog("[HistoryBitstampUSD] ERROR: historical orderbook error - ".$e->getMessage());
 			}
 		} else {
+			iLog("[HistoryBitstampUSD] Updating current order depth...");
 			$res = file_get_contents($this->depthUrl);
 			try {
 				$json = json_decode($res);
@@ -48,9 +58,9 @@ class HistoryBitstampUSD extends HistoryMarket
 		try {
 			$res = $DB->query("SELECT * FROM bitstamp_".$this->getPeriodTable()." WHERE timestamp <= {$this->timestamp} ORDER BY timestamp DESC LIMIT 1");
 			if($row = $DB->fetch_array_assoc($res)){
-				$ticker = new Ticker($row);
+				$ticker = new PeriodTicker($row);
 				$t = $ticker->getTickerArray();
-				iLog("[HistoryBitstampUSD] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
+				iLog("[HistoryBitstampUSD] Ticker @ ".date("d M Y H:i:s", $t['timestamp'])." - high: {$t['high']} low: {$t['low']} avg: {$t['avg']} open: {$t['open']} close: {$t['close']} volume: {$t['volume']} avgvolume: {$t['avgvolume']} total: {$t['total']} count: {$t['count']}");
 				return $ticker;
 			} else {
 				iLog("[HistoryBitstampUSD] ERROR: no historical ticker found for for TS: {$this->timestamp} P: {$this->period}");

@@ -31,8 +31,10 @@ abstract class Market
 		global $config;
 
 		$timeDiff = time() - $this->depthUpdated;
-		if ($timeDiff > $this->updateRate) {
+		if ($timeDiff >= $this->updateRate) {
 			$this->updateMarketOrderBooks();
+		} else {
+			iLog("[Market] Couldn't update Market {$this->name} - time diff less than refresh rate");
 		}
 		$timeDiff = time() - $this->depthUpdated;
 		if ($timeDiff > $config['marketExpirationTime']) {

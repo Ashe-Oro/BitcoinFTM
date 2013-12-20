@@ -1,7 +1,7 @@
 <?php
 session_start();
 $noEchoLog = 1;
-require_once("config/config.php");
+require_once("core/config/config.php");
 
 $errs = "";
 if (isset($_POST['submit']) && isset($_POST['uname']) && isset($_POST['pwd'])){

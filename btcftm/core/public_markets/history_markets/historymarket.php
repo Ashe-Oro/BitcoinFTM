@@ -9,7 +9,8 @@ abstract class HistoryMarket extends Market
 	public function __construct($currency)
 	{
 		parent::__construct($currency);
-		$this->live = true;
+		$this->live = false;
+		$this->updateRate = 0; // always update from DB
 	}
 	
 	public function updateTimestamp($timestamp, $period)
@@ -24,7 +25,7 @@ abstract class HistoryMarket extends Market
 			// use half-hourly table
 			case PERIOD_30M:
 			{
-				return "_history_half_hours";
+				return "history_half_hours";
 			}
 			
 			// use hourly table
@@ -34,26 +35,26 @@ abstract class HistoryMarket extends Market
 			case PERIOD_6H:
 			case PERIOD_12H:
 			{
-				return "_history_hours";
+				return "history_hours";
 			}
 			
 			// use daily table
 			case PERIOD_1D:
 			case PERIOD_3D:
 			{
-				return "_history_days";
+				return "history_days";
 			}
 			
 			// use weekly table
 			case PERIOD_1W:
 			{
-				return "_history_weeks";
+				return "history_weeks";
 			}
 			
 			// use granular table
 			default:
 			{
-				return "_ticker";
+				return "ticker";
 			}
 		}
 	}
