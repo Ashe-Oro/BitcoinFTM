@@ -1,0 +1,251 @@
+body {
+	margin: 0;
+	padding:0;
+	text-align: center;
+	background-color: #990000;
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+
+label {
+	display: inline-block;
+	float: left;
+	width: 140px;
+	font-weight: bold;
+	line-height: 26px;
+	margin-right: 5px;
+}
+
+input {
+	padding: 2px;
+	font-size: 13px;
+}
+
+fieldset {
+	border: 1px solid #aaa;
+	padding: 5px;
+	font-size: 13px;
+}
+
+legend {
+	margin-left: 6px;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+li.pos {
+	padding-left: 20px !important;
+	color: #090;
+	background-image: url('http://lit2bit.com/btcftm/images/up-down.png');
+	background-repeat: no-repeat;
+	background-position: 0px 0px;
+}
+
+li.neg {
+	padding-left: 20px !important;
+	color: #F00;
+	background-image: url('http://lit2bit.com/btcftm/images/up-down.png');
+	background-repeat: no-repeat;
+	background-position: 0px -64px;
+}
+
+li.neu {
+	padding-left: 20px !important;
+	color: #000;
+}
+
+#container {
+	margin: 30px auto;
+	padding: 0px;
+	background-color: #FFFFFF;
+	background-color: rgba(255, 255, 255, 0.95);
+	border-top: 3px solid #000;
+	border-bottom: 3px solid #000;
+	-moz-box-shadow: 0px 0px 30px 10px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0px 0px 30px 10px rgba(0,0,0,0.5);
+	box-shadow: 0px 0px 30px 10px rgba(0,0,0,0.5);
+}
+
+#header {
+	position: relative;
+	display: block;
+	width: 100%;
+	height: 180px;
+	border-bottom: 5px solid #000;
+	padding-bottom: 5px;
+}
+
+#logo {
+	position: absolute;
+	display: block;
+	top: 0px;
+	left: 10px;
+	color: #000;
+}
+
+#logo-title {
+	position: absolute;
+	display: block;
+	float: left;
+	font-size: 32px;
+	top: 5px;
+	left: 300px;
+}
+
+#logo-welcome {
+	position: absolute;
+	display: block;
+	float: left;
+	font-size: 24px;
+	top: 66px;
+	left: 300px;
+}
+
+#info_wrapper {
+	display: block;
+	margin: 0px auto;
+	width: 100%;
+}
+
+.info {
+	display: block;
+	position: relative;
+	margin: 20px 10px;
+	padding: 10px;
+	background-color: #eee;
+	background-color: rgba(238,238,238,0.5);
+	border: 1px solid #ccc;
+	text-align: left;
+	float: left;
+}
+
+.info fieldset {
+	background-color: #eee;
+	background-color: rgba(238,238,238,0.7);
+	border: 1px solid #ccc;
+}
+
+.info_row {
+	display: block;
+	width: 100%;
+	text-align: left;
+	line-height: 26px;
+}
+
+#account_info {
+	position: absolute;
+	right: 10px;
+	top: -10px;
+	width: 180px;
+}
+
+#account_info .info_row {
+	line-height: 18px;
+}
+
+#account_info label {
+	width: 130px;
+}
+
+#trading-status {
+	position: absolute;
+	display: block;
+	top: 130px;
+	left: 300px;
+	width: auto;
+	background: #eee;
+	border: 1px solid #ccc;
+	padding: 5px;
+}
+
+.submit {
+	background: #990000;
+	color: #eee;
+	text-shadow: 1px 1px 1px #000;
+	border: 2px solid #660000;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	cursor: pointer;
+	padding: 4px 12px;
+}
+
+.submit:hover {
+	background: #cc0000;
+	color: #fff;
+}
+
+#settings-wrapper {
+	position: relative;
+	float: left;
+	width: 30%;
+	margin-left: 1%;
+	margin-right: 1%;
+}
+
+#markets-wrapper {
+	position: relative;
+	float: right;
+	width: 62%;
+	margin-left: 1%;
+	margin-right: 1%;
+}
+
+#markets-wrapper fieldset {
+	display: block;
+	float: left;
+	width: 29%;
+	margin-left: 0%;
+	margin-right: 2%;
+}
+
+.market-ticker, .market-history {
+	position: relative;
+	display: block;
+	list-style: none;
+}
+
+.market-ticker li, .market-history li {
+	list-style: none;
+	display: block;
+	position: relative;
+	float: left;
+	padding: 2px 4px;
+	width: 90px;
+	line-height: 16px;
+	font-size: 12px;
+}
+
+.market-ticker li {
+	float: none;
+}
+
+.market-ticker label, .market-history label {
+	width: auto;
+	line-height: 16px;
+}
+
+#trends-wrapper {
+	position: relative;
+	float: left;
+	width: 96%;
+	margin-left: 1%;
+	margin-right: 1%;
+}
+
+.history-box {
+	position: relative;
+	float: left;
+	width: 46%;
+	margin-left: 1%;
+	margin-right: 1%;
+}
+
+#history-graph-wrapper {
+	position: relative;
+	display: block;
+	float: left;
+	width: 96%;
+	margin-left: 1%;
+	margin-right: 1%;
+}
