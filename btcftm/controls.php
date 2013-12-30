@@ -14,10 +14,10 @@ if (isset($_GET['signout'])){
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>BTC FTM</title>
-<script language="javascript" type="application/javascript" src="http://lit2bit.com/btcftm/jquery/jquery-1.8.2.min.js"></script>
+<script language="javascript" type="application/javascript" src="jquery/jquery-1.8.2.min.js"></script>
 
-<link type="text/css" rel="stylesheet" href="http://lit2bit.com/btcftm/css/core.css" />
-<link type="text/css" rel="stylesheet" href="http://lit2bit.com/btcftm/css/controls.css" />
+<link type="text/css" rel="stylesheet" href="css/core.css" />
+<link type="text/css" rel="stylesheet" href="css/controls.css" />
 </head>
 
 <body>

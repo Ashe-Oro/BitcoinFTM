@@ -26,7 +26,7 @@ class Portfolio
 	}
 	
 	private function _initPrivateMarkets($markets, $cArray)
-	{
+	{		
 		foreach ($markets as $mname) {
 			$lowername = strtolower($mname);
 			$lowernameEx = str_replace("usd", "", $lowername);
@@ -36,8 +36,8 @@ class Portfolio
 				$pName = "private".$mname;
 				try {
 					$cid = (int) (isset($cArray["{$lowernameEx}id"])) ? $cArray["{$lowernameEx}id"] : $this->client->getID();
-					$ckey = (isset($cArray["{$lowernameEx}key"])) ? $cArray["{$lowernameEx}key"] : "";
-					$csecret = (isset($cArray["{$lowernameEx}secret"])) ? $cArray["{$lowernameEx}secret"] : "";
+					$ckey = $this->getAPIKey($cid, $lowernameEx);
+					$csecret = $this->getAPISecret($cid, $lowernameEx);
 					
 					if ($cid && strlen($ckey) && strlen($csecret)) {
 						$this->privateMarkets[$mname] = new $pName($cid, $ckey, $csecret);
@@ -60,6 +60,70 @@ class Portfolio
 		}
 	}
 	
+	private function getAPIKey($cid, $market) {
+		global $DB;
+
+		try {
+			$mid = $this->getMarketId($market);
+			if(isset($mid) && $mid != false && $mid != "") {
+				$result = $DB->query("SELECT apiKey FROM privatemarkets WHERE clientid = {$cid} and marketid = {$mid}");
+				if ($apiKey = $DB->fetch_array_assoc($result)){
+					$apiKey = $apiKey['apiKey'];
+					return $apiKey;
+				}
+				else {
+					return false;
+				}
+			}
+		} catch (Exception $e){
+			iLog("[Portfolio] ERROR: Failed Getting API Key for clientID {$cid} and market {$market} - ".$e->getMessage());
+			return false;
+		}
+
+		return false;
+
+	}
+
+	private function getAPISecret($cid, $market) {
+		global $DB;
+
+		try {
+			$mid = $this->getMarketId($market);
+			if(isset($mid) && $mid != false && $mid != "") {
+				$result = $DB->query("SELECT apiSecret FROM privatemarkets WHERE clientid = {$cid} and marketid = {$mid}");
+				if ($apiSecret = $DB->fetch_array_assoc($result)){
+					$apiSecret = $apiSecret['apiSecret'];
+					return $apiSecret;
+				}
+				else {
+					return false;
+				}
+			}
+		} catch (Exception $e){
+			iLog("[Portfolio] ERROR: Failed Getting API Key for clientID {$cid} and market {$market} - ".$e->getMessage());
+			return false;
+		}
+
+		return false;
+
+	}
+
+	private function getMarketId($market) {
+		global $DB;
+
+		try {
+			$result = $DB->query("SELECT id FROM markets WHERE name='{$market}'");
+			if($mid = $DB->fetch_array_assoc($result)){
+				$mid = $mid["id"];
+				return $mid;
+			}
+		} catch (Exception $e){
+			iLog("[Portfolio] ERROR: Failed Getting Market ID for Market {$market} - " . $e->getMassage());
+			return false;
+		}
+		return false;
+	}
+
 	public function getPrivateMarket($mname)
 	{
 		if (isset($this->privateMarkets[$mname])){

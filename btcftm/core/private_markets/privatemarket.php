@@ -6,6 +6,7 @@ class PrivateMarket
 	public $btcBalance = 0;
 	public $eurBalance = 0;
 	public $usdBalance = 0;
+	public $clientId = 0;
 
 	public $fc = NULL; // future currency converter
 
@@ -16,7 +17,7 @@ class PrivateMarket
 		$this->btcBalance = 0;
 		$this->eurBalance = 0;
 		$this->usdBalance = 0;
-		
+		$this->clientId = $clientID;
 		$this->_loadClient($clientID, $key, $secret);
 	}
 
