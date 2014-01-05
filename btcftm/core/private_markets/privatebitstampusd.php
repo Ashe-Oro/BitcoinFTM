@@ -153,10 +153,10 @@ class PrivateBitstampUSD extends PrivateMarket
 			}
 		} else {	// SIMULATED TRADING USES DATABASE DATA
 			try {
-				$result = $DB->query("SELECT * FROM clients WHERE bitstampkey = '{$this->privatekey}'");
+				$result = $DB->query("SELECT * FROM privatemarkets WHERE apiKey = '{$this->privatekey}' AND clientid = '{$this->clientId}'");
 				if ($client = $DB->fetch_array_assoc($result)){
-					$this->btcBalance = $client['bitstampbtc'];
-					$this->usdBalance = $client['bitstampusd'];
+					$this->btcBalance = $client['btc'];
+					$this->usdBalance = $client['usd'];
 					iLog("[PrivateBitstampUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
 					return true;
 				}
