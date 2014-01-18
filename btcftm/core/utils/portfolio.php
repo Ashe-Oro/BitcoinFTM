@@ -5,7 +5,7 @@ class Portfolio
 {
 	private $portfolioID = 0;
 	private $trades = array(); // array of trades
-	private $privateMarkets = array(); // array of private market accounts
+	public $privateMarkets = array(); // array of private market accounts
 	private $tradeCount = 0;
 	private $client = NULL;
 	
@@ -42,7 +42,6 @@ class Portfolio
 					if ($cid && strlen($ckey) && strlen($csecret)) {
 						$this->privateMarkets[$mname] = new $pName($cid, $ckey, $csecret);
 					} else {
-						//var_dump($client);
 						if (!strlen($ckey)){	
 							iLog("[Portfolio] ERROR: Private market {$mname} missing key in client DB {$lowernameEx}key - ".$client["{$lowernameEx}key"]);
 						} else

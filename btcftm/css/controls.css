@@ -123,6 +123,8 @@ li.neu {
 	background-color: #eee;
 	background-color: rgba(238,238,238,0.7);
 	border: 1px solid #ccc;
+	float: left;
+	width: 125px;
 }
 
 .info_row {
@@ -133,10 +135,9 @@ li.neu {
 }
 
 #account_info {
-	position: absolute;
 	right: 10px;
 	top: -10px;
-	width: 180px;
+	width: 100%;
 }
 
 #account_info .info_row {

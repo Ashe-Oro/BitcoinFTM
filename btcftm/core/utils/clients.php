@@ -7,7 +7,7 @@ class Client
 	private $firstName = '';
 	private $lastName = '';
 	private $userName = '';
-	private $portfolio = NULL;
+	public $portfolio = NULL;
 	
 	private $maxTxVolume = 10;
 	private $minTxVolume = 1;
