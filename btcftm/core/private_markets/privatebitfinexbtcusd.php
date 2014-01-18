@@ -34,13 +34,10 @@ class PrivateBitfinexBTCUSD extends PrivateMarket
 		$response['result'] = 'success';
 		$response['return'] = false;
 		
-		echo "[PrivateBitfinexUSD] Sending Request: {$rUrl}";
-		//iLog("[PrivateBitfinexUSD] Sending Request: {$rUrl}");
-		
+		iLog("[PrivateBitfinexUSD] Sending Request: {$rUrl}");
 		
 		if ($method == METHOD_NEW_ORDER) {
-			echo "[PrivateBitfinexUSD] WARNING: Request not sent. Live sell and buy functions currently disabled.";
-			//iLog("[PrivateBitfinexUSD] WARNING: Request not sent. Live sell and buy functions currently disabled.");
+			iLog("[PrivateBitfinexUSD] WARNING: Request not sent. Live sell and buy functions currently disabled.");
 			return $response; 
 		}
 		
@@ -120,21 +117,17 @@ class PrivateBitfinexBTCUSD extends PrivateMarket
 
 		try {
 			$response = $this->_sendRequest(self::API_URL, "", self::METHOD_NEW_ORDER);
-			echo "<br/><br/>RESPONSE: ";
-			var_dump($response);
 			if ($response){
 				//TODO NOT SURE THERE"S A GOOD WAY TO CATCH THIS CASE, BUT LEAVING IT IN FOR NOW TO NOT FORGET IT
 				if (isset($response['error'])) {
-					//iLog("[PrivateBitfinexUSD] ERROR: Buy failed {$response['error']['message']}");
-					echo "[PrivateBitfinexUSD] ERROR: Buy failed {$response['error']['message']}";
+					iLog("[PrivateBitfinexUSD] ERROR: Buy failed {$response['error']['message']}");
 				} else {
 					alert('BUY'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
 					return true;
 				}
 			}
 		} catch (Exception $e) {
-			//iLog("[PrivateBitfinexUSD] ERROR: Buy failed - ".$e->getMessage());
-			echo "[PrivateBitfinexUSD] ERROR: Buy failed - ".$e->getMessage();
+			iLog("[PrivateBitfinexUSD] ERROR: Buy failed - ".$e->getMessage());
 		}
 
 		return false;
@@ -165,7 +158,7 @@ class PrivateBitfinexBTCUSD extends PrivateMarket
 		global $config;
 		global $DB;
 
-		//if ($config['live']) { // LIVE TRADING USES LIVE DATA
+		if ($config['live']) { // LIVE TRADING USES LIVE DATA
 			try {
 				//no params need to be sent, that is the empty string param below
 				$response = $this->_sendRequest(self::API_URL, "", self::METHOD_BALANCES);
@@ -179,23 +172,34 @@ class PrivateBitfinexBTCUSD extends PrivateMarket
 
 					$usdArr = $response[1];
 					$usdAvailable = (float)$usdArr->{'available'};
-
 					
 					$this->btcBalance = $btcAvailable;
 					$this->usdBalance = $usdAvailable;
-					echo "[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD";
-					//iLog("[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+					iLog("[PrivateBitfinexUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
 					return true;
 				}
 				else {
-					//iLog("[PrivateBTCeUSD] ERROR: Get info failed - {$response}");
+					iLog("[PrivateBitfinexUSD] ERROR: Get info failed - {$response}");
 					return false;
 				}			
 			} catch (Exceptin $e){
-				//iLog("[PrivateBTCeUSD] ERROR: Get info failed - ".$e->getMessage());
+				iLog("[PrivateBitfinexUSD] ERROR: Get info failed - ".$e->getMessage());
 				return false;			
 			}
-		//}
+		} else {
+			try {
+				$result = $DB->query("SELECT * FROM privatemarkets WHERE apiKey = '{$this->privatekey}' AND clientid = '{$this->clientId}'");
+				if ($client = $DB->fetch_array_assoc($result)){
+					$this->btcBalance = $client['btc'];
+					$this->usdBalance = $client['usd'];
+					iLog("[PrivateBitfinexUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+					return true;
+				}
+			} catch (Exception $e){
+				iLog("[PrivateBitfinexUSD] ERROR: Get info failed - ".$e->getMessage());
+				return false;
+			}			
+		}
 
 		return false;
 	}
