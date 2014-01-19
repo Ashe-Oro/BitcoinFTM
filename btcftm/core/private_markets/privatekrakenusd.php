@@ -137,14 +137,27 @@ class PrivateKrakenUSD extends PrivateMarket
 	}
 
 	public function getInfo()
-	{
+	{	
 		global $config;
 		global $DB;
-		
-		$response = $this->_sendRequest(self::API_URL, "", self::METHOD_BALANCE);
 
-		//TODO fill out info
-		return false;
+		if ($config['live']) { // LIVE TRADING USES LIVE DATA
+			//TODO finish this
+			$response = $this->_sendRequest(self::API_URL, "", self::METHOD_BALANCE);
+		} else {
+			try {
+				$result = $DB->query("SELECT * FROM privatemarkets WHERE apiKey = '{$this->privatekey}' AND clientid = '{$this->clientId}'");
+				if ($client = $DB->fetch_array_assoc($result)){
+					$this->btcBalance = $client['btc'];
+					$this->usdBalance = $client['usd'];
+					iLog("[PrivateKrakenUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+					return true;
+				}
+			} catch (Exception $e){
+				iLog("[PrivateKrakenUSD] ERROR: Get info failed - ".$e->getMessage());
+				return false;
+			}			
+		}
 	}
 }
 ?>

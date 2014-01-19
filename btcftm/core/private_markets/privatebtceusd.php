@@ -161,6 +161,19 @@ class PrivateBTCeUSD extends PrivateMarket
 				iLog("[PrivateBTCeUSD] ERROR: Get info failed - ".$e->getMessage());
 				return false;			
 			}
+		} else {
+			try {
+				$result = $DB->query("SELECT * FROM privatemarkets WHERE apiKey = '{$this->privatekey}' AND clientid = '{$this->clientId}'");
+				if ($client = $DB->fetch_array_assoc($result)){
+					$this->btcBalance = $client['btc'];
+					$this->usdBalance = $client['usd'];
+					iLog("[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+					return true;
+				}
+			} catch (Exception $e){
+				iLog("[PrivateBTCeUSD] ERROR: Get info failed - ".$e->getMessage());
+				return false;
+			}
 		}
 		return false;
 	}
