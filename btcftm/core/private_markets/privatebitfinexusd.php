@@ -1,7 +1,7 @@
 <?php
 require_once('privatemarket.php');
 
-class PrivateBitfinexBTCUSD extends PrivateMarket
+class PrivateBitfinexUSD extends PrivateMarket
 {
 	const API_URL = "https://api.bitfinex.com";
 	const METHOD_BALANCES = "/v1/balances";
@@ -186,7 +186,7 @@ class PrivateBitfinexBTCUSD extends PrivateMarket
 				iLog("[PrivateBitfinexUSD] ERROR: Get info failed - ".$e->getMessage());
 				return false;			
 			}
-		} else {
+		}  else {	// SIMULATED TRADING USES DATABASE DATA
 			try {
 				$result = $DB->query("SELECT * FROM privatemarkets WHERE apiKey = '{$this->privatekey}' AND clientid = '{$this->clientId}'");
 				if ($client = $DB->fetch_array_assoc($result)){
@@ -198,7 +198,7 @@ class PrivateBitfinexBTCUSD extends PrivateMarket
 			} catch (Exception $e){
 				iLog("[PrivateBitfinexUSD] ERROR: Get info failed - ".$e->getMessage());
 				return false;
-			}			
+			}
 		}
 
 		return false;

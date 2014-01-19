@@ -24,8 +24,9 @@ if (isset($_GET['signout'])){
 <?php
 if ($signedIn == 1) {
 	require_once("core/include.php");
-		
+
 	$settingsUpdateMessage = "";
+	
 	if (isset($_POST['submit-settings'])){
 		//var_dump($_POST);
 		
@@ -49,10 +50,9 @@ if ($signedIn == 1) {
 		iLog($settingsUpdateMessage);
 	}
 	
-	
 	$client = new Client($_SESSION['username']);
 	$arb = NULL;
-	
+
 	if ($client->isActive()) {
 		$cList = new ClientsList(array($client->getID()));
 		$arb = new Arbitrage($cList);
@@ -83,22 +83,6 @@ if ($signedIn == 1) {
 <div id="container">
 
 <div id="header" class="clearfix full">
-    <fieldset class="info" id="account_info" >
-        <legend>Your <?php echo ($config['live']) ? "LIVE" : "TESTING"; ?> Accounts</legend>
-        
-        <fieldset id="mtgox-wallet">
-            <legend>MtGox</legend>
-            <div class="info_row"><b>USD: </b><?php echo number_format($client->getMarketBalance("MtGox", "USD"), 4); ?></div>
-            <div class="info_row"><b>BTC: </b><?php echo number_format($client->getMarketBalance("MtGox", "BTC"), 8); ?> BTC</div>
-        </fieldset>
-        
-        <fieldset id="bitstamp-wallet">
-            <legend>Bitstamp</legend>
-            <div class="info_row"><b>USD: </b><?php echo number_format($client->getMarketBalance("Bitstamp", "USD"), 4); ?> USD</div>
-            <div class="info_row"><b>BTC: </b><?php echo number_format($client->getMarketBalance("Bitstamp", "BTC"), 8);  ?> BTC</div>
-        </fieldset>
-    
-    </fieldset>
 
     <div id="logo"><img src="images/ftm.png" /></div>
     <h2 id="logo-title">Bitcoin Finance Trade Manager</h2>
@@ -124,6 +108,34 @@ if ($signedIn == 1) {
         </span>
     </div>
 </div>
+<?php
+	$privateMarkets = $client->portfolio;
+	$privateMarkets = $privateMarkets->privateMarkets;
+	if(count($privateMarkets) > 0) {
+?>
+    <fieldset class="info" id="account_info" >
+        <legend>Your <?php echo ($config['live']) ? "LIVE" : "TESTING"; ?> Accounts</legend>
+        
+        <?php
+        foreach($privateMarkets as $market) {
+        	//The market name comes back with extra text we want to strip off.  Might consider doing this differently in the future
+        	$remove = array("Private", "USD");
+			$mName = str_ireplace($remove, "", $market->name);
+			$mNameLower = strtolower($mName);
+        ?>	
+			<fieldset id="<?php echo $mNameLower; ?>-wallet">
+	            <legend><?php echo $mName; ?></legend>
+	            <div class="info_row"><b>USD: </b><?php echo number_format($client->getMarketBalance($mName, "USD"), 4); ?></div>
+	            <div class="info_row"><b>BTC: </b><?php echo number_format($client->getMarketBalance($mName, "BTC"), 8); ?></div>
+	        </fieldset>
+			
+		<?php
+		}
+        ?>
+    </fieldset>
+<?php
+	}
+?>
 
 <div style="height: 1px; clear: both; display: block;"></div>
 
