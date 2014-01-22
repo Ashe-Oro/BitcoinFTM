@@ -1,9 +1,26 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:700italic,400);
+
+html {
+	margin: 0;
+	padding: 0;
+}
+
 body {
+	width: 100%;
+	height: 100%;
 	margin: 0;
 	padding:0;
 	text-align: center;
-	background-color: #990000;
-	font-family: Helvetica, Arial, sans-serif;
+	background: #252525 url('../images/btc-background.jpg') no-repeat center center fixed;
+	-webkit-background-size: cover;
+	  -moz-background-size: cover;
+	  -o-background-size: cover;
+	  background-size: cover;
+	font-family: 'Open Sans', Helvetica, sans-serif;
+}
+
+a:hover {
+	text-decoration:  none;
 }
 
 
@@ -54,52 +71,226 @@ li.neu {
 	color: #000;
 }
 
-#container {
-	margin: 30px auto;
-	padding: 0px;
-	background-color: #FFFFFF;
-	background-color: rgba(255, 255, 255, 0.95);
-	border-top: 3px solid #000;
-	border-bottom: 3px solid #000;
-	-moz-box-shadow: 0px 0px 30px 10px rgba(0,0,0,0.5);
-	-webkit-box-shadow: 0px 0px 30px 10px rgba(0,0,0,0.5);
-	box-shadow: 0px 0px 30px 10px rgba(0,0,0,0.5);
-}
+/* -- ====== HEADER ===== -- */
 
 #header {
-	position: relative;
-	display: block;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background: #000;
+	border-bottom: 3px solid #444;
+	height: 30px;
 	width: 100%;
-	height: 180px;
-	border-bottom: 5px solid #000;
-	padding-bottom: 5px;
+	z-index: 100;
+   -moz-box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+  box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
 }
 
-#logo {
+#header h2 {
 	position: absolute;
-	display: block;
 	top: 0px;
 	left: 10px;
-	color: #000;
+	color: #fff;
+	margin: 0px;
+	padding: 0px;
+	font-size: 20px;
 }
 
-#logo-title {
+#header h3 {
 	position: absolute;
-	display: block;
-	float: left;
-	font-size: 32px;
+	right: 40px;
 	top: 5px;
-	left: 300px;
+	color: #fff;
+	margin: 0px;
+	padding: 0px;
 }
 
-#logo-welcome {
+#header .account {
 	position: absolute;
-	display: block;
-	float: left;
-	font-size: 24px;
-	top: 66px;
-	left: 300px;
+	right: 5px;
+	top: 0px;
+	background:  transparent;
+	transition: opacity 600ms;
+	-webkit-transition: opacity 600ms;
 }
+
+#header .account .account-icon {
+	width: 20px;
+	height: 20px;
+	padding: 5px;
+	display:  block;
+	background: url('../images/gears-icon-small.png') center center no-repeat;
+}
+
+#header .account ul.account-dropdown {
+	position:  absolute;
+	display:  none;
+	opacity: 0;
+	right: 2px;
+	width: 140px;
+	background: #000;
+	border: 3px solid #444;
+	margin: 0;
+	padding: 0;
+	list-style:  none;
+	text-align:  left;
+}
+
+#header .account:hover ul.account-dropdown {
+	display: block;
+	opacity: 1.0;
+}
+
+ul.account-dropdown li {
+	padding: 5px 5px;
+	font-size: 12px;
+	border-bottom: 1px solid #222;
+}
+
+ul.account-dropdown li:hover {
+	background: #222;
+}
+
+ul.account-dropdown li a {
+	color: #ddd;
+}
+
+ul.account-dropdown li:hover > a {
+	color: #fff;
+}
+
+#header .account:hover {
+	background: #444;
+	cursor:  pointer;
+}
+	
+
+#container {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	top: 0px;
+	left: 0px;
+	z-index: 1;
+}
+
+/* ======= SIDEBAR ======= */
+
+#sidebar {
+	position: absolute;
+	width: 140px;
+	height: 100%;
+	left: 0px;
+	top: 0px;
+	background: rgba(0,0,0,0.9);
+	z-index: 10;
+	border-right: 3px solid #444;
+	color: #fff;
+   -moz-box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+  box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+}
+
+#sidebar ul {
+	
+	list-style: none;
+	text-align: left;
+	font-size: 16px;
+	padding: 0px;
+	margin: 0px;
+	margin-top: 40px;
+}
+
+#sidebar ul li {
+	margin: 0px aut;
+	padding: 10px 10px;
+	border-bottom: 1px solid #222;
+}
+
+#sidebar ul li a {
+	color: #ddd;
+}
+
+#sidebar ul li:hover {
+	background-color: #222;
+	cursor: pointer;
+}
+
+#sidebar ul li:hover > a {
+	color: #fff;
+}
+
+#sidebar ul li:active, #sidebar ul li.active {
+	background: #222;
+}
+
+/* ===== CONTENT ===== */
+
+#main-content {
+	display: block;
+	position: absolute;
+	left: 160px;
+	top: 50px;
+	bottom: 30px;
+	right: 20px;
+	background-color: transparent;
+}
+
+#main-content .content {
+	display: block;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.9);
+	color: #eee;
+	border: 3px solid #444;
+	opacity: 1.0;
+	margin-left: 0px;
+	box-sizing: border-box;
+	-webkit-transition: all 1s ease-in-out;
+	-moz-transition: all 1s ease-in-out;
+	-o-transition: all 1s ease-in-out;
+	transition: all 1s ease-in-out;
+  overflow: scroll;
+  -moz-box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+  -webkit-box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+  box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
+}
+
+#main-content .content.hide {
+	opacity: 0.0;
+	margin-left: 3000px;
+}
+
+/* ===== FOOTER ===== */
+
+#footer {
+	display: block;
+	position: absolute;;
+	width: 100%;
+	height: 30px;
+	bottom: 0px;
+	left: 0px;
+	background: -moz-linear-gradient(top,  rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,1)));
+background: -webkit-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,1) 100%);
+background: -o-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,1) 100%);
+background: -ms-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,1) 100%);
+background: linear-gradient(to bottom,  rgba(0,0,0,0) 0%,rgba(0,0,0,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#000000',GradientType=0 );
+
+	color: #aaa;
+}
+
+#footer .copyright {
+	position:  absolute;
+	right: 5px;
+	bottom: 5px;
+	font-size: 10px;
+}
+
 
 #info_wrapper {
 	display: block;
@@ -146,17 +337,6 @@ li.neu {
 
 #account_info label {
 	width: 130px;
-}
-
-#trading-status {
-	position: absolute;
-	display: block;
-	top: 130px;
-	left: 300px;
-	width: auto;
-	background: #eee;
-	border: 1px solid #ccc;
-	padding: 5px;
 }
 
 .submit {

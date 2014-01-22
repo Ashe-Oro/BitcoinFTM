@@ -32,10 +32,11 @@ class CryptoTradeUSD extends LiveMarket
 		$res = file_get_contents($this->tickerUrl);
 		try {
 			$json = json_decode($res);
-			$data = $json['data'];
-			$data['volume'] = $data['vol_btc'];
-			$data['ask'] = $data['min_ask'];
-			$data['bid'] = $data['max_bid'];
+			$data = $json->data;
+			$data->volume = $data->vol_usd;
+			$data->ask = $data->min_ask;
+			$data->bid = $data->max_bid;
+			$data->timestamp = time();
 			
 			$ticker = new Ticker($data);
 			$t = $ticker->getTickerArray();

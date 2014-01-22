@@ -43,10 +43,10 @@ class Portfolio
 						$this->privateMarkets[$mname] = new $pName($cid, $ckey, $csecret);
 					} else {
 						if (!strlen($ckey)){	
-							iLog("[Portfolio] ERROR: Private market {$mname} missing key in client DB {$lowernameEx}key - ".$client["{$lowernameEx}key"]);
+							iLog("[Portfolio] ERROR: Private market {$mname} missing key in client DB {$lowernameEx}key");
 						} else
 						if (!strlen($csecret)){
-							iLog("[Portfolio] ERROR: Private market {$mname} missing secret in client DB - ".$client["{$lowernameEx}secret"]);
+							iLog("[Portfolio] ERROR: Private market {$mname} missing secret in client DB");
 						}
 						
 					}

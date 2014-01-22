@@ -31,7 +31,12 @@ class BTCeUSD extends LiveMarket
 		$res = file_get_contents($this->tickerUrl);
 		try {
 			$json = json_decode($res);
-			$ticker = new Ticker($json['ticker']);
+			$data = $json->ticker;
+			$data->timestamp = $data->updated;
+			$data->ask = $data->sell;
+			$data->bid = $data->buy;
+			$data->volume = $data->vol_cur;	
+			$ticker = new Ticker($data);
 			$t = $ticker->getTickerArray();
 			iLog("[BTCeUSD] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
 			return $ticker;

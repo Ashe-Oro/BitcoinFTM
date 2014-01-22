@@ -1,0 +1,32 @@
+#markets table {
+	width: 100%;
+}
+
+#markets td {
+	display: table-cell;
+	padding: 5px;
+	margin: 2px;
+}
+
+.pos { 
+color: #0c0;
+}
+
+.neg {
+color: #c00;
+}
+
+.market {
+	background-color: #009;
+	color: #fff;
+}
+
+.value {
+	background-color: #990;
+	color: #fff;
+}
+
+#markets .updating, #markets .waiting {
+	font-size: 11px;
+	color: #aaa;
+}

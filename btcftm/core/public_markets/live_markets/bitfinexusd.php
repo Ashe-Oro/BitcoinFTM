@@ -32,10 +32,10 @@ class BitfinexUSD extends LiveMarket
 		$res = file_get_contents($this->tickerUrl);
 		try {
 			$json = json_decode($res);
-			$json['last'] = $json['last_price'];
-			$json['high'] = max($json['last_price'], $json['mid']); // doesn't have high or low in JSON, so make it up
-			$json['low'] = min($json['last_price'], $json['mid']);
-			$json['volume'] = 0;
+			$json->last = $json->last_price;
+			$json->high = max($json->last_price, $json->mid); // doesn't have high or low in JSON, so make it up
+			$json->low = min($json->last_price, $json->mid);
+			$json->volume = 0;
 			
 			$ticker = new Ticker($json);
 			$t = $ticker->getTickerArray();

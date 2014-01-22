@@ -36,12 +36,14 @@ class CampBXUSD extends LiveMarket
 		try {
 			$json = json_decode($res);
 			$data = $json;
-			$data['volume'] = 0;
-			$data['ask'] = $data['Best Ask'];
-			$data['bid'] = $data['Best Bid'];
-			$data['last'] = $data['Last Trade'];
-			$data['high'] = $data['last'];
-			$data['low'] = $data['low'];
+			
+			$data->volume = 0;
+			$data->ask = $data->{"Best Ask"};
+			$data->bid = $data->{"Best Bid"};
+			$data->last = $data->{"Last Trade"};
+			$data->high = $data->last;
+			$data->low = $data->last;
+			$data->timestamp = time();
 			
 			$ticker = new Ticker($data);
 			$t = $ticker->getTickerArray();

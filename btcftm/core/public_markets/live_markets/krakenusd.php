@@ -33,13 +33,14 @@ class KrakenUSD extends LiveMarket
 		try {
 			$json = json_decode($res);
 			$data = $json->result->XXBTZUSD;		// refer to https://www.kraken.com/help/api#get-ticker-info
-			$jData = array(	'ask' => $data['a'][0],
-							'bid' => $data['b'][0],
-							'last' => $data['c'][0],
-							'low' => $data['l'][0],
-							'high' => $data['h'][0],
+			//var_dump($data);
+			$jData = array(	'ask' => $data->a[0],
+							'bid' => $data->b[0],
+							'last' => $data->c[0],
+							'low' => $data->l[0],
+							'high' => $data->h[0],
 							'timestamp' => time(),
-							'volume' => $data['v'][1]
+							'volume' => $data->v[1] * $data->p[1]
 						);
 			
 			$ticker = new Ticker($jData);

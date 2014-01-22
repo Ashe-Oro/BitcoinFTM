@@ -1,0 +1,28 @@
+ul.#bitcoin-markets {
+	display: table-row;
+	margin: 10px auto;
+	padding:  0px;
+	list-style: none;
+	width: 100%;
+	border-bottom: 1px solid #444;
+}
+
+#bitcoin-markets li {
+	display: table-cell;
+	text-align:  center;
+	padding: 5px 10px;
+	list-style:  none;
+}
+
+#bitcoin-markets li a {
+	color: #ddd;
+}
+
+#bitcoin-markets li:hover > a {
+	color: #fff;
+	text-decoration:  underline;
+}
+
+#bitcoin-markets li.active {
+	background-color: #444;
+}

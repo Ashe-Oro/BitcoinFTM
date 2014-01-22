@@ -1,0 +1,41 @@
+#trading-status {
+	position: absolute;
+	display: block;
+	top: 0px;
+	right: 0px;
+	width: auto;
+	border: 1px solid #444;
+	border-right: none;
+	border-top: none;
+	padding: 5px;
+}
+
+#best-ops {
+	position: absolute;
+	display: block;
+	top: 0px;
+	left: 0px;
+	width: 400px;
+	height: auto;
+	border: 1px solid #444;
+	border-left: none;
+	border-top: none;
+	padding: 5px;
+}
+
+#best-ops .updating, #best-ops .waiting {
+	font-size: 11px;
+	color: #aaa;
+}
+
+#best-ops td {
+	font-size: 13px;
+	padding: 5px 10px;
+	text-align: left;
+}
+
+#best-ops th {
+	font-size: 14px;
+	padding: 5px 10px;
+	text-align: left;
+}

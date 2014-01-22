@@ -1,7 +1,7 @@
 <?php
 session_start();
 $noEchoLog = 1;
-require_once("core/config/config.php");
+require_once("./core/config/config.php");
 
 $errs = "";
 if (isset($_POST['submit']) && isset($_POST['uname']) && isset($_POST['pwd'])){
@@ -25,71 +25,11 @@ $signedIn = (isset($_SESSION['adminAccess']) && isset($_SESSION['clientID']) && 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>BTC FTM</title>
-<style type="text/css">
-body {
-	margin: 0;
-	padding:0;
-	text-align: center;
-	background-color: #990000;
-	font-family: Helvetica, Arial, sans-serif;
-}
-
-#container {
-	margin: 100px auto;
-	padding: 35px;
-	background-color: #FFFFFF;
-	border-top: 3px solid #000;
-	border-bottom: 3px solid #000;
-	-moz-box-shadow: 0px 0px 30px 10px rgba(0,0,0,0.5);
-	-webkit-box-shadow: 0px 0px 30px 10px rgba(0,0,0,0.5);
-	box-shadow: 0px 0px 30px 10px rgba(0,0,0,0.5);
-}
-
-#btc_signin {
-	display: block;
-	position: relative;
-	margin: 20px auto;
-	padding: 10px;
-	background-color: #eee;
-	border: 1px solid #ccc;
-	width: 300px;
-}
-
-label {
-	display: inline-block;
-	float: left;
-	width: 100px;
-	font-weight: bold;
-	line-height: 26px;
-}
-
-input {
-	width: 180px;
-	padding: 2px;
-	font-size: 13px;
-}
-
-#submit {
-	background: #990000;
-	color: #eee;
-	text-shadow: 1px 1px 1px #000;
-	border: 2px solid #660000;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
-	border-radius: 3px;
-	cursor: pointer;
-}
-
-#submit:hover {
-	background: #cc0000;
-	color: #fff;
-}
-
-</style>
+<title>Bitcoin Financial Trade Manager</title>
+<link rel="stylesheet" type="text/css" href="css/index.css" />
 </head>
 
-<body>
+<body class="<?php echo $signedIn ? "signed_in" : "signed_out"; ?>">
 
 <div id="container">
 <?php
@@ -99,6 +39,8 @@ if ($signedIn) {
 <h2>CAN I HAZ BITCOINZ?</h2>
 
 <p>Loading your profile, please wait...</p>
+
+<img src="/images/ajax-loader.gif" alt="Loading..." width="50" height="50" />
 
 <script language="javascript">
 document.location.href = "controls.php";
@@ -110,7 +52,7 @@ document.location.href = "controls.php";
 if (strlen($errs)){ echo "<p>{$errs}</p>"; }
 ?>
 
-<div id="logo"><img src="images/ftm-oval.jpg" /></div>
+<h1>Financial Trade Manager</h1>
 
 <h3>Please Sign In</h3>
 

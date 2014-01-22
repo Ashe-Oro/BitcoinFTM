@@ -1,0 +1,32 @@
+#matrix table {
+	width: 100%;
+}
+
+#matrix td {
+	display: table-cell;
+	padding: 5px;
+	margin: 2px;
+}
+
+.pos { 
+color: #0c0;
+}
+
+.neg {
+color: #c00;
+}
+
+.ask {
+	background-color: #009;
+	color: #fff;
+}
+
+.bid {
+	background-color: #990;
+	color: #fff;
+}
+
+#enter-the-matrix .updating, #enter-the-matrix .waiting {
+	font-size: 11px;
+	color: #aaa;
+}
