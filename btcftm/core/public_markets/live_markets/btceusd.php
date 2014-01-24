@@ -74,11 +74,12 @@ class BTCeUSD extends LiveMarket
 		return $tickers;
 	}
 	
-	public function getHistoryTicker($timestamp) {
+	public function getHistoryTicker($timestamp="") {
 		global $DB;
 		$ticker = NULL;
 		
-		if (is_string($timestamp)){ $timestamp = strtotime($timestamp); }
+		if (empty($timestamp)) { $timestamp = time(); }
+if (is_string($timestamp)){ $timestamp = strtotime($timestamp); }
 		if(is_int($timestamp)){
 			$qid = $DB->query("SELECT * FROM btceusd_ticker WHERE timestamp <= {$timestamp} ORDER BY timestamp DESC LIMIT 1");
 			$result = $DB->fetch_array_assoc($qid);

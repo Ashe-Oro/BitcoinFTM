@@ -28,7 +28,7 @@ charts.showChart = function(args) {
       cParam = '/bitfinex/btcusd/';
       break;
 
-    case 'CryptotradeUSD':
+    case 'CryptoTradeUSD':
       cParam = '/cryptotrade/btcusd/';
       break;
 

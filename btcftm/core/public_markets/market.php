@@ -21,7 +21,7 @@ abstract class Market
 	}
 	
 	abstract public function getHistoryTickers($startDate, $endDate="");
-	abstract public function getHistoryTicker($timestamp);
+	abstract public function getHistoryTicker($timestamp="");
 	abstract public function getHistorySamples($startDate, $endDate="", $sampling="day");
 	abstract public function updateOrderBookData();
 	abstract public function getCurrentTicker();
@@ -47,6 +47,7 @@ abstract class Market
 	public function formatOrderBook($depth)
 	{
 		iLog("[Market] Formating Order Book...");
+		//var_dump($depth);
 		return new MarketOrderBook($depth->asks, $depth->bids);
 	}	
 	

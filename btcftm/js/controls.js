@@ -1,11 +1,15 @@
-var ftmState = "dashboard";
+var controls = new Object();
+controls.ftmState = "dashboard";
+controls.json = null;
+controls.jsonInt = 10000;
 
 $(document).ready(function(){
+	updateMasterJSON();
 	bindSidebarMenu();
 	bindAccountMenu();
 
 	$('#main-content .content').each(function(){
-		if ($(this).attr('id') == ftmState) {
+		if ($(this).attr('id') == controls.ftmState) {
 			$(this).removeClass('hide');
 		} else {
 			$(this).addClass('hide');
@@ -13,12 +17,22 @@ $(document).ready(function(){
 	});
 });
 
+function updateMasterJSON()
+{
+	setInterval(function(){
+		$.getJSON("json/master.json", function( data ) {
+			controls.json = data;
+			alert('json updated');
+		});
+	}, controls.jsonInt);
+}
+
 function changeFtmState(state)
 {
-	if (ftmState != state){
-		$('#'+ftmState).addClass('hide');
-		ftmState = state;
-		$('#'+ftmState).removeClass('hide');
+	if (controls.ftmState != state){
+		$('#'+controls.ftmState).addClass('hide');
+		controls.ftmState = state;
+		$('#'+controls.ftmState).removeClass('hide');
 	}
 }
 

@@ -75,10 +75,11 @@ class BitfinexUSD extends LiveMarket
 		return $tickers;
 	}
 	
-	public function getHistoryTicker($timestamp) {
+	public function getHistoryTicker($timestamp="") {
 		global $DB;
 		$ticker = NULL;
 		
+		if (empty($timestamp)) { $timestamp = time(); }
 		if (is_string($timestamp)){ $timestamp = strtotime($timestamp); }
 		if(is_int($timestamp)){
 			$qid = $DB->query("SELECT * FROM bitfinexusd_ticker WHERE timestamp <= {$timestamp} ORDER BY timestamp DESC LIMIT 1");

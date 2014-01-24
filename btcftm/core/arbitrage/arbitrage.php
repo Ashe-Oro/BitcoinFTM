@@ -46,14 +46,16 @@ class Arbitrage
 		$this->_loadMOB();
 		
 		// load the client list
-		$this->clients = ($clientsList == NULL) ? new ClientsList() : $clientsList;
-		$cArray = $this->clients->getClientsList();
-		
-		foreach($cArray as $client) {
-			iLog("[Arbitrage] Client loaded - username: ".$client->getUsername());
-			// create an arbitrer for each client
-			$arb = $this->createArbitrer($client, $args);
-			$this->arbitrers[$client->getID()] = $arb;
+		if (!isset($args['noclients'])){ // client list is now optional (speeds up JSON greatly!)
+			$this->clients = ($clientsList == NULL) ? new ClientsList() : $clientsList;
+			$cArray = $this->clients->getClientsList();
+			
+			foreach($cArray as $client) {
+				iLog("[Arbitrage] Client loaded - username: ".$client->getUsername());
+				// create an arbitrer for each client
+				$arb = $this->createArbitrer($client, $args);
+				$this->arbitrers[$client->getID()] = $arb;
+			}
 		}
 	}
 	
@@ -176,6 +178,50 @@ class Arbitrage
 	{
 		return $this->arbitrers;
 	}
+
+	public function updateMasterJSON($writeFile=false)
+	{
+		$json = $this->getMasterJSON();
+		if ($writeFile){
+			file_put_contents("json/master.json", $json);
+		}
+		return $json;
+	}
+
+	private function getMasterJSON()
+	{
+		$json = array("markets" => array(), "mob" => array(), "timestamp" => 0);
+
+		// add current market values to JSON
+		foreach($this->markets as $mkt) {
+			$t = $mkt->getCurrentTicker();
+			$mname = str_replace("History", "", $mkt->name);
+			$json['markets'][$mname] = array(
+				"name" => $mname,
+				"currency" => $mkt->currency,
+				"high" => $t->getHigh(),
+				"low" => $t->getLow(),
+				"last" => $t->getLast(),
+				"bid" => $t->getBid(),
+				"ask" => $t->getAsk(),
+				"volume" => $t->getVolume()
+			);
+		}
+
+		$matrix = $this->mob->getFullExchangeMatrix();
+		foreach($matrix as $askname => $askM) {
+			$aname = str_replace("History", "", $askname);
+			$json['mob'][$aname] = array();
+			foreach($askM as $bidname => $bidM) {
+				$bname = str_replace("History", "", $bidname);
+				$json['mob'][$aname][$bname] = $bidM['profit'];
+			}
+		}
+
+		$json['timestamp'] = time();
+
+		return json_encode($json);
+	}
 	
 	/**
 	 * Executes a command
@@ -192,6 +238,11 @@ class Arbitrage
 					foreach($this->arbitrers as $clientID => $arb) {
 						$arb->watchMarkets($this->markets, $this->mob);
 					}
+					break;
+
+				case "json":
+					$this->updateMarketDepths();
+					echo $this->updateMasterJSON();
 					break;
 					
 				case "sim":
