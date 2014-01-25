@@ -1,16 +1,16 @@
 <?php
 require_once("historymarket.php");
 
-class HistoryBitstampUSD extends HistoryMarket
+class HistoryBTCeUSD extends HistoryMarket
 {
 	public function __construct()
 	{
 		parent::__construct("USD");
 		$this->orderBook = new MarketOrderBook();
-		$this->table = "bitstamp";
-		$this->historyname = "HistoryBitstampUSD";
-		$this->depthUrl = "https://www.bitstamp.net/api/order_book/";
-		$this->tickerUrl = "https://www.bitstamp.net/api/ticker/";
+		$this->table = "btce_btcusd";
+		$this->historyname = "HistoryBTCeUSD";
+		$this->depthUrl = "https://btc-e.com/api/2/btc_usd/depth";
+		$this->tickerUrl = "https://btc-e.com/api/2/btc_usd/ticker";
 	}
 
 	protected function parseDepthJson($res)

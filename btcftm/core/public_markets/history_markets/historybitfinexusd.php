@@ -17,5 +17,14 @@ class HistoryBitfinexUSD extends HistoryMarket
 	{
 		return json_decode($res);
 	}
+
+	protected function parseTickerRow($row)
+	{
+		$row['high'] = max($row['last'], $row['mid']);
+		$row['low'] = min($row['last'], $row['mid']);
+		$row['volume'] = 0;
+
+		return $row;
+	}
 }
 ?>

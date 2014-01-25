@@ -19,6 +19,7 @@ abstract class HistoryMarket extends Market
 	}
 
 	abstract protected function parseDepthJson($json);
+	abstract protected function parseTickerRow($row);
 	
 	public function updateTimestamp($timestamp, $period)
 	{
@@ -98,6 +99,7 @@ abstract class HistoryMarket extends Market
 			$res = $DB->query("SELECT * FROM {$this->table}_{$tPeriod} WHERE timestamp <= {$this->timestamp} ORDER BY timestamp DESC LIMIT 1");
 			if($row = $DB->fetch_array_assoc($res)){
 				if ($tPeriod == "ticker"){
+					$row = $this->parseTickerRow($row);
 					$ticker = new Ticker($row);
 					$t = $ticker->getTickerArray();
 					iLog("[{$this->historyname}] Latest ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");

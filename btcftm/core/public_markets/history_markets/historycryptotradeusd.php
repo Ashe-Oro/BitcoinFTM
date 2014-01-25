@@ -1,16 +1,16 @@
 <?php
 require_once("historymarket.php");
 
-class HistoryBitstampUSD extends HistoryMarket
+class HistoryCryptoTradeUSD extends HistoryMarket
 {
 	public function __construct()
 	{
 		parent::__construct("USD");
 		$this->orderBook = new MarketOrderBook();
-		$this->table = "bitstamp";
-		$this->historyname = "HistoryBitstampUSD";
-		$this->depthUrl = "https://www.bitstamp.net/api/order_book/";
-		$this->tickerUrl = "https://www.bitstamp.net/api/ticker/";
+		$this->table = "cryptotrade_btcusd";
+		$this->historyname = "HistoryCryptoTradeUSD";
+		$this->depthUrl = "https://crypto-trade.com/api/1/depth/btc_usd";
+		$this->tickerUrl = "https://crypto-trade.com/api/1/ticker/btc_usd";
 	}
 
 	protected function parseDepthJson($res)
@@ -19,6 +19,7 @@ class HistoryBitstampUSD extends HistoryMarket
 	}
 	
 	protected function parseTickerRow($row){
+		//	var_dump($row);
 		return $row;
 	}
 }

@@ -21,5 +21,10 @@ class HistoryMtGoxUSD extends HistoryMarket
 		}
 		return NULL;
 	}
+
+	protected function parseTickerRow($row)
+	{
+		return $row;
+	}
 }
 ?>
