@@ -1,1 +1,1 @@
-<h2>sims</h2>
+<h1>Trading Simulations</h1>

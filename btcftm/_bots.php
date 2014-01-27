@@ -1,1 +1,1 @@
-<h2>bots</h2>
+<h1>Trading Bots</h1>

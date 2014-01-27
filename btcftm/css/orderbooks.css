@@ -1,0 +1,207 @@
+#orderbooks table {
+	width: 100%;
+}
+
+#orderbooks td {
+	display: table-cell;
+	padding: 5px;
+	margin: 2px;
+	font-size: 11px;
+	text-align: left;
+}
+
+.marketname-MtGox {
+	background: #900;
+}
+
+.asks-list-MtGox {
+	background: #700;
+}
+
+.bids-list-MtGox {
+	background: #500;
+}
+
+.ask-list-price-MtGox {
+	background: #600;
+}
+
+.ask-list-amount-MtGox {
+	background: #400;
+}
+
+.bid-list-price-MtGox {
+	background: #300;
+}
+
+.bid-list-amount-MtGox {
+	background: #100;
+}
+
+.marketname-Bitstamp {
+	background: #009;
+}
+
+.asks-list-Bitstamp {
+	background: #007;
+}
+
+.bids-list-Bitstamp {
+	background: #005;
+}
+
+.ask-list-price-Bitstamp {
+	background: #006;
+}
+
+.ask-list-amount-Bitstamp {
+	background: #004;
+}
+
+.bid-list-price-Bitstamp {
+	background: #003;
+}
+
+.bid-list-amount-Bitstamp {
+	background: #001;
+}
+
+.marketname-Kraken {
+	background: #909;
+}
+
+.asks-list-Kraken {
+	background: #707;
+}
+
+.bids-list-Kraken {
+	background: #505;
+}
+
+.ask-list-price-Kraken {
+	background: #606;
+}
+
+.ask-list-amount-Kraken {
+	background: #404;
+}
+
+.bid-list-price-Kraken {
+	background: #303;
+}
+
+.bid-list-amount-Kraken {
+	background: #101;
+}
+
+.marketname-BTCe {
+	background: #990;
+}
+
+.asks-list-BTCe {
+	background: #770;
+}
+
+.bids-list-BTCe {
+	background: #550;
+}
+
+.ask-list-price-BTCe {
+	background: #660;
+}
+
+.ask-list-amount-BTCe {
+	background: #440;
+}
+
+.bid-list-price-BTCe {
+	background: #330;
+}
+
+.bid-list-amount-BTCe {
+	background: #110;
+}
+
+.marketname-Bitfinex {
+	background: #090;
+}
+
+.asks-list-Bitfinex {
+	background: #070;
+}
+
+.bids-list-Bitfinex {
+	background: #050;
+}
+
+.ask-list-price-Bitfinex {
+	background: #060;
+}
+
+.ask-list-amount-Bitfinex {
+	background: #040;
+}
+
+.bid-list-price-Bitfinex {
+	background: #030;
+}
+
+.bid-list-amount-Bitfinex {
+	background: #010;
+}
+
+.marketname-CryptoTrade {
+	background: #099;
+}
+
+.asks-list-CryptoTrade {
+	background: #077;
+}
+
+.bids-list-CryptoTrade {
+	background: #055;
+}
+
+.ask-list-price-CryptoTrade {
+	background: #066;
+}
+
+.ask-list-amount-CryptoTrade {
+	background: #044;
+}
+
+.bid-list-price-CryptoTrade {
+	background: #033;
+}
+
+.bid-list-amount-CryptoTrade {
+	background: #011;
+}
+
+.marketname-CampBX {
+	background: #999;
+}
+
+.asks-list-CampBX {
+	background: #777;
+}
+
+.bids-list-CampBX {
+	background: #555;
+}
+
+.ask-list-price-CampBX {
+	background: #666;
+}
+
+.ask-list-amount-CampBX {
+	background: #444;
+}
+
+.bid-list-price-CampBX {
+	background: #333;
+}
+
+.bid-list-amount-CampBX {
+	background: #111;
+}

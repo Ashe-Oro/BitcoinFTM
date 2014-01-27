@@ -1,6 +1,6 @@
 ul.#bitcoin-markets {
 	display: table-row;
-	margin: 10px auto;
+	margin: 0px auto 10px auto;
 	padding:  0px;
 	list-style: none;
 	width: 100%;

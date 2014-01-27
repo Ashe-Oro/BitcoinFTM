@@ -74,7 +74,7 @@ charts.sizeChart = function() {
   var ch = $('#charts').height();
 
   var dh = $('#bitcoin-markets').outerHeight() + $('#charts h1').outerHeight();
-  $('#bitcoin-chart iframe').css({width: cw+'px', height: (ch-dh-55)+'px'});
+  $('#bitcoin-chart iframe').css({width: cw+'px', height: (ch-dh)+'px'});
 }
 
 $(document).ready(function() {

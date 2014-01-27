@@ -3,7 +3,7 @@ matrix.timeout = null;
 matrix.timeMS = 15000;
 matrix.sleepMS = 2000;
 
-matrix.updateMatrix = function()
+matrix.updateMatrixOld = function()
 {
   if (matrix.timeout) { clearTimeout(matrix.timeout); }
   if ($('#matrix').css("opacity") == 1) {
@@ -23,7 +23,18 @@ matrix.updateMatrix = function()
   }
 }
 
+matrix.updateMatrix = function() 
+{
+  $.each(controls.json.mob, function(aname, amkt){
+    $.each(amkt, function(bname, xchg){
+      var klass = (xchg < 1) ? 'neg' : (xchg > 1) ? 'pos' : 'neu';
+      $('#matrix-'+aname+'-'+bname).html("<span class='"+klass+"'>"+xchg.toFixed(4)+"</span>");
+    });
+  });
+}
+
 $(document).ready(function() {
-	matrix.updateMatrix();
+	controls.addJSONListener(matrix.updateMatrix);
+ // matrix.updateMatrix();
 });
 

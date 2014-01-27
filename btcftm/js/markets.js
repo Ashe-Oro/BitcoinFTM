@@ -3,7 +3,8 @@ markets.timeout = null;
 markets.timeMS = 15000;
 markets.sleepMS = 2000;
 
-markets.updateMarkets = function()
+// deprecated old live function
+markets.updateMarketsLive = function()
 {
   if (markets.timeout) { clearTimeout(markets.timeout); }
   if ($('#markets').css("opacity") == 1) {
@@ -23,7 +24,22 @@ markets.updateMarkets = function()
   }
 }
 
+// new JSON-based function using callback listener
+markets.updateMarkets = function()
+{
+ $.each(controls.json.markets, function(mname, mkt){
+  mname = mname.replace("USD","");
+  $('#mkt-last-'+mname).html(mkt.last);
+  $('#mkt-high-'+mname).html(mkt.high);
+  $('#mkt-low-'+mname).html(mkt.low);
+  $('#mkt-ask-'+mname).html(mkt.ask);
+  $('#mkt-bid-'+mname).html(mkt.bid);
+  $('#mkt-vol-'+mname).html(mkt.volume);
+ });
+}
+
 $(document).ready(function() {
-	markets.updateMarkets();
+	controls.addJSONListener(markets.updateMarkets);
+  //markets.updateMarkets();
 });
 

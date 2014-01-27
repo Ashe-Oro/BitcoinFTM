@@ -39,11 +39,20 @@ class Arbitrage
 		}
 		
 		// load the markets
-		$this->_loadMarkets($args);
+		if (!isset($args['nomarkets'])){
+			$this->_loadMarkets($args);
+		}
+
+		// set historical timestamp if applicable
+		if (isset($args['timestamp']) && isset($args['period'])){
+			$this->setTimestamp($args['timestamp'], $args['period']);
+		}
 		
 		
 		// load the MOB
-		$this->_loadMOB();
+		if (!isset($args['nomob'])){
+			$this->_loadMOB();
+		}
 		
 		// load the client list
 		if (!isset($args['noclients'])){ // client list is now optional (speeds up JSON greatly!)
@@ -174,9 +183,14 @@ class Arbitrage
 		return $arb;
 	}
 	
-	public function getArbitrer()
+	public function getArbitrers()
 	{
 		return $this->arbitrers;
+	}
+
+	public function getArbitrer($clientID)
+	{
+		return ($this->arbitrers[$clientID]) ? $this->arbitrer[$clientID] : NULL;
 	}
 
 	public function updateMasterJSON($writeFile=false)

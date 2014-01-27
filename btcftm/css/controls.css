@@ -11,6 +11,7 @@ body {
 	margin: 0;
 	padding:0;
 	text-align: center;
+	color: #fff;
 	background: #252525 url('../images/btc-background.jpg') no-repeat center center fixed;
 	-webkit-background-size: cover;
 	  -moz-background-size: cover;
@@ -95,24 +96,41 @@ li.neu {
 	margin: 0px;
 	padding: 0px;
 	font-size: 20px;
+	z-index: 11;
+}
+
+#loading-data {
+	position: absolute;
+	top: 0px;
+	left: 335px;
+	width: 30px;
+	height: 30px;
+	background: #000 url('../images/small-ajax-loader.gif') center center no-repeat;
+	z-index: 100;
 }
 
 #header h3 {
 	position: absolute;
-	right: 40px;
-	top: 5px;
+	right: 35px;
+	top: 0px;
 	color: #fff;
 	margin: 0px;
 	padding: 0px;
+	padding-top: 5px;
+	padding-left: 10px;
+	padding-right: 5px;
+	background-color: #000;
+	z-index:  10;
 }
 
 #header .account {
 	position: absolute;
 	right: 5px;
 	top: 0px;
-	background:  transparent;
+	background:  #000;
 	transition: opacity 600ms;
 	-webkit-transition: opacity 600ms;
+	z-index: 20;
 }
 
 #header .account .account-icon {
@@ -164,7 +182,39 @@ ul.account-dropdown li:hover > a {
 	background: #444;
 	cursor:  pointer;
 }
-	
+
+#bitcoin-market-ticker {
+	position: absolute;
+	display:  block;
+	left: 345px;
+	right: 10px;
+	height: 30px;
+	z-index:  2;
+	overflow: hidden;
+}
+
+#bitcoin-market-ticker .ticker-wrapper {
+	position: absolute;
+	top: 6px;
+	left: 0px;
+	font-size: 13px;
+	color: #fff;
+	height: 20px;
+	width: 2000px;
+	white-space: nowrap;
+	padding: 0px 20px;
+}
+
+#bitcoin-market-ticker .market-ticker {
+	position: relative;
+	display: block;
+	float: left;
+	padding-right: 20px;
+	color: #ccc;
+}
+
+
+/* ====== CONTAINER ===== */
 
 #container {
 	position: absolute;
@@ -259,9 +309,26 @@ ul.account-dropdown li:hover > a {
   box-shadow: 0px 0px 5px rgba(0,0,0,0.5);
 }
 
+#main-content .content.init {
+	display: none;
+}
+
 #main-content .content.hide {
+	display: block;
 	opacity: 0.0;
 	margin-left: 3000px;
+}
+
+#main-content .content h1 {
+	display:  block;
+	width: 100%;
+	height: 30px;
+	font-size: 20px;
+	line-height:  30px;
+	text-align: center;
+	padding: 0px;
+	margin: 0px auto;
+	background-color: #444;
 }
 
 /* ===== FOOTER ===== */
@@ -291,6 +358,9 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 	font-size: 10px;
 }
 
+
+
+/*****
 
 #info_wrapper {
 	display: block;
@@ -430,3 +500,4 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 	margin-left: 1%;
 	margin-right: 1%;
 }
+*/

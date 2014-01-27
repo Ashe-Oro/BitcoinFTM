@@ -26,6 +26,7 @@ dashboard.bestops.updateBestOps = function()
 }
 
 $(document).ready(function() {
-	dashboard.bestops.updateBestOps();
+	return;
+  dashboard.bestops.updateBestOps();
 });
 

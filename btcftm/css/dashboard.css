@@ -1,7 +1,7 @@
 #trading-status {
 	position: absolute;
 	display: block;
-	top: 0px;
+	bottom: 0px;
 	right: 0px;
 	width: auto;
 	border: 1px solid #444;
@@ -19,7 +19,7 @@
 	height: auto;
 	border: 1px solid #444;
 	border-left: none;
-	border-top: none;
+	border-bottom: none;
 	padding: 5px;
 }
 

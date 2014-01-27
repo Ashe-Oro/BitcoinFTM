@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: application/json');
 $noEchoLog = 1;
 require_once("core/include.php");
 
