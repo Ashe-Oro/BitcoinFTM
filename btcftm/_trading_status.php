@@ -16,3 +16,10 @@
     ?>
     </span>
 </div>
+
+<script type="text/javascript">
+controls.status = new Object();
+controls.status.livedata = <?php echo ($config["live"]) ? "true" : "false"; ?>;
+controls.status.activeclient = <?php echo ($client->isActive()) ? "true" : "false"; ?>;
+controls.status.activetrading = <?php echo ($client->isTrading()) ? "true" : "false"; ?>;
+</script>

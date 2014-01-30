@@ -40,7 +40,7 @@ if ($signedIn) {
 
 <p>Loading your profile, please wait...</p>
 
-<img src="/images/ajax-loader.gif" alt="Loading..." width="50" height="50" />
+<img src="images/ajax-loader.gif" alt="Loading..." width="50" height="50" />
 
 <script language="javascript">
 document.location.href = "controls.php";

@@ -4,15 +4,12 @@
 <link rel="stylesheet" href="css/charts.css" />
 
 <div id="charts">
-<?php
-$a = new Arbitrage();
-$markets = $a->markets;
-?>
 	<ul id="bitcoin-markets">
 	<?php
 	foreach($markets as $mkt) {
-		if ($mkt->name != "KrakenUSD") { // kraken not currently supported at bitwisdom
-			echo "<li id='btcmarket_{$mkt->name}' class='bitcoin-market-chart'><a href='#'>{$mkt->name}</a></li>";
+		$mname = $mkt->getName();
+		if ($mname != "Kraken") { // kraken not currently supported at bitwisdom
+			echo "<li id='btcmarket_{$mname}' class='bitcoin-market-chart'><a href='#'>{$mname}</a></li>";
 		}
 	}
 	?>

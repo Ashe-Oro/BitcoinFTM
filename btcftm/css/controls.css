@@ -273,7 +273,7 @@ ul.account-dropdown li:hover > a {
 }
 
 #sidebar ul li:active, #sidebar ul li.active {
-	background: #222;
+	background: #444;
 }
 
 /* ===== CONTENT ===== */

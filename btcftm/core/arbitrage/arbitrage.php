@@ -218,7 +218,8 @@ class Arbitrage
 				"last" => $t->getLast(),
 				"bid" => $t->getBid(),
 				"ask" => $t->getAsk(),
-				"volume" => $t->getVolume()
+				"volume" => $t->getVolume(),
+				"commission" => $mkt->commission
 			);
 		}
 

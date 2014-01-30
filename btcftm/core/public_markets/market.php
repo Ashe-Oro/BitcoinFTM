@@ -6,18 +6,24 @@ abstract class Market
 {
 	public $name = '';
 	public $currency = '';
+	public $commission = '';
 	public $depthUpdated = 0;
+	public $expiration = 0;
+	public $refresh = 0;
 	public $updateRate = 60;
 	public $orderBook = NULL;
+	public $mname = '';
 	
 	protected $live = false;
 
-	public $fc = NULL; // currency converter object, not yet needed
+	public $fc = NULL; // currency converter object, not yet needed [but it will be - aww skeet skeet]
 
 	public function __construct($currency)
 	{
 		$this->name = get_class($this);
 		$this->currency = $currency;
+		$this->mname = str_replace("History", "", str_replace($this->currency, "", get_class($this)));
+		$this->_initMarket();
 	}
 	
 	abstract public function getHistoryTickers($startDate, $endDate="");
@@ -25,6 +31,22 @@ abstract class Market
 	abstract public function getHistorySamples($startDate, $endDate="", $sampling="day");
 	abstract public function updateOrderBookData();
 	abstract public function getCurrentTicker();
+
+	private function _initMarket()
+	{
+		global $DB;
+		try {
+			$res = $DB->query("SELECT * FROM markets WHERE name = '{$this->mname}'");
+			if ($res) {
+				$row = $DB->fetch_array_assoc($res);
+				$this->refresh = $row['refresh'];
+				$this->expiration = $row['expiration'];
+				$this->commission = $row['commission'];
+			}
+		} catch (Exception $e) {
+			iLog("[Market] ERROR: Failed to init market - ".$e->getMessage());
+		}
+	}
 	
 	public function updateMarketDepth()
 	{
@@ -240,6 +262,11 @@ abstract class Market
 	{
 		if($this->currency == 'USD') { return; }
 		// otherwise do other stuff, but we're only in USD right now
+	}
+
+	public function getName()
+	{
+		return str_replace("History","", str_replace($this->currency, "", $this->name));
 	}
 	
 }

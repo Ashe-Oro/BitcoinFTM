@@ -1,9 +1,16 @@
+function noEvent(e)
+{
+	e.preventDefault();
+	e.stopPropagation();
+	return false;
+}
+
 var controls = new Object();
 controls.ftmState = "dashboard";
 controls.json = null;
 controls.jsonInt = 15000; // update every 15s for now
 controls.jsonListeners = new Array();
-controls.ftmStateList = ["dashboard","markets","orderbooks","matrix","charts","bots","sims","settings","portfolio"];
+controls.ftmStateList = ["dashboard","markets","orders","orderbooks","matrix","charts","bots","sims","settings","portfolio"];
 
 controls.updateMasterJSON = function()
 {
@@ -86,6 +93,8 @@ controls.bindSidebarMenu = function()
 		$('#sidebar li.active').removeClass('active');
 		$(this).addClass('active');
 
+
+		window.location.hash = '#'+controls.ftmState;
 		controls.changeFtmState(newState);
 		
 		e.preventDefault();

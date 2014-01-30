@@ -110,6 +110,7 @@ if ($signedIn == 1) {
 	<aside id="sidebar" role="complementary">
     <ul>
     <li class="dashboard"><a href="#dashboard">Dashboard</a></li>
+    <li class="orders"><a href="#orders">Buy/Sell</a></li>
     <li class="markets"><a href="#markets">Markets</a></li>
     <li class="orderbooks"><a href="#orderbooks">Order Books</a></li>
     <li class="matrix"><a href="#matrix">Arbitrage</a></li>
@@ -128,6 +129,9 @@ if ($signedIn == 1) {
     	</div>
   	   <div id="dashboard" class="content init">
       	<?php include("_dashboard.php"); ?>
+      </div>
+      <div id="orders" class="content init">
+        <?php include("_orders.php"); ?>
       </div>
       <div id="markets" class="content init">
       	<?php include("_markets.php"); ?>
