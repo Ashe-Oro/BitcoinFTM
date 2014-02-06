@@ -9,6 +9,20 @@ if (isset($_GET['signout'])){
 	session_unset();
 	$signedIn = 0;
 }
+
+$panels = array(
+	"account_balance",
+	"dashboard",
+	"charts",
+	"markets",
+	"matrix",
+	"orderbooks",
+	"orders",
+	"portfolio",
+	"settings",
+	"bots",
+	"sims"
+);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -17,9 +31,21 @@ if (isset($_GET['signout'])){
 <title>BTC FTM</title>
 <script language="javascript" type="application/javascript" src="jquery/jquery-1.8.2.min.js"></script>
 <script language="javascript" type="application/javascript" src="js/controls.js"></script>
+<?php
+foreach($panels as $p){
+	echo "<script language='javascript' type='application/javascript' src='js/{$p}.js'></script>";
+}
+?>
 
 <link type="text/css" rel="stylesheet" href="css/core.css" />
 <link type="text/css" rel="stylesheet" href="css/controls.css" />
+
+<?php
+foreach($panels as $p){
+	echo "<link type='text/css' rel='stylesheet' href='css/{$p}.css' />";
+}
+?>
+
 </head>
 
 <body>
@@ -59,6 +85,7 @@ if ($signedIn == 1) {
   $args = array("history" => 1); // use historical mode triggers JSON feed
   $ARB = new Arbitrage($cl, $args);
   $markets = $ARB->markets;
+  $currencies = $ARB->currencies;
 	
 	/*
   $range = "1-day";
@@ -88,11 +115,12 @@ if ($signedIn == 1) {
 
 <header id="header">
 	<h2 class="title">Bitcoin Financial Trade Manager</h2>
-  <div id="loading-data">
-  </div>
+ 	 <div id="loading-data">
+  	</div>
 	    
-	<h3 class="welcome"><b><?php echo $client->getName(); ?></b></h3>
-	<div class="account"><span class="account-icon"></span>
+	<div class="account">
+		<h3 class="welcome"><b><?php echo $client->getName(); ?></b></h3>
+		<span class="account-icon"></span>
 		<ul class="account-dropdown">
 			<li class="settings"><a href="#settings">Account Settings</a></li>
 			<li class="portfolio"><a href="#portfolio">Manage Portfolio</a></li>

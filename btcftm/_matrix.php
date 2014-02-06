@@ -1,10 +1,5 @@
 <h1>Arbitrage Exchange Matrix</h1>
 
-<script language="javascript" type="text/javascript" src="js/matrix.js"></script>
-
-<link rel="stylesheet" href="css/matrix.css" />
-
-
 <div id="enter-the-matrix">
 <?php /*	<div class="updating">
 	Updating... this may take a few seconds...
@@ -25,8 +20,7 @@
 	<?php
 	echo "<th class='ask'></th>";
 	foreach($full as $askmarket => $mx){
-		$aname = str_replace("History", "", $askmarket);
-		echo "<th class='bid'>{$aname}</th>";
+		echo "<th class='bid'>".sanitizeMarketName($askmarket)."</th>";
 	}
 	?>
 	</tr>
@@ -34,11 +28,11 @@
 <?php
 $fclone = $full;
 foreach($full as $askmarket => $mx){
-	$aname = str_replace("History", "", $askmarket);
+	$aname = sanitizeMarketName($askmarket);
 	echo "<tr>";
 	echo "<th class='ask'>{$aname}</th>";
 	foreach($fclone as $bidmarket => $mx2){
-		$bname = str_replace("History", "", $bidmarket);
+		$bname = sanitizeMarketName($bidmarket);
 		$m = isset($mx[$bidmarket]) ? $mx[$bidmarket] : NULL;
 		if (!$m || $aname == $bname) {
 			echo "<td class='matrix-cell'>----</td>";

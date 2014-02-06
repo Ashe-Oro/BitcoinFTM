@@ -58,6 +58,10 @@
 	color: #ddd;
 }
 
+#buysell-bitcoin-markets li:hover {
+	background-color: #222;
+}
+
 #buysell-bitcoin-markets li:hover > a {
 	color: #fff;
 	text-decoration:  underline;
@@ -157,7 +161,8 @@
 
 #buy-button.disabled, #buy-button.disabled:hover, #buy-button.disabled:active {
 	cursor:  default;
-	background-color: #797;
+	color: #ccc;
+	background-color: #444;
 }
 
 #sell-button {
@@ -177,5 +182,6 @@
 
 #sell-button.disabled, #sell-button.disabled:hover, #sell-button.disabled:active {
 	cursor:  default;
-	background-color: #797;
+	color: #ccc;
+	background-color: #444;
 }

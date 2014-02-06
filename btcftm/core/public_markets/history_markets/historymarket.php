@@ -58,8 +58,9 @@ abstract class HistoryMarket extends Market
 			}
 		} else {
 			iLog("[{$this->historyname}] Updating current order depth...");
-			$res = file_get_contents($this->depthUrl);
 			try {
+				//$res = file_get_contents($this->depthUrl);
+				$res = curl($this->depthUrl);
 				$data = $this->parseDepthJson($res);
 				$this->orderBook = $this->formatOrderBook($data);
 				iLog("[{$this->historyname}] Order Depth Updated");

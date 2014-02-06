@@ -1,8 +1,5 @@
 <h1>Market Charts</h1>
 
-<script language="javascript" type="text/javascript" src="js/charts.js"></script>
-<link rel="stylesheet" href="css/charts.css" />
-
 <div id="charts">
 	<ul id="bitcoin-markets">
 	<?php

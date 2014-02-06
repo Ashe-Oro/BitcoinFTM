@@ -5,6 +5,11 @@ function noEvent(e)
 	return false;
 }
 
+function sanitizeMarketName(mname)
+{
+	return mname.replace("History","").replace("USD","");
+}
+
 var controls = new Object();
 controls.ftmState = "dashboard";
 controls.json = null;
@@ -94,7 +99,7 @@ controls.bindSidebarMenu = function()
 		$(this).addClass('active');
 
 
-		window.location.hash = '#'+controls.ftmState;
+		//window.location.hash = '#'+controls.ftmState;
 		controls.changeFtmState(newState);
 		
 		e.preventDefault();
@@ -102,9 +107,9 @@ controls.bindSidebarMenu = function()
 		return false;
 	});
 
-	$('#sidebar li a').click(function(e){
+	/*$('#sidebar li a').click(function(e){
 		return false;
-	});
+	});*/
 }
 
 controls.bindAccountMenu = function()

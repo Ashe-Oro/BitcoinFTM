@@ -1,6 +1,3 @@
-<link rel="stylesheet" href="css/settings.css" />
-<script language="javascript" type="text/javascript" src="js/settings.js"></script>
-
 <h1>Account Settings</h1>
 
 <fieldset>

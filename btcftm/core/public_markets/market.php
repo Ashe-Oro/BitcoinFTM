@@ -10,6 +10,11 @@ abstract class Market
 	public $depthUpdated = 0;
 	public $expiration = 0;
 	public $refresh = 0;
+	public $supportsUSD = 0;
+	public $supportsEUR = 0;
+	public $supportsBTC = 0;
+	public $supportsLTC = 0;
+
 	public $updateRate = 60;
 	public $orderBook = NULL;
 	public $mname = '';
@@ -42,10 +47,23 @@ abstract class Market
 				$this->refresh = $row['refresh'];
 				$this->expiration = $row['expiration'];
 				$this->commission = $row['commission'];
+
+				$this->supportsUSD = $row['usd'];
+				$this->supportsEUR = $row['eur'];
+				$this->supportsBTC = $row['btc'];
+				$this->supportsLTC = $row['ltc'];
 			}
 		} catch (Exception $e) {
 			iLog("[Market] ERROR: Failed to init market - ".$e->getMessage());
 		}
+	}
+
+	public function supports($currency) {
+		$cur = strtoupper($currency);
+		if (isset($this->{"supports{$cur}"})){
+			return $this->{"supports{$cur}"};
+		}
+		return false;
 	}
 	
 	public function updateMarketDepth()
@@ -269,5 +287,10 @@ abstract class Market
 		return str_replace("History","", str_replace($this->currency, "", $this->name));
 	}
 	
+}
+
+function sanitizeMarketName($mname)
+{
+	return str_replace("History","",str_replace("USD","", $mname));
 }
 ?>

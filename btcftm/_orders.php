@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="css/orders.css" />
-<script language="javascript" type="text/javascript" src="js/orders.js"></script>
 <h1>Buy &amp; Sell Bitcoins</h1>
 
 <div id="buysell">

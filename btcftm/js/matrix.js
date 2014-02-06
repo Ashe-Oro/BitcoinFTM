@@ -26,11 +26,34 @@ matrix.updateMatrixOld = function()
 matrix.updateMatrix = function() 
 {
   $.each(controls.json.mob, function(aname, amkt){
+    aname = sanitizeMarketName(aname);
     $.each(amkt, function(bname, xchg){
-      var klass = (xchg < 1) ? 'neg' : (xchg > 1) ? 'pos' : 'neu';
+      bname = sanitizeMarketName(bname);
+      var klass = (xchg < 0) ? 'neg' : (xchg > 0) ? 'pos' : 'neu';
       $('#matrix-'+aname+'-'+bname).html("<span class='"+klass+"'>"+xchg.toFixed(4)+"</span>");
     });
   });
+  matrix.highlightOpportunities();
+}
+
+matrix.highlightOpportunities = function() 
+{
+ $.each(controls.json.mob, function(aname, amkt){
+  aname = sanitizeMarketName(aname);
+  $.each(amkt, function(bname, xchg){
+    bname = sanitizeMarketName(bname);
+    if (account.balances[aname].usd > 0 && account.balances[bname].btc > 0){
+      var cell = $('#matrix-'+aname+'-'+bname);
+      if (cell.find('span').hasClass('pos')){
+        cell.addClass('highlight');
+      } else {
+        cell.removeClass('highlight');
+      }
+    } else {
+      $('#matrix-'+aname+'-'+bname).removeClass('highlight');
+    }
+  });
+ });
 }
 
 $(document).ready(function() {

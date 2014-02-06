@@ -21,8 +21,9 @@ abstract class LiveMarket extends Market
 	{
 		iLog("[{$this->marketname}] Updating order book data...");
 		$url = "";
-		$res = file_get_contents($this->depthUrl);
 		try {
+			$res = curl($this->depthUrl);
+			//$res = file_get_contents($this->depthUrl);
 			$data = $this->parseDepthJson($res);
 			$this->orderBook = $this->formatOrderBook($data);
 			//var_dump($this->depth);
@@ -35,8 +36,9 @@ abstract class LiveMarket extends Market
 	public function getCurrentTicker()
 	{
 		iLog("[{$this->marketname}] Getting current ticker...");
-		$res = file_get_contents($this->tickerUrl);
 		try {
+			$res = curl($this->tickerUrl);
+			//$res = file_get_contents($this->tickerUrl);
 			return $this->parseTickerJson($res);		
 		} catch (Exception $e) {
 			iLog("[{$this->marketname}] ERROR: can't parse JSON feed - {$this->tickerUrl} - ".$e->getMessage());

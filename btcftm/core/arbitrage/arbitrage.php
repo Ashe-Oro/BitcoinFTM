@@ -1,4 +1,5 @@
 <?php
+require_once("./core/utils/currencyList.php");
 require_once("./core/utils/clientsList.php");
 require_once("./core/public_markets/mob/mob.php");
 require_once("arbitrer.php");
@@ -10,6 +11,7 @@ class Arbitrage
 {
 	public $arbitrers = array(); 
 	public $clients = array();
+	public $currencies = array();
 	
 	public $markets = array();
 	public $mob = NULL;
@@ -32,6 +34,8 @@ class Arbitrage
 		
 		if ($config['echoLog']) { echo "<hr />\n"; }
 		iLog("[Arbitrage] PHASE 1: ACQUIRE BITCOINS");
+
+		$this->currencies = new CurrencyList();
 		
 		// switch on historical mode here
 		if (isset($args['history'])){
@@ -236,6 +240,11 @@ class Arbitrage
 		$json['timestamp'] = time();
 
 		return json_encode($json);
+	}
+
+	function printCurrency($amount, $abbr)
+	{
+		return $this->currencies->printCurrency($amount, $abbr);
 	}
 	
 	/**

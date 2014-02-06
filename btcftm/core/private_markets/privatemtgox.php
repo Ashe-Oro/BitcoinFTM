@@ -12,9 +12,6 @@ class PrivateMtGox extends PrivateMarket
 	protected $tickerUrl = '';
 	protected $buyUrl = '';
 	protected $sellUrl = '';
-
-	protected $privatekey;
-	protected $secret;
 	
 	protected $ch = NULL;
 
@@ -117,7 +114,7 @@ class PrivateMtGox extends PrivateMarket
             throw new Exception('Could not get reply: ' . curl_error($this->ch));
 		}
 		
-        $json = json_decode($res, true);
+        $json = json_decode($res);
         if (!$json) {
             throw new Exception('Invalid data received, please make sure connection is working and requested API exists');
 		}

@@ -1,0 +1,46 @@
+#portfolio table {
+	width: 100%;
+}
+
+#portfolio tr {
+	display: table-row;
+	margin: 10px auto;
+}
+
+#portfolio td {
+	display: table-cell;
+	padding: 5px;
+	margin: 0px;
+	border-top: 1px solid #444;
+}
+
+
+.portfolio-api-data {
+	text-align: left;
+	font-size: 11px;
+}
+
+.portfolio-finance {
+	text-align: left;
+	line-height:  22px;
+}
+
+.portfolio-finance input {
+	padding: 2px 10px;
+	margin: 2px auto;
+	border: 1px solid #444;
+	background-color: #222;
+	color: #fff;
+	text-align: center;
+}
+
+.portfolio-finance input:hover {
+	cursor: pointer;
+	background-color: #444;
+	border-color: #777;
+}
+
+.portfolio-balances {
+	text-align: left;
+	line-height:  28px
+}

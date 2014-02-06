@@ -1,10 +1,5 @@
 <h1>Order Book Depths</h1>
 
-<script language="javascript" type="text/javascript" src="js/orderbooks.js"></script>
-
-<link rel="stylesheet" href="css/orderbooks.css" />
-
-
 <div id="orderbooks-list">
 <table>
 <tr>

@@ -10,10 +10,6 @@ class PrivateBTCeUSD extends PrivateMarket
 	const METHOD_ACTIVE_ORDERS = "ActiveOrders";
 	const METHOD_TRADE = "Trade";
 	const METHOD_CANCEL_ORDER = "CancelOrder";
-
-    private $privatekey = '';
-    private $secret = '';
-	private $clientID = '';
 	
 	private $ch = NULL;
 
@@ -72,7 +68,7 @@ class PrivateBTCeUSD extends PrivateMarket
         if ($res === false) {
             throw new Exception('Could not get reply: ' . curl_error($this->ch));
 		}
-        $json = json_decode($res, true);
+        $json = json_decode($res);
         if (!$json) {
             throw new Exception('Invalid data received, please make sure connection is working and requested API exists');
 		}
@@ -163,10 +159,12 @@ class PrivateBTCeUSD extends PrivateMarket
 			}
 		} else {
 			try {
-				$result = $DB->query("SELECT * FROM privatemarkets WHERE apiKey = '{$this->privatekey}' AND clientid = '{$this->clientId}'");
+				$result = $DB->query("SELECT * FROM privatemarkets WHERE marketid = {$this->publicmarketid} AND clientid = {$this->clientId}");
 				if ($client = $DB->fetch_array_assoc($result)){
-					$this->btcBalance = $client['btc'];
-					$this->usdBalance = $client['usd'];
+					$this->btcBalance = (float) ($client['btc'] != NULL ? $client['btc'] : 0);
+					$this->usdBalance = (float) ($client['usd'] != NULL ? $client['usd'] : 0);
+					$this->ltcBalance = (float) ($client['ltc'] != NULL ? $client['ltc'] : 0);
+					$this->eurBalance = (float) ($client['eur'] != NULL ? $client['eur'] : 0);
 					iLog("[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
 					return true;
 				}

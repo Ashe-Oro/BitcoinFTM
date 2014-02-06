@@ -1,6 +1,3 @@
-<link rel="stylesheet" href="css/account_balance.css" />
-<script language="javascript" type="text/javascript" src="js/account_balance.js"></script>
-
 <div id="account-balance">
 <fieldset>
 <legend>Account Balances</legend>
@@ -22,8 +19,8 @@
 $totalusdbal = 0;
 $totalbtcbal = 0;
 foreach($markets as $mkt){
-	$mname = str_replace("USD", "", str_replace("History","",$mkt->name));
-	//var_dump($client);
+	$mname = $mkt->mname;
+	//var_dump($client);  
 	$usdbal = $client->getMarketBalance($mname, "USD");
 	$btcbal = $client->getMarketBalance($mname, "BTC");
 

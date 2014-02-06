@@ -32,6 +32,7 @@ orders.changeMarket = function(mname)
 	if (controls.json){
 		orders.updateBuySell();
 	}
+	orders.setButtonStates();
 }
 
 orders.changeOrderType = function(otype)
@@ -94,6 +95,9 @@ orders.updateMarketBuySell = function()
 		$('#sell-button .order-commission-value').html('-$'+sellComValue.toFixed(4)+' (-'+mkt.commission+'%)');
 		$('#order-buy-total').html('-$'+buyTotal.toFixed(4));
 		$('#order-sell-total').html('+$'+sellTotal.toFixed(4));
+
+		orders.setButtonStates();
+
 	} else {
 		$('#buy-button .order-commission-value').html('... (-'+mkt.commission+'%)');
 		$('#sell-button .order-commission-value').html('... (-'+mkt.commission+'%)');
@@ -126,6 +130,9 @@ orders.updateLimitBuySell = function()
 		$('#sell-button .order-commission-value').html('-$'+sellComValue.toFixed(4)+' (-'+mkt.commission+'%)');
 		$('#order-buy-total').html('-$'+buyTotal.toFixed(4));
 		$('#order-sell-total').html('+$'+sellTotal.toFixed(4));
+
+		orders.setButtonStates();
+
 	} else {
 		$('.order-limit-value').html('...');
 
@@ -148,6 +155,53 @@ orders.updateCapital = function()
 			$('#order-capital-usd').html('$0.0000');
 			$('#order-capital-btc').html('0.00000000 BTC');
 		}
+	}
+}
+
+orders.setButtonStates = function()
+{
+	if (controls.json) {
+		var mkt = controls.json.markets[orders.market+'USD'];
+		var usd = account.balances[orders.market].usd;
+		var btc = account.balances[orders.market].btc;
+		var btcVol = parseFloat($('#order-volume-val').val());
+		var limitPrice = parseFloat($('#order-limit-price-val').val());
+
+		if (orders.ordertype == 'limit') {
+			if (btc < btcVol) {
+				$('#sell-button').addClass('disabled');
+			} else {
+				$('#sell-button').removeClass('disabled');
+			}
+
+			if (usd < btcVol*limitPrice) {
+				$('#buy-button').addClass('disabled');
+			} else {
+				$('#buy-button').removeClass('disabled');
+			}
+		} else if (orders.ordertype == 'market') {
+			var askPrice = mkt.ask;
+			var bidPrice = mkt.bid;
+			if (btc < btcVol) {
+				$('#sell-button').addClass('disabled');
+			} else {
+				$('#sell-button').removeClass('disabled');
+			}
+
+			if (usd < btcVol*askPrice) {
+				$('#buy-button').addClass('disabled');
+			} else {
+				$('#buy-button').removeClass('disabled');
+			}
+		}
+
+		if (btc == -1 || usd == -1){
+			$('#buy-button').addClass('disabled');
+			$('#sell-button').addClass('disabled');
+		}
+	} else {
+		$('#buy-button').addClass('disabled');
+		$('#sell-button').addClass('disabled');
 	}
 }
 
@@ -191,11 +245,13 @@ orders.initButtons = function()
 			alert("Sell functionality coming soon.")
 		}
 	});
+
+	orders.setButtonStates();
 }
 
 $(document).ready(function() {
 	orders.initButtons();
-	orders.changeMarket(orders.market);
+	orders.changeMarket("MtGox");
 	controls.addJSONListener(orders.updateBuySell);
 });
 

@@ -2,10 +2,18 @@
 class PrivateMarket
 {
 	public $name = '';
+	public $mname = '';
+	public $publicmarketid = 0;
 	public $currency = '';
-	public $btcBalance = 0;
-	public $eurBalance = 0;
-	public $usdBalance = 0;
+
+	protected $btcBalance = 0;
+	protected $eurBalance = 0;
+	protected $usdBalance = 0;
+	protected $ltcBalance = 0;
+
+	protected $privatekey = '';
+    protected $secret = '';
+	
 	public $clientId = 0;
 
 	public $fc = NULL; // future currency converter
@@ -13,12 +21,26 @@ class PrivateMarket
 	public function __construct($currency, $clientID, $key, $secret)
 	{
 		$this->name = get_class($this);
+		$this->mname = str_replace("Private", "", str_replace("USD", "", $this->name));
 		$this->currency = $currency;
 		$this->btcBalance = 0;
 		$this->eurBalance = 0;
 		$this->usdBalance = 0;
+		$this->ltcBalance = 0;
 		$this->clientId = $clientID;
+		$this->_setPublicMarket();
 		$this->_loadClient($clientID, $key, $secret);
+	}
+
+	protected function _setPublicMarket()
+	{
+		global $DB;
+		$query = "SELECT id FROM markets WHERE name = '".strtolower($this->mname)."'";
+		$res = $DB->query($query);
+		if ($res){ 
+			$row = $DB->fetch_array_assoc($res);
+			$this->publicmarketid = $row['id'];
+		}
 	}
 
 	protected function _str()
@@ -80,7 +102,18 @@ class PrivateMarket
 			case 'btc': { return $this->btcBalance; }
 			case 'usd': { return $this->usdBalance; }
 			case 'eur': { return $this->eurBalance; }
+			case 'ltc': { return $this->ltcBalance; }
 		}
+	}
+
+	public function getAPISecret()
+	{
+		return $this->secret;
+	}
+
+	public function getAPIKey()
+	{
+		return $this->privatekey;
 	}
 }
 

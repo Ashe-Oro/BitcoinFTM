@@ -1,10 +1,5 @@
 <h1>Markets Overview</h1>
 
-<script language="javascript" type="text/javascript" src="js/markets.js"></script>
-
-<link rel="stylesheet" href="css/markets.css" />
-
-
 <div id="market-list">
 <?php /*
 	<div class="updating">

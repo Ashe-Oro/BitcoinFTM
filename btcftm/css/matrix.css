@@ -8,6 +8,11 @@
 	margin: 2px;
 }
 
+#matrix td.highlight {
+	border: 1px solid #ff0;
+	background-color: #440;
+}
+
 .pos { 
 color: #0c0;
 }
