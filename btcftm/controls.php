@@ -156,34 +156,34 @@ if ($signedIn == 1) {
 			 <img src="images/ajax-loader.gif" alt="Loading..." width="50" height="50" alt="Loading..." />
     	</div>
   	   <div id="dashboard" class="content init">
-      	<?php include("_dashboard.php"); ?>
+      	<?php include("partials/_dashboard.php"); ?>
       </div>
       <div id="orders" class="content init">
-        <?php include("_orders.php"); ?>
+        <?php include("partials/_orders.php"); ?>
       </div>
       <div id="markets" class="content init">
-      	<?php include("_markets.php"); ?>
+      	<?php include("partials/_markets.php"); ?>
       </div>
       <div id="orderbooks" class="content init">
-        <?php include("_orderbooks.php"); ?>
+        <?php include("partials/_orderbooks.php"); ?>
       </div>
       <div id="charts" class="content init">
-        <?php include("_charts.php"); ?>
+        <?php include("partials/_charts.php"); ?>
       </div>
       <div id="matrix" class="content init">
-      	<?php include("_matrix.php"); ?>
+      	<?php include("partials/_matrix.php"); ?>
       </div>
       <div id="bots" class="content init">
-        <?php include("_bots.php"); ?>
+        <?php include("partials/_bots.php"); ?>
       </div>
       <div id="sims" class="content init">
-     		<?php include("_sims.php"); ?>
+     		<?php include("partials/_sims.php"); ?>
       </div>
       <div id="settings" class="content init">
-      	<?php include("_settings.php"); ?>
+      	<?php include("partials/_settings.php"); ?>
       </div>
       <div id="portfolio" class="content init">
-      	<?php include("_portfolio.php"); ?>
+      	<?php include("partials/_portfolio.php"); ?>
       </div>
     </section>
 </div>
