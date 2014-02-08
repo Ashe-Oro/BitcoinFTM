@@ -7,11 +7,9 @@ class BitfinexUSD extends LiveMarket
 	{
 		parent::__construct("USD");
 		//TODO This updateRate is a random guess... Find out real update rate
-		$this->updateRate = 100;
 		$this->depthUrl = "https://api.bitfinex.com/v1/book/btcusd";
 		$this->tickerUrl = "https://api.bitfinex.com/v1/ticker/btcusd";
-		$this->table = "bitfinexusd";
-		$this->marketname = "BitfinexUSD";
+		$this->table = "bitfinex_btcusd";
 	}
 
 	protected function parseDepthJson($res)
@@ -30,7 +28,7 @@ class BitfinexUSD extends LiveMarket
 		$ticker = new Ticker($json);
 		$t = $ticker->getTickerArray();
 
-		iLog("[{$this->marketname}] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
+		iLog("[{$this->name}] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
 		return $ticker;
 	}
 }

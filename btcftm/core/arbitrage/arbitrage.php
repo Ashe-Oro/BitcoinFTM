@@ -35,6 +35,7 @@ class Arbitrage
 		if ($config['echoLog']) { echo "<hr />\n"; }
 		iLog("[Arbitrage] PHASE 1: ACQUIRE BITCOINS");
 
+		// load currency profiles from DB
 		$this->currencies = new CurrencyList();
 		
 		// switch on historical mode here
@@ -75,10 +76,21 @@ class Arbitrage
 	private function _loadMarkets($args)
 	{
 		global $config;
+		global $DB;
 		
 		// initializes arbitrer markets
-		$markets = isset($args['markets']) ? $args['markets'] : (isset($config['markets'])) ? $config['markets'] : NULL;
+		$markets = isset($args['markets']) ? $args['markets'] : NULL;
 		
+		// load markets from DB
+		if (!$markets) {
+			$markets = array();
+			$res = $DB->query("SELECT * FROM markets ORDER BY id ASC");
+			while($row = $DB->fetch_array_assoc($res)){
+				array_push($markets, $row['name']);
+			}
+		}
+		
+		// initialize market objects
 		if ($markets && count($markets)) {
 			iLog("[Arbitrage] Loading ".count($markets)." markets...");
 			$this->market_names = $markets;
@@ -87,11 +99,11 @@ class Arbitrage
 			
 			$mLoaded = 0;
 			foreach($markets as $market_name){
-				$mFile = "./core/public_markets/{$mFolder}/{$mPrefix}".strtolower($market_name).".php";
+				$mFile = "./core/public_markets/{$mFolder}/{$mPrefix}".strtolower($market_name)."usd.php";
 				if (file_exists($mFile)){
 					require_once($mFile);
 					try {
-						$market_name = ($this->useHistorical) ? "history{$market_name}" : $market_name;
+						$market_name = ($this->useHistorical) ? "History{$market_name}USD" : $market_name."USD";
 						$market = new $market_name();
 						array_push($this->markets, $market);
 						$mLoaded++;
@@ -213,9 +225,11 @@ class Arbitrage
 		// add current market values to JSON
 		foreach($this->markets as $mkt) {
 			$t = $mkt->getCurrentTicker();
-			$mname = str_replace("History", "", $mkt->name);
-			$json['markets'][$mname] = array(
-				"name" => $mname,
+			$sma10 = $mkt->getSMA(10);
+			$sma25 = $mkt->getSMA(25);
+
+			$json['markets'][$mkt->mname] = array(
+				"name" => $mkt->mname,
 				"currency" => $mkt->currency,
 				"high" => $t->getHigh(),
 				"low" => $t->getLow(),
@@ -223,7 +237,9 @@ class Arbitrage
 				"bid" => $t->getBid(),
 				"ask" => $t->getAsk(),
 				"volume" => $t->getVolume(),
-				"commission" => $mkt->commission
+				"commission" => $mkt->commission,
+				"sma10" => ($sma10) ? $sma10->getAvg() : -1,
+				"sma25" => ($sma25) ? $sma25->getAvg() : -1
 			);
 		}
 

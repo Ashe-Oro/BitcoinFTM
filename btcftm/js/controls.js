@@ -10,12 +10,36 @@ function sanitizeMarketName(mname)
 	return mname.replace("History","").replace("USD","");
 }
 
+/******* CONTROLS OBJECT *********/
+
 var controls = new Object();
 controls.ftmState = "dashboard";
 controls.json = null;
 controls.jsonInt = 15000; // update every 15s for now
 controls.jsonListeners = new Array();
 controls.ftmStateList = ["dashboard","markets","orders","orderbooks","matrix","charts","bots","sims","settings","portfolio"];
+controls.currencies = new Array();
+
+controls.loadCurrencies = function()
+{
+  $('.currency-data').each(function(){
+    var abbr = $(this).attr('id').replace('currency-','');
+    controls.currencies[abbr] = new Object();
+    controls.currencies[abbr].abbr = abbr;
+    controls.currencies[abbr].symbol = $(this).attr('data-symbol');
+    controls.currencies[abbr].prefix = $(this).attr('data-prefix') == '1' ? true : false;
+    controls.currencies[abbr].precision = parseInt($(this).attr('data-precision'));
+  });
+}
+
+controls.printCurrency = function(amount, abbr)
+{
+  if (controls.currencies[abbr]) {
+    var c = controls.currencies[abbr];
+    return (c.prefix) ? c.symbol + amount.toFixed(c.precision) : amount.toFixed(c.precision) + c.symbol;
+  }
+  return "";
+}
 
 controls.updateMasterJSON = function()
 {
@@ -61,9 +85,9 @@ controls.updateMarketTicker = function()
     $.each(controls.json.markets, function(mname, mkt) {
       feed += "<div class='market-ticker' id='market-ticker-"+mname+"'>";
       feed += "<span class='market-ticker-name'>"+mname+": </span>";
-      feed += "<span class='market-ticker-last'>"+mkt.last+"</span>";
-      feed += " (<span class='market-ticker-ask'>"+mkt.ask+"</span>";
-      feed += "/<span class='market-ticker-bid'>"+mkt.bid+"</span>)";
+      feed += "<span class='market-ticker-last'>"+controls.printCurrency(mkt.last, "USD")+"</span>";
+      feed += " (<span class='market-ticker-ask'>"+controls.printCurrency(mkt.ask, "USD")+"</span>";
+      feed += "/<span class='market-ticker-bid'>"+controls.printCurrency(mkt.bid, "USD")+"</span>)";
       feed += "</div>";
     });
     tw.html(feed).fadeIn(500, function() {
@@ -81,7 +105,7 @@ controls.updateMarketTicker = function()
       var tickerW = hWidth - (titleW + accountW + welcomeW);
 
       var dH = Math.max(0, tWidth - tickerW) + 100;
-      tw.animate({'left': -dH+"px"}, controls.jsonInt);
+      tw.animate({'left': -dH+"px"}, 'linear', controls.jsonInt);
     });
   });
 
@@ -161,6 +185,7 @@ controls.startControls = function()
 }
 
 $(document).ready(function(){
+  controls.loadCurrencies();
 	controls.updateMasterJSON();
   controls.addJSONListener(controls.updateMarketTicker);
 	controls.bindSidebarMenu();

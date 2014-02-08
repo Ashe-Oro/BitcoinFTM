@@ -16,7 +16,7 @@ class MOB
 		foreach($markets as $m){
 			$m->updateMarketDepth();
 			$obook = $m->getOrderBook();
-			$this->orderbooks[$m->name] = $obook;
+			$this->orderbooks[$m->mname] = $obook;
 		}
 		$this->matrix = $this->_updateExchangeMatrix();
 		//$this->dumpOrderBooks();
@@ -122,11 +122,11 @@ class MOB
 		$matrix = array();
 		
 		foreach($this->markets as $m){
-			$matrix[$m->name] = array();
+			$matrix[$m->mname] = array();
 			foreach($this->orderbooks as $mname => $obook) {
-				if ($mname != $m->name){
-					$profit = $this->compareMarketOrderBooks($m->name, $mname);
-					$matrix[$m->name][$mname] = array("market" => $mname, "profit" => $profit);
+				if ($mname != $m->mname){
+					$profit = $this->compareMarketOrderBooks($m->mname, $mname);
+					$matrix[$m->mname][$mname] = array("market" => $mname, "profit" => $profit);
 					//iLog("[MOB] Opportunity for {$askMarketName} at {$mname}: {$profit}");
 				}
 			}

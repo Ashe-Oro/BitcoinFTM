@@ -1,5 +1,5 @@
 <?php
-$VERSION = 0.3;
+$VERSION = "0.4 pre-alpha";
 $noEchoLog = 1;
 session_start();
 $signedIn = (isset($_SESSION['adminAccess']) && isset($_SESSION['clientID']) && isset($_SESSION['username'])) ? 1 : 0;
@@ -10,19 +10,10 @@ if (isset($_GET['signout'])){
 	$signedIn = 0;
 }
 
-$panels = array(
-	"account_balance",
-	"dashboard",
-	"charts",
-	"markets",
-	"matrix",
-	"orderbooks",
-	"orders",
-	"portfolio",
-	"settings",
-	"bots",
-	"sims"
-);
+if ($signedIn == 1) {
+  require_once("core/include.php");
+  require_once("panels.php");
+}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -31,28 +22,35 @@ $panels = array(
 <title>BTC FTM</title>
 <script language="javascript" type="application/javascript" src="jquery/jquery-1.8.2.min.js"></script>
 <script language="javascript" type="application/javascript" src="js/controls.js"></script>
-<?php
-foreach($panels as $p){
-	echo "<script language='javascript' type='application/javascript' src='js/{$p}.js'></script>";
+<?php if ($config['minify']) { ?>
+<script language="javascript" type="application/javascript" src="js/combine-js.php"></script>
+<?php 
+} else { 
+  foreach($panels as $p){
+	 echo "<script language='javascript' type='application/javascript' src='js/{$p}.js'></script>";
+  }
 }
 ?>
 
 <link type="text/css" rel="stylesheet" href="css/core.css" />
 <link type="text/css" rel="stylesheet" href="css/controls.css" />
 
-<?php
-foreach($panels as $p){
-	echo "<link type='text/css' rel='stylesheet' href='css/{$p}.css' />";
-}
+<?php if ($config['minify']) { ?>
+<link type="text/css" rel="stylesheet" href="css/combine-css.php" />
+<?php 
+} else { 
+  foreach($panels as $p){
+    echo "<link type='text/css' rel='stylesheet' href='css/{$p}.css' />";
+  }
+} 
 ?>
+
 
 </head>
 
 <body>
 <?php
 if ($signedIn == 1) {
-	require_once("core/include.php");
-
 	// MIGRATE THIS SHIT OUT TO SOMEWHERE ELSE!!!!
 
 	$settingsUpdateMessage = "";
@@ -110,13 +108,9 @@ if ($signedIn == 1) {
 	//var_dump($_POST);
 
 ?>
-
-<div id="container">
-
 <header id="header">
 	<h2 class="title">Bitcoin Financial Trade Manager</h2>
- 	 <div id="loading-data">
-  	</div>
+ 	 <div id="loading-data"></div>
 	    
 	<div class="account">
 		<h3 class="welcome"><b><?php echo $client->getName(); ?></b></h3>
@@ -146,46 +140,58 @@ if ($signedIn == 1) {
     <li class="bots"><a href="#bots">Bots</a></li>
     <li class="sims"><a href="#sims">Simulations</a></li>
     </ul>
-    </aside>
+  </aside>
     
-    <section id="main-content">
-    	<div id="loading" class="content">
-    	 <h1>Bitcoin Financial Trade Manager</h1>
-			 <h3>Welcome, <?php echo $client->getName(); ?>!</h3>
-       <p>Loading your profile, please wait...</p>
-			 <img src="images/ajax-loader.gif" alt="Loading..." width="50" height="50" alt="Loading..." />
-    	</div>
-  	   <div id="dashboard" class="content init">
-      	<?php include("partials/_dashboard.php"); ?>
-      </div>
-      <div id="orders" class="content init">
-        <?php include("partials/_orders.php"); ?>
-      </div>
-      <div id="markets" class="content init">
-      	<?php include("partials/_markets.php"); ?>
-      </div>
-      <div id="orderbooks" class="content init">
-        <?php include("partials/_orderbooks.php"); ?>
-      </div>
-      <div id="charts" class="content init">
-        <?php include("partials/_charts.php"); ?>
-      </div>
-      <div id="matrix" class="content init">
-      	<?php include("partials/_matrix.php"); ?>
-      </div>
-      <div id="bots" class="content init">
-        <?php include("partials/_bots.php"); ?>
-      </div>
-      <div id="sims" class="content init">
-     		<?php include("partials/_sims.php"); ?>
-      </div>
-      <div id="settings" class="content init">
-      	<?php include("partials/_settings.php"); ?>
-      </div>
-      <div id="portfolio" class="content init">
-      	<?php include("partials/_portfolio.php"); ?>
-      </div>
-    </section>
+  <section id="main-content">
+    <div id="loading" class="content">
+  	 <h1>Bitcoin Financial Trade Manager</h1>
+		 <h3>Welcome, <?php echo $client->getName(); ?>!</h3>
+     <p>Loading your profile, please wait...</p>
+		 <img src="images/ajax-loader.gif" alt="Loading..." width="50" height="50" alt="Loading..." />
+    </div>
+	   <div id="dashboard" class="content init">
+    	<?php include("partials/_dashboard.php"); ?>
+    </div>
+    <div id="orders" class="content init">
+      <?php include("partials/_orders.php"); ?>
+    </div>
+    <div id="markets" class="content init">
+    	<?php include("partials/_markets.php"); ?>
+    </div>
+    <div id="orderbooks" class="content init">
+      <?php include("partials/_orderbooks.php"); ?>
+    </div>
+    <div id="charts" class="content init">
+      <?php include("partials/_charts.php"); ?>
+    </div>
+    <div id="matrix" class="content init">
+    	<?php include("partials/_matrix.php"); ?>
+    </div>
+    <div id="bots" class="content init">
+      <?php include("partials/_bots.php"); ?>
+    </div>
+    <div id="sims" class="content init">
+   		<?php include("partials/_sims.php"); ?>
+    </div>
+    <div id="settings" class="content init">
+    	<?php include("partials/_settings.php"); ?>
+    </div>
+    <div id="portfolio" class="content init">
+    	<?php include("partials/_portfolio.php"); ?>
+    </div>
+    <div id="arbitrage" class="content init">
+      <?php include("partials/_arbitrage.php"); ?>
+    </div>
+  </section>
+</div>
+
+<div id="hidden-data">
+  <?php
+  $curlist = $currencies->getCurrencyList();
+  foreach($curlist as $abbr => $c){
+    echo "<div class='currency-data' id='currency-{$abbr}' data-precision='{$c->precision}' data-prefix='{$c->prefix}' data-symbol='{$c->symbol}'></div>";
+  }
+  ?>
 </div>
 
 <footer id="footer">

@@ -2,11 +2,11 @@
 
 <table>
 <tr>
-<th>Market</th><th>API Info</th><th>Balance</th><th>Finance</th></tr>
+<th>Market</th><th>API Info</th><th>Balances</th><th>Add Funds</th></tr>
 <?php
 $curlist = $currencies->getCurrencyList();
 foreach($markets as $mkt) {
-	$pmarket = $client->getPrivateMarket($mkt->mname.'USD');
+	$pmarket = $client->getPrivateMarket($mkt->mname);
 	$key  = $pmarket->getAPIKey();
 	$secret = $pmarket->getAPISecret();
 
@@ -29,7 +29,7 @@ foreach($markets as $mkt) {
 	echo "<td class='portfolio-finance'>";
   foreach($curlist as $abbr => $cur) {
     if ($mkt->supports($abbr)){
-      echo "<div class='portfolio-{$abbr}'><input type='button' name='finance-portfolio-{$abbr}' id='finance-portfolio-{$abbr}-{$mkt->mname}' value='Add USD at {$mkt->mname}' /></div>";
+      echo "<div class='portfolio-{$abbr}'><input type='button' name='finance-portfolio-{$abbr}' id='finance-portfolio-{$abbr}-{$mkt->mname}' value='Add {$abbr} at {$mkt->mname}' /></div>";
     }
   }
 	echo "</td>";

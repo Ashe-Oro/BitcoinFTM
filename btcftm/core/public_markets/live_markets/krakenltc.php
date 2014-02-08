@@ -6,7 +6,6 @@ class KrakenLTC extends LiveMarket
 	public function __construct()
 	{
 		parent::__construct("LTC");
-		$this->updateRate = 60;
 		$this->depthUrl = "https://api.kraken.com/0/public/Depth?pair=LTCUSD";
 		$this->tickerUrl = "https://api.kraken.com/0/public/Ticker?pair=LTCUSD";
 	}

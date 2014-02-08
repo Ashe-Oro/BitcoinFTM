@@ -6,11 +6,9 @@ class BTCeUSD extends LiveMarket
 	public function __construct()
 	{
 		parent::__construct("USD");
-		$this->updateRate = 20;
 		$this->depthUrl = "https://btc-e.com/api/2/btc_usd/depth";
 		$this->tickerUrl = "https://btc-e.com/api/2/btc_usd/ticker";
-		$this->table = "btceusd";
-		$this->marketname = "BTCeUSD";
+		$this->table = "btce_btcusd";
 	}
 
 	protected function parseDepthJson($res)
@@ -29,7 +27,7 @@ class BTCeUSD extends LiveMarket
 		$ticker = new Ticker($data);
 		$t = $ticker->getTickerArray();
 
-		iLog("[{$this->marketname}] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
+		iLog("[{$this->name}] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
 		return $ticker;
 	}
 }

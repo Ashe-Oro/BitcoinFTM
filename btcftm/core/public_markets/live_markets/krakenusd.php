@@ -6,9 +6,9 @@ class KrakenUSD extends LiveMarket
 	public function __construct()
 	{
 		parent::__construct("USD");
-		$this->updateRate = 20;
 		$this->depthUrl = "https://api.kraken.com/0/public/Depth?pair=XBTUSD";
 		$this->tickerUrl = "https://api.kraken.com/0/public/Ticker?pair=XBTUSD";
+		$this->table = "kraken_btcusd";
 	}
 
 	protected function parseDepthJson($res)
@@ -34,7 +34,7 @@ class KrakenUSD extends LiveMarket
 		$ticker = new Ticker($jData);
 		$t = $ticker->getTickerArray();
 
-		iLog("[{$this->marketname}] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
+		iLog("[{$this->name}] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
 		return $ticker;
 	}
 

@@ -8,7 +8,6 @@ class HistoryCampBXUSD extends HistoryMarket
 		parent::__construct("USD");
 		$this->orderBook = new MarketOrderBook();
 		$this->table = "campbx_btcusd";
-		$this->historyname = "HistoryCampBXUSD";
 		$this->depthUrl = "http://campbx.com/api/xdepth.php";
 		$this->tickerUrl = "http://campbx.com/api/xticker.php";
 	}

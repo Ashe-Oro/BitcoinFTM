@@ -5,23 +5,29 @@ require_once("./core/public_markets/mob/marketorderbook.php");
 abstract class Market
 {
 	public $name = '';
+	public $mname = '';
+	public $marketid = 0;
 	public $currency = '';
+	
 	public $commission = '';
-	public $depthUpdated = 0;
 	public $expiration = 0;
 	public $refresh = 0;
+	
 	public $supportsUSD = 0;
 	public $supportsEUR = 0;
 	public $supportsBTC = 0;
 	public $supportsLTC = 0;
 
-	public $updateRate = 60;
+	public $depthUpdated = 0;
 	public $orderBook = NULL;
-	public $mname = '';
+	
+	public $fc = NULL; // currency converter object, not yet needed [but it will be - aww skeet skeet]
 	
 	protected $live = false;
-
-	public $fc = NULL; // currency converter object, not yet needed [but it will be - aww skeet skeet]
+	protected $depthUrl = "";
+	protected $tickerUrl = "";
+	protected $table = "";
+	
 
 	public function __construct($currency)
 	{
@@ -30,10 +36,8 @@ abstract class Market
 		$this->mname = str_replace("History", "", str_replace($this->currency, "", get_class($this)));
 		$this->_initMarket();
 	}
-	
-	abstract public function getHistoryTickers($startDate, $endDate="");
-	abstract public function getHistoryTicker($timestamp="");
-	abstract public function getHistorySamples($startDate, $endDate="", $sampling="day");
+
+	abstract protected function parseDepthJson($json);
 	abstract public function updateOrderBookData();
 	abstract public function getCurrentTicker();
 
@@ -44,9 +48,10 @@ abstract class Market
 			$res = $DB->query("SELECT * FROM markets WHERE name = '{$this->mname}'");
 			if ($res) {
 				$row = $DB->fetch_array_assoc($res);
-				$this->refresh = $row['refresh'];
-				$this->expiration = $row['expiration'];
-				$this->commission = $row['commission'];
+				$this->marketid = (int) $row['id'];
+				$this->refresh = (int) $row['refresh'];
+				$this->expiration = (int) $row['expiration'];
+				$this->commission = (float) $row['commission'];
 
 				$this->supportsUSD = $row['usd'];
 				$this->supportsEUR = $row['eur'];
@@ -71,7 +76,7 @@ abstract class Market
 		global $config;
 
 		$timeDiff = time() - $this->depthUpdated;
-		if ($timeDiff >= $this->updateRate) {
+		if ($timeDiff >= $this->refresh) {
 			$this->updateMarketOrderBooks();
 		} else {
 			iLog("[Market] Couldn't update Market {$this->name} - time diff less than refresh rate");
@@ -88,7 +93,15 @@ abstract class Market
 	{
 		iLog("[Market] Formating Order Book...");
 		//var_dump($depth);
-		return new MarketOrderBook($depth->asks, $depth->bids);
+		if ($depth) {
+			try {
+				return new MarketOrderBook($depth->asks, $depth->bids);
+			} catch (Exception $e) {
+				echo "Market {$this->mname} failed format order book!";
+			}
+		} else {
+			iLog("[Market] Market {$this->mname} had no depths...");
+		}
 	}	
 	
 	public function getOrderBook()
@@ -118,6 +131,144 @@ abstract class Market
 		}
 		return $res;
 	}
+
+	public function getHistoryTicker($timestamp="") {
+		global $DB;
+		
+		if (empty($timestamp)) { $timestamp = time(); }
+		if (is_string($timestamp)){ $timestamp = strtotime($timestamp); }
+		if(is_int($timestamp)){
+			$qid = $DB->query("SELECT * FROM {$this->table}_ticker WHERE timestamp <= {$timestamp} ORDER BY timestamp DESC LIMIT 1");
+			$result = $DB->fetch_array_assoc($qid);
+			return new Ticker($result);
+		}
+		return NULL;
+	}
+
+	public function getHistoryTickers($startDate, $endDate="")
+	{
+		global $DB;
+		$tickers = NULL;
+		
+		if (is_string($startDate)){ $startDate = strtotime($startDate); }
+		if (empty($endDate)){ $endDate = time(); }
+		if (is_string($endDate)){ $endDate = strtotime($endDate); }
+		
+		if (is_int($startDate) && is_int($endDate)){
+			iLog("[{$this->name}] Get History Tickers...");
+			try {
+				$ret = $DB->query("SELECT * FROM {$this->table}_ticker WHERE timestamp >= {$startDate} AND timestamp < {$endDate} ORDER BY timestamp DESC");
+				$rowcount = $DB->num_rows($ret);
+				if ($rowcount > 0){
+					$tickers = array();
+					while ($row = $DB->fetch_array_assoc($ret)){
+						//$row['timestamp'] = $row['timestamp'] / 1000000; // convert microseconds to timestamp
+						array_push($tickers, new Ticker($row));
+					}
+				}
+				iLog("[{$this->name}] {$rowcount} Tickers retrieved");
+				return $tickers;
+			} catch (Exception $e) {
+				iLog("[{$this->name}] ERROR: History ticker query failed: ".$e->getMessage());
+			}
+		}
+		
+		return $tickers;
+	}
+
+	public function getHistorySamples($startDate, $endDate="", $period=PERIOD_1D)
+	{
+		global $DB;
+		$tickers = NULL;
+		
+		if (is_string($startDate)){ $startDate = strtotime($startDate); }
+		if (empty($endDate)){ $endDate = time(); }
+		if (is_string($endDate)){ $endDate = strtotime($endDate); }
+
+		$ptable = $this->getPeriodTable($period);
+		$tclass = ($ptable == 'ticker') ? "Ticker" : "PeriodTicker";
+
+		if (is_int($startDate) && is_int($endDate)){
+			iLog("[{$this->name}] Getting history samples...");
+
+			try {
+				$q = "SELECT * FROM {$this->table}_{$ptable} WHERE timestamp >= {$startDate} AND timestamp < {$endDate} ORDER BY timestamp DESC";
+				//echo $q;
+				$ret = $DB->query($q);
+				$rowcount = $DB->num_rows($ret);
+				if ($rowcount > 0){
+					$tickers = array();
+					while ($row = $DB->fetch_array_assoc($ret)){
+						//$row['timestamp'] = $row['timestamp'] / 1000000; // convert microseconds to timestamp
+						array_push($tickers, new $tclass($row));
+					}
+				}
+				iLog("[{$this->name}] {$rowcount} History sample tickers retrieved");
+				return $tickers;
+			} catch (Exception $e) {
+				iLog("[{$this->name}] ERROR: History sample ticker query failed: ".$e->getMessage());
+			}
+		}
+	}
+
+	protected function getPeriodTable($period="")
+	{
+		if (isset($this->period) && empty($period)){
+			$period = $this->period;
+		}
+
+		switch($period) {
+			// use half-hourly table
+			case PERIOD_30M:
+			{
+				return "history_half_hours";
+			}
+			
+			// use hourly table
+			case PERIOD_1H:
+			case PERIOD_2H:
+			case PERIOD_4H:			
+			case PERIOD_6H:
+			case PERIOD_12H:
+			{
+				return "history_hours";
+			}
+			
+			// use daily table
+			case PERIOD_1D:
+			case PERIOD_3D:
+			{
+				return "history_days";
+			}
+			
+			// use weekly table
+			case PERIOD_1W:
+			{
+				return "history_weeks";
+			}
+			
+			// use granular table
+			default:
+			{
+				return "ticker";
+			}
+		}
+	}
+	
+
+	public function getSMA($days)
+	{
+		$startdate = strtotime("midnight today -{$days} days");
+		$enddate = strtotime("midnight today");
+		return $this->getHistorySampleSMA($startdate, $enddate, PERIOD_1D);
+	}
+
+	public function getXMA($days)
+	{
+		$startdate = strtotime("midnight today -{$days} days");
+		$enddate = strtotime("midnight today");
+		return $this->getHistorySampleXMA($startdate, $enddate, PERIOD_1D);
+	}
 	
 	private function _getNewSMA($history)
 	{
@@ -135,9 +286,9 @@ abstract class Market
 		return $this->_getNewSMA($this->getHistoryPeriodTickers($startDate, $endDate, $period));
 	}
 	
-	public function getHistorySampleSMA($startDate, $endDate="", $sampling="day")
+	public function getHistorySampleSMA($startDate, $endDate="", $period=PERIOD_1D)
 	{
-		return $this->_getNewSMA($this->getHistorySamples($startDate, $endDate, $sampling));
+		return $this->_getNewSMA($this->getHistorySamples($startDate, $endDate, $period));
 	}
 	
 	private function _getNewXMA($history)

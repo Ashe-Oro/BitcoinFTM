@@ -29,12 +29,14 @@ markets.updateMarkets = function()
 {
  $.each(controls.json.markets, function(mname, mkt){
   mname = mname.replace("USD","");
-  $('#mkt-last-'+mname).html(mkt.last);
-  $('#mkt-high-'+mname).html(mkt.high);
-  $('#mkt-low-'+mname).html(mkt.low);
-  $('#mkt-ask-'+mname).html(mkt.ask);
-  $('#mkt-bid-'+mname).html(mkt.bid);
-  $('#mkt-vol-'+mname).html(mkt.volume);
+  $('#mkt-last-'+mname).html(controls.printCurrency(mkt.last, 'USD'));
+  $('#mkt-high-'+mname).html(controls.printCurrency(mkt.high, 'USD'));
+  $('#mkt-low-'+mname).html(controls.printCurrency(mkt.low, 'USD'));
+  $('#mkt-ask-'+mname).html(controls.printCurrency(mkt.ask, 'USD'));
+  $('#mkt-bid-'+mname).html(controls.printCurrency(mkt.bid, 'USD'));
+  $('#mkt-sma10-'+mname).html(controls.printCurrency(mkt.sma10, 'USD'));
+  $('#mkt-sma25-'+mname).html(controls.printCurrency(mkt.sma25, 'USD'));
+  $('#mkt-vol-'+mname).html((mkt.volume > 0) ? mkt.volume.toFixed(6) : "--");
  });
 }
 

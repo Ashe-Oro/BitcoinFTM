@@ -30,7 +30,7 @@ matrix.updateMatrix = function()
     $.each(amkt, function(bname, xchg){
       bname = sanitizeMarketName(bname);
       var klass = (xchg < 0) ? 'neg' : (xchg > 0) ? 'pos' : 'neu';
-      $('#matrix-'+aname+'-'+bname).html("<span class='"+klass+"'>"+xchg.toFixed(4)+"</span>");
+      $('#matrix-'+aname+'-'+bname).html("<span class='"+klass+"'>"+controls.printCurrency(xchg, "USD")+"</span>");
     });
   });
   matrix.highlightOpportunities();

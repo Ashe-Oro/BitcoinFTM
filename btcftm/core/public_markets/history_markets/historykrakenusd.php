@@ -8,7 +8,6 @@ class HistoryKrakenUSD extends HistoryMarket
 		parent::__construct("USD");
 		$this->orderBook = new MarketOrderBook();
 		$this->table = "kraken_btcusd";
-		$this->historyname = "HistoryKrakenUSD";
 		$this->depthUrl = "https://api.kraken.com/0/public/Depth?pair=XBTUSD";
 		$this->tickerUrl = "https://api.kraken.com/0/public/Ticker?pair=XBTUSD";
 	}

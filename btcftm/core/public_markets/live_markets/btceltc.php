@@ -7,7 +7,6 @@ class BTCeLTC extends LiveMarket
 	{
 		parent::__construct("LTC");
 		//TODO This updateRate is a random guess... Find out real update rate
-		$this->updateRate = 100;
 		$this->depthUrl = "https://btc-e.com/api/2/ltc_btc/depth";
 		$this->tickerUrl = "https://btc-e.com/api/2/ltc_btc/ticker";
 	}

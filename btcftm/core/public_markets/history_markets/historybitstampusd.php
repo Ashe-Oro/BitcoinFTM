@@ -8,7 +8,6 @@ class HistoryBitstampUSD extends HistoryMarket
 		parent::__construct("USD");
 		$this->orderBook = new MarketOrderBook();
 		$this->table = "bitstamp";
-		$this->historyname = "HistoryBitstampUSD";
 		$this->depthUrl = "https://www.bitstamp.net/api/order_book/";
 		$this->tickerUrl = "https://www.bitstamp.net/api/ticker/";
 	}

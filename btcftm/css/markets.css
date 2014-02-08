@@ -6,6 +6,7 @@
 	display: table-cell;
 	padding: 5px;
 	margin: 2px;
+	text-align: right;
 }
 
 .pos { 

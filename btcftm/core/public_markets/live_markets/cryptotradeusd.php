@@ -7,11 +7,9 @@ class CryptoTradeUSD extends LiveMarket
 	{
 		parent::__construct("USD");
 		//TODO This updateRate is a random guess... Find out real update rate
-		$this->updateRate = 100;
 		$this->depthUrl = "https://crypto-trade.com/api/1/depth/btc_usd";
 		$this->tickerUrl = "https://crypto-trade.com/api/1/ticker/btc_usd";
-		$this->table = "cryptotradeusd";
-		$this->marketname = "CryptoTradeUSD";
+		$this->table = "cryptotrade_btcusd";
 	}
 
 	protected function parseDepthJson($res)
@@ -31,7 +29,7 @@ class CryptoTradeUSD extends LiveMarket
 		$ticker = new Ticker($data);
 		$t = $ticker->getTickerArray();
 
-		iLog("[{$this->marketname}] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
+		iLog("[{$this->name}] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
 		return $ticker;
 	}
 }

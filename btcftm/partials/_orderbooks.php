@@ -6,8 +6,7 @@
 <?php
 //var_dump($ARB->mob);
 foreach($markets as $mkt) {
-	$mname = str_replace("USD", "", str_replace("History","", $mkt->name));
-	echo "<th class='marketname marketname-{$mname}' colspan='4'>{$mname}</th>";
+	echo "<th class='marketname marketname-{$mkt->mname}' colspan='4'>{$mkt->mname}</th>";
 }
 ?>	
 </tr>
@@ -15,9 +14,8 @@ foreach($markets as $mkt) {
 <tr>
 <?php
 foreach($markets as $mkt) {
-	$mname = str_replace("USD", "", str_replace("History","",$mkt->name));
-	echo "<th class='asks-list asks-list-{$mname}' colspan='2'>Asks</th>";
-	echo "<th class='bids-list bids-list-{$mname}' colspan='2'>Bids</th>";
+	echo "<th class='asks-list asks-list-{$mkt->mname}' colspan='2'>Asks</th>";
+	echo "<th class='bids-list bids-list-{$mkt->mname}' colspan='2'>Bids</th>";
 }
 ?>
 </tr>
@@ -25,29 +23,28 @@ foreach($markets as $mkt) {
 <tr>
 <?php
 foreach($markets as $mkt) {
-	$mname = str_replace("USD", "", str_replace("History","",$mkt->name));
-	$asks = $ARB->mob->getMarketAskOrderBook($mkt->name);
+	$asks = $ARB->mob->getMarketAskOrderBook($mkt->mname);
 	$orders = $asks->getOrders();
-	echo "<td class='asks-list-price ask-list-price-{$mname}'>";
+	echo "<td class='asks-list-price ask-list-price-{$mkt->mname}'>";
 	foreach($orders as $a){
 		echo "$".$a->getPrice()."<br />";
 	}
 	echo "</td>";
-	echo "<td class='asks-list-amount ask-list-amount-{$mname}'>";
+	echo "<td class='asks-list-amount ask-list-amount-{$mkt->mname}'>";
 	foreach($orders as $a){
 		echo $a->getAmount()."<br />";
 	}
 	echo "</td>";
 
-	$bids = $ARB->mob->getMarketBidOrderBook($mkt->name);
+	$bids = $ARB->mob->getMarketBidOrderBook($mkt->mname);
 	//echo $mkt->name.":";var_dump($bids);
 	$orders = $bids->getOrders();
-	echo "<td class='bids-list-price bid-list-price-{$mname}'>";
+	echo "<td class='bids-list-price bid-list-price-{$mkt->mname}'>";
 	foreach($orders as $a){
 		echo "$".$a->getPrice()."<br />";
 	}
 	echo "</td>";
-	echo "<td class='bids-list-amount bid-list-amount-{$mname}'>";
+	echo "<td class='bids-list-amount bid-list-amount-{$mkt->mname}'>";
 	foreach($orders as $a){
 		echo $a->getAmount()."<br />";
 	}

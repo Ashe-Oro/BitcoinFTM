@@ -7,7 +7,6 @@ class BitfinexLTC extends LiveMarket
 	{
 		parent::__construct("LTC");
 		//TODO This updateRate is a random guess... Find out real update rate
-		$this->updateRate = 100;
 		$this->depthUrl = "https://api.bitfinex.com/v1/book/ltcusd";
 		$this->tickerUrl = "https://api.bitfinex.com/v1/ticker/ltcusd";
 	}

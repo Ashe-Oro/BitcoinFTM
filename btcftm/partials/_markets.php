@@ -71,6 +71,25 @@ foreach($markets as $mkt) {
 </tr>
 
 <tr>
+<td class="value">SMA10</td>
+<?php
+foreach($markets as $mkt) {
+	echo "<td class='mkt-sma10' id='mkt-sma10-{$mktnames[$mkt->name]}'>...</td>";
+}
+?>
+</tr>
+
+
+<tr>
+<td class="value">SMA25</td>
+<?php
+foreach($markets as $mkt) {
+	echo "<td class='mkt-sma25' id='mkt-sma25-{$mktnames[$mkt->name]}'>...</td>";
+}
+?>
+</tr>
+
+<tr>
 <td class="value">Volume</td>
 <?php
 foreach($markets as $mkt) {
@@ -78,6 +97,8 @@ foreach($markets as $mkt) {
 }
 ?>
 </tr>
+
+
 
 
 </table>

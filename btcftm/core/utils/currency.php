@@ -8,8 +8,8 @@ class Currency
 
 	public $amount = 0;
 
-	private $prefix;
-	private $precision;
+	public $prefix;
+	public $precision;
 
 	public function __construct($amount, $args)
 	{

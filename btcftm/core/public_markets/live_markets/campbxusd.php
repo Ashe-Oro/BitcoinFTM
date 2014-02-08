@@ -10,8 +10,7 @@ class CampBXUSD extends LiveMarket
 		$this->updateRate = 20;
 		$this->depthUrl = "http://campbx.com/api/xdepth.php";
 		$this->tickerUrl = "http://campbx.com/api/xticker.php";
-		$this->table = "campbxusd";
-		$this->marketname = "CampBXUSD";
+		$this->table = "campbx_btcusd";
 	}
 
 	protected function parseDepthJson($res)
@@ -40,7 +39,7 @@ class CampBXUSD extends LiveMarket
 		$ticker = new Ticker($data);
 		$t = $ticker->getTickerArray();
 
-		iLog("[{$this->marketname}] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
+		iLog("[{$this->name}] Current ticker - high: {$t['high']} low: {$t['low']} last: {$t['last']} ask: {$t['ask']} bid: {$t['bid']} volume: {$t['volume']}");
 		return $ticker;
 	}
 }

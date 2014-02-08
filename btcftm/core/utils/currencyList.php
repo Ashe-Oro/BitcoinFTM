@@ -24,7 +24,7 @@ class CurrencyList
 		$result = $DB->query("SELECT * FROM currencies {$exclude}ORDER BY currency_id ASC");
 		iLog("[CurrencyList] Loading currencies from DB...");
 		while($row = $DB->fetch_array_assoc($result)){
-			iLog("[CurrencyList] Loading client {$row['abbr']}...");
+			iLog("[CurrencyList] Loading currency {$row['abbr']}...");
 			try {
 				$c = new Currency(0, $row);
 				$this->cList[$c->abbr] = $c;

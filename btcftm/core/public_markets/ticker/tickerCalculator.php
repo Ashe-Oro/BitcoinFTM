@@ -119,32 +119,34 @@ class TickerCalculator
 	
 	public function getSMATicker()
 	{
-		$t = $this->tickers[0];
-		if ($t && is_a($t, "Ticker")) {
-			if ($this->tickerClass == "PeriodTicker"){
-				$tArray = array(
-								"timestamp" => $t->getTimestamp(),
-								"high" => $this->_getSMA("High"),
-								"low" => $this->_getSMA("Low"),
-								"open" => $this->_getSMA("Open"),
-								"close" => $this->_getSMA("Close"),
-								"avg" => $this->_getSMA("Avg"),
-								"volume" => $this->_getSMA("Volume"),
-								"avgvolume" => $this->_getSMA("AvgVolume"),
-								"count" => $this->_getSMA("Count")
-								);
-				return new PeriodTicker($tArray);
-			} else {
-				$tArray = array(
-								"timestamp" => $t->getTimestamp(),
-								"high" => $this->_getSMA("High"),
-								"low" => $this->_getSMA("Low"),
-								"last" => $this->_getSMA("Last"),
-								"ask" => $this->_getSMA("Ask"),
-								"bid" => $this->_getSMA("Bid"),
-								"volume" => $this->_getSMA("Volume")
-								);
-				return new Ticker($tArray);
+		if ($this->tickers && count($this->tickers)) {
+			$t = $this->tickers[0];
+			if ($t && is_a($t, "Ticker")) {
+				if ($this->tickerClass == "PeriodTicker"){
+					$tArray = array(
+									"timestamp" => $t->getTimestamp(),
+									"high" => $this->_getSMA("High"),
+									"low" => $this->_getSMA("Low"),
+									"open" => $this->_getSMA("Open"),
+									"close" => $this->_getSMA("Close"),
+									"avg" => $this->_getSMA("Avg"),
+									"volume" => $this->_getSMA("Volume"),
+									"avgvolume" => $this->_getSMA("AvgVolume"),
+									"count" => $this->_getSMA("Count")
+									);
+					return new PeriodTicker($tArray);
+				} else {
+					$tArray = array(
+									"timestamp" => $t->getTimestamp(),
+									"high" => $this->_getSMA("High"),
+									"low" => $this->_getSMA("Low"),
+									"last" => $this->_getSMA("Last"),
+									"ask" => $this->_getSMA("Ask"),
+									"bid" => $this->_getSMA("Bid"),
+									"volume" => $this->_getSMA("Volume")
+									);
+					return new Ticker($tArray);
+				}
 			}
 		}
 		return NULL;

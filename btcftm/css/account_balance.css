@@ -6,6 +6,7 @@
 	display: table-cell;
 	padding: 5px;
 	margin: 2px;
+	text-align: right;
 }
 
 #account-balance .marketname, #account-balance .account-mkt-name {
@@ -44,4 +45,5 @@
 #account-mkt-total td {
 	border-top: 1px solid #444;
 }
+
 

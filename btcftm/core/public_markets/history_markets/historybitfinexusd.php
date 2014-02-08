@@ -8,7 +8,6 @@ class HistoryBitfinexUSD extends HistoryMarket
 		parent::__construct("USD");
 		$this->orderBook = new MarketOrderBook();
 		$this->table = "bitfinex_btcusd";
-		$this->historyname = "HistoryBitfinexUSD";
 		$this->depthUrl = "https://api.bitfinex.com/v1/book/btcusd";
 		$this->tickerUrl = "https://api.bitfinex.com/v1/ticker/btcusd";
 	}

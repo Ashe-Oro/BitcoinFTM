@@ -31,9 +31,9 @@ account.updateMarkets = function() {
 
 	$.each(controls.json.markets, function(mname, mkt){
     mname = mname.replace("History","").replace("USD", "");
-    $('#account-mkt-price-'+mname).html('$'+mkt.last);
-    $('#account-mkt-ask-'+mname).html('$'+mkt.ask);
-    $('#account-mkt-bid-'+mname).html('$'+mkt.bid);
+    $('#account-mkt-price-'+mname).html(controls.printCurrency(mkt.last, "USD"));
+    $('#account-mkt-ask-'+mname).html(controls.printCurrency(mkt.ask, "USD"));
+    $('#account-mkt-bid-'+mname).html(controls.printCurrency(mkt.bid, "USD"));
 
     //var usdbal = parseFloat($('#account-mkt-usdbal-'+mname).attr('data-usdbal'));
     //var btcbal = parseFloat($('#account-mkt-btcbal-'+mname).attr('data-btcbal'));
@@ -46,10 +46,10 @@ account.updateMarkets = function() {
       account.balances[mname].totalvalueusd = usdbal+btc2usd;
       account.balances[mname].totalvaluebtc = btcbal+usd2btc;
 
-      $('#account-mkt-usd2btc-'+mname).html(usd2btc.toFixed(8)+" BTC");
-      $('#account-mkt-btc2usd-'+mname).html("$"+btc2usd.toFixed(4));
-      $('#account-mkt-usdtotal-'+mname).html("$"+(usdbal+btc2usd).toFixed(4));
-      $('#account-mkt-btctotal-'+mname).html((btcbal+usd2btc).toFixed(8)+" BTC");
+      $('#account-mkt-usd2btc-'+mname).html(controls.printCurrency(usd2btc, "BTC"));
+      $('#account-mkt-btc2usd-'+mname).html(controls.printCurrency(btc2usd, "USD"));
+      $('#account-mkt-usdtotal-'+mname).html(controls.printCurrency((usdbal+btc2usd), "USD"));
+      $('#account-mkt-btctotal-'+mname).html(controls.printCurrency((btcbal+usd2btc), "BTC"));
 
       account.totalusd2btc += usd2btc;
       account.totalbtc2usd += btc2usd;
@@ -58,10 +58,10 @@ account.updateMarkets = function() {
     }
   });
 
-  $('#account-mkt-usd2btc-total').html(account.totalusd2btc.toFixed(8)+" BTC");
-  $('#account-mkt-btc2usd-total').html("$"+account.totalbtc2usd.toFixed(4));
-  $('#account-mkt-usdtotal-total').html("$"+account.totalvalueusd.toFixed(4));
-  $('#account-mkt-btctotal-total').html(account.totalvaluebtc.toFixed(8)+" BTC");
+  $('#account-mkt-usd2btc-total').html(controls.printCurrency(account.totalusd2btc, "BTC"));
+  $('#account-mkt-btc2usd-total').html(controls.printCurrency(account.totalbtc2usd, "USD"));
+  $('#account-mkt-usdtotal-total').html(controls.printCurrency(account.totalvalueusd, "USD"));
+  $('#account-mkt-btctotal-total').html(controls.printCurrency(account.totalvaluebtc, "BTC"));
 }
 
 account.hasCapitalAtMarket = function(mname)

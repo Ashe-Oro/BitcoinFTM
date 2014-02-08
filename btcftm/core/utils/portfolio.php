@@ -5,6 +5,7 @@ class Portfolio
 {
 	private $portfolioID = 0;
 	private $trades = array(); // array of trades
+	private $pmarketData = array();
 	public $privateMarkets = array(); // array of private market accounts
 	private $tradeCount = 0;
 	private $client = NULL;
@@ -12,10 +13,16 @@ class Portfolio
 	public function __construct($client, $clientArray, $portfolio=NULL)
 	{
 		global $config;
+		global $DB;
 		
 		$this->client = $client;
-		
-		$markets = $config['markets'];
+		$markets = array();
+
+		$res = $DB->query("SELECT * FROM privatemarkets LEFT OUTER JOIN markets ON privatemarkets.marketid = markets.id WHERE privatemarkets.clientid = ".$this->client->getID());
+		while ($pmkts = $DB->fetch_array_assoc($res)){
+			$this->pmarketData[$pmkts['name']] = $pmkts;
+			array_push($markets, $pmkts['name']);
+		}
 		
 		if ($portfolio) {
 			// load portfolio from DB here
@@ -29,21 +36,20 @@ class Portfolio
 	{		
 		foreach ($markets as $mname) {
 			$lowername = strtolower($mname);
-			$lowernameEx = str_replace("usd", "", $lowername);
-			$pFile = "./core/private_markets/private{$lowername}.php";
+			$pFile = "./core/private_markets/private{$lowername}usd.php";
 			if (file_exists($pFile)){
 				require_once($pFile);
-				$pName = "private".$mname;
+				$pName = "Private".$mname."USD";
 				try {
-					$cid = (int) (isset($cArray["{$lowernameEx}id"])) ? $cArray["{$lowernameEx}id"] : $this->client->getID();
-					$ckey = $this->getAPIKey($cid, $lowernameEx);
-					$csecret = $this->getAPISecret($cid, $lowernameEx);
+					$cid = (int) (isset($cArray["{$lowername}id"])) ? $cArray["{$lowername}id"] : $this->client->getID();
+					$ckey = $this->getAPIKey($cid, $mname);
+					$csecret = $this->getAPISecret($cid, $mname);
 					
 					if ($cid && strlen($ckey) && strlen($csecret)) {
 						$this->privateMarkets[$mname] = new $pName($cid, $ckey, $csecret);
 					} else {
 						if (!strlen($ckey)){	
-							iLog("[Portfolio] ERROR: Private market {$mname} missing key in client DB {$lowernameEx}key");
+							iLog("[Portfolio] ERROR: Private market {$mname} missing key in client DB {$lowername}key");
 						} else
 						if (!strlen($csecret)){
 							iLog("[Portfolio] ERROR: Private market {$mname} missing secret in client DB");
@@ -61,6 +67,10 @@ class Portfolio
 	
 	private function getAPIKey($cid, $market) {
 		global $DB;
+
+		if (isset($this->pmarketData[$market])){
+			return $this->pmarketData[$market]['apiKey'];
+		}
 
 		try {
 			$mid = $this->getMarketId($market);
@@ -85,6 +95,10 @@ class Portfolio
 
 	private function getAPISecret($cid, $market) {
 		global $DB;
+
+		if (isset($this->pmarketData[$market])){
+			return $this->pmarketData[$market]['apiSecret'];
+		}
 
 		try {
 			$mid = $this->getMarketId($market);

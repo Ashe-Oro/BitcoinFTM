@@ -68,13 +68,13 @@ orders.updateBuySell = function()
 
 orders.updateMarketBuySell = function()
 {
-	var mkt = controls.json.markets[orders.market+'USD'];
+	var mkt = controls.json.markets[orders.market];
 	var askPrice = mkt.ask;
 	var bidPrice = mkt.bid;
 	var btcVol = parseFloat($('#order-volume-val').val());
 
-	$('#order-ask-value').html('$'+askPrice.toFixed(4));
-	$('#order-bid-value').html('$'+bidPrice.toFixed(4));
+	$('#order-ask-value').html(controls.printCurrency(askPrice, 'USD'));
+	$('#order-bid-value').html(controls.printCurrency(bidPrice, 'USD'));
 
 	var buyComValue = 0;
 	var sellComValue = 0;
@@ -108,7 +108,7 @@ orders.updateMarketBuySell = function()
 
 orders.updateLimitBuySell = function()
 {
-	var mkt = controls.json.markets[orders.market+'USD'];
+	var mkt = controls.json.markets[orders.market];
 	var btcVol = parseFloat($('#order-volume-val').val());
 	var limitPrice = parseFloat($('#order-limit-price-val').val());
 
@@ -161,7 +161,7 @@ orders.updateCapital = function()
 orders.setButtonStates = function()
 {
 	if (controls.json) {
-		var mkt = controls.json.markets[orders.market+'USD'];
+		var mkt = controls.json.markets[orders.market];
 		var usd = account.balances[orders.market].usd;
 		var btc = account.balances[orders.market].btc;
 		var btcVol = parseFloat($('#order-volume-val').val());

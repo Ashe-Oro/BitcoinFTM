@@ -8,7 +8,6 @@ class HistoryCryptoTradeUSD extends HistoryMarket
 		parent::__construct("USD");
 		$this->orderBook = new MarketOrderBook();
 		$this->table = "cryptotrade_btcusd";
-		$this->historyname = "HistoryCryptoTradeUSD";
 		$this->depthUrl = "https://crypto-trade.com/api/1/depth/btc_usd";
 		$this->tickerUrl = "https://crypto-trade.com/api/1/ticker/btc_usd";
 	}

@@ -92,7 +92,7 @@ class Client
 	
 	public function getMarketBalance($mname, $currency)
 	{
-		if ($mkt = $this->getPrivateMarket($mname."USD")){
+		if ($mkt = $this->getPrivateMarket($mname)){
 			//var_dump($mkt);
 			return $mkt->getBalance($currency);
 		}
