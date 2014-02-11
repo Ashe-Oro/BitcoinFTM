@@ -149,7 +149,9 @@ abstract class Market
 			$qid = $DB->query("SELECT * FROM {$this->table}_ticker WHERE timestamp <= {$timestamp} ORDER BY timestamp DESC LIMIT 1");
 			$row = $DB->fetch_array_assoc($qid);
 			$tclass = "History{$this->mname}{$this->currency}";
-			$row = $tclass::parseTickerRow($row);
+			//echo "hello world: {$tclass}";
+			$tvar = new $tclass();
+			$row = $tvar->parseTickerRow($row);
 			return new Ticker($row);
 		}
 		return NULL;
@@ -173,7 +175,9 @@ abstract class Market
 					$tickers = array();
 					while ($row = $DB->fetch_array_assoc($ret)){
 						$tclass = "History{$this->mname}{$this->currency}";
-						$row = $tclass::parseTickerRow($row);
+						$tvar = new $tclass();
+						$row = $tvar->parseTickerRow($row);
+						//$row = $tclass::parseTickerRow($row);
 						//$row['timestamp'] = $row['timestamp'] / 1000000; // convert microseconds to timestamp
 						array_push($tickers, new Ticker($row));
 					}

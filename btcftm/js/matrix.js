@@ -34,9 +34,9 @@ matrix.updateMatrix = function()
       var cell = $('#matrix-'+aname+'-'+bname);
       cell.find('.matrix-cell-value').html("<span class='"+klass+" "+op+"'>"+controls.printCurrency(xchg, "USD")+"</span>");
       
-      var perc = controls.json.deltas.mob[aname][bname].perc;
-      klass = (perc < 0) ? 'neg' : (perc > 0) ? 'pos' : 'neu';
-      cell.find('.matrix-cell-perc').html("<span class='"+klass+"'><span class='matrix-perc-icon'></span>"+perc.toFixed(3)+"%</span>")
+      var spread = controls.json.deltas.mob[aname][bname].spread;
+      klass = (spread < 0) ? 'neg' : (spread > 0) ? 'pos' : 'neu';
+      cell.find('.matrix-cell-perc').html("<span class='"+klass+"'><span class='matrix-perc-icon'></span>"+controls.printCurrency(spread, "USD")+"</span>")
     });
   });
   matrix.highlightOpportunities();
