@@ -11,13 +11,13 @@ class KrakenUSD extends LiveMarket
 		$this->table = "kraken_btcusd";
 	}
 
-	protected function parseDepthJson($res)
+	public function parseDepthJson($res)
 	{
 		$json = json_decode($res);
 		return $json->result->XXBTZUSD;
 	}
 
-	protected function parseTickerJson($res)
+	public function parseTickerJson($res)
 	{
 		$json = json_decode($res);
 		$data = $json->result->XXBTZUSD;		// refer to https://www.kraken.com/help/api#get-ticker-info

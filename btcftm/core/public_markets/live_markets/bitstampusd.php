@@ -11,12 +11,12 @@ class BitstampUSD extends LiveMarket
 		$this->table = "bitstamp";
 	}
 
-	protected function parseDepthJson($res)
+	public function parseDepthJson($res)
 	{
 		return json_decode($res);
 	}
 
-	protected function parseTickerJson($res)
+	public function parseTickerJson($res)
 	{
 		$json = json_decode($res);
 		$ticker = new Ticker($json);

@@ -31,3 +31,38 @@ color: #c00;
 	font-size: 11px;
 	color: #aaa;
 }
+
+.mkt-value-row .val {
+	display: block;
+	font-size: 16px;
+}
+
+.mkt-value-row .perc {
+	display: block;
+	font-size: 12px;
+}
+
+.mkt-value-row .perc .pos {
+	color: #0f0;
+}
+
+.mkt-value-row .perc .neg {
+	color: #f00;
+}
+
+.market-perc-icon {
+	background: transparent url('../images/up-down.png') 0px 0px no-repeat;
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin: 0px 2px;
+	padding: 0px;
+}
+
+.neg .market-perc-icon {
+	background-position: 0px -16px;
+}
+
+.neu .market-perc-icon {
+	display: none;
+}

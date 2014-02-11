@@ -12,12 +12,12 @@ class HistoryCryptoTradeUSD extends HistoryMarket
 		$this->tickerUrl = "https://crypto-trade.com/api/1/ticker/btc_usd";
 	}
 
-	protected function parseDepthJson($res)
+	public function parseDepthJson($res)
 	{
 		return json_decode($res);
 	}
 	
-	protected function parseTickerRow($row){
+	public function parseTickerRow($row){
 		//	var_dump($row);
 		return $row;
 	}

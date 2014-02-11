@@ -211,19 +211,46 @@ ul.account-dropdown li:hover > a {
 	top: 6px;
 	left: 0px;
 	font-size: 13px;
+	font-weight: bold;
 	color: #fff;
 	height: 20px;
 	width: 2000px;
 	white-space: nowrap;
 	padding: 0px 20px;
+	vertical-align: top;
 }
 
 #bitcoin-market-ticker .market-ticker {
 	position: relative;
 	display: block;
 	float: left;
-	padding-right: 20px;
+	padding-right: 30px;
 	color: #ccc;
+}
+
+.market-trend.pos {
+	color: #0f0;
+}
+
+.market-trend.neg {
+	color: #f00;
+}
+
+.market-trend-icon {
+	background: transparent url('../images/up-down.png') 0px 0px no-repeat;
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin: 0px 3px;
+	padding: 0px;
+}
+
+.market-trend.neg .market-trend-icon {
+	background-position: 0px -16px;
+}
+
+.market-trend.neu .market-trend-icon {
+	display: none;
 }
 
 

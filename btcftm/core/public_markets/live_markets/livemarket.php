@@ -9,7 +9,7 @@ abstract class LiveMarket extends Market
 		$this->live = true;
 	}
 
-	abstract protected function parseTickerJson($res);
+	abstract public function parseTickerJson($res);
 
 	public function updateOrderBookData()
 	{

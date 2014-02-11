@@ -12,12 +12,12 @@ class HistoryBTCeUSD extends HistoryMarket
 		$this->tickerUrl = "https://btc-e.com/api/2/btc_usd/ticker";
 	}
 
-	protected function parseDepthJson($res)
+	public function parseDepthJson($res)
 	{
 		return json_decode($res);
 	}
 	
-	protected function parseTickerRow($row){
+	public function parseTickerRow($row){
 		return $row;
 	}
 }

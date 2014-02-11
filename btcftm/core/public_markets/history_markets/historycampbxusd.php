@@ -12,7 +12,7 @@ class HistoryCampBXUSD extends HistoryMarket
 		$this->tickerUrl = "http://campbx.com/api/xticker.php";
 	}
 
-	protected function parseDepthJson($res)
+	public function parseDepthJson($res)
 	{
 		$data = json_decode($res);
 		$data->asks = $data->Asks;
@@ -20,7 +20,7 @@ class HistoryCampBXUSD extends HistoryMarket
 		return $data;
 	}
 	
-	protected function parseTickerRow($row){
+	public function parseTickerRow($row){
 		//	var_dump($row);
 		$row['volume'] = 0;
 		$row['high'] = $row['last'];

@@ -11,7 +11,7 @@ class MtGoxUSD extends LiveMarket
 		$this->table = "mtgox";
 	}
 
-	protected function parseDepthJson($res)
+	public function parseDepthJson($res)
 	{
 		$json = json_decode($res);
 		if ($json->result == 'success') {
@@ -20,7 +20,7 @@ class MtGoxUSD extends LiveMarket
 		return NULL;
 	}
 
-	protected function parseTickerJson($res)
+	public function parseTickerJson($res)
 	{
 		$json = json_decode($res);
 				

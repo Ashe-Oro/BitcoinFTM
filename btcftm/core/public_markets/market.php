@@ -37,7 +37,7 @@ abstract class Market
 		$this->_initMarket();
 	}
 
-	abstract protected function parseDepthJson($json);
+	abstract public function parseDepthJson($json);
 	abstract public function updateOrderBookData();
 	abstract public function getCurrentTicker();
 
@@ -79,12 +79,13 @@ abstract class Market
 		if ($timeDiff >= $this->refresh) {
 			$this->updateMarketOrderBooks();
 		} else {
+			$this->orderBook = ($this->orderBook) ? $this->orderBook : new MarketOrderBook();
 			iLog("[Market] Couldn't update Market {$this->name} - time diff less than refresh rate");
 		}
 		$timeDiff = time() - $this->depthUpdated;
-		if ($timeDiff > $config['marketExpirationTime']) {
+		if ($timeDiff > $this->expiration) {
 			iLog("[Market] WARNING: Market {$this->name} order book is expired");
-			$this->orderBook = new MarketOrderBook();
+			$this->orderBook = new MarketOrderBook(); // return empty orderbook just to keep things moving along
 		}
 		return $this->orderBook;
 	}
@@ -132,6 +133,13 @@ abstract class Market
 		return $res;
 	}
 
+	public function getYesterdaysLastTicker()
+	{
+		$timestamp = strtotime("today midnight -1 second");
+		$h =  $this->getHistoryTicker($timestamp);
+		return $h;
+	}
+
 	public function getHistoryTicker($timestamp="") {
 		global $DB;
 		
@@ -139,8 +147,10 @@ abstract class Market
 		if (is_string($timestamp)){ $timestamp = strtotime($timestamp); }
 		if(is_int($timestamp)){
 			$qid = $DB->query("SELECT * FROM {$this->table}_ticker WHERE timestamp <= {$timestamp} ORDER BY timestamp DESC LIMIT 1");
-			$result = $DB->fetch_array_assoc($qid);
-			return new Ticker($result);
+			$row = $DB->fetch_array_assoc($qid);
+			$tclass = "History{$this->mname}{$this->currency}";
+			$row = $tclass::parseTickerRow($row);
+			return new Ticker($row);
 		}
 		return NULL;
 	}
@@ -162,6 +172,8 @@ abstract class Market
 				if ($rowcount > 0){
 					$tickers = array();
 					while ($row = $DB->fetch_array_assoc($ret)){
+						$tclass = "History{$this->mname}{$this->currency}";
+						$row = $tclass::parseTickerRow($row);
 						//$row['timestamp'] = $row['timestamp'] / 1000000; // convert microseconds to timestamp
 						array_push($tickers, new Ticker($row));
 					}

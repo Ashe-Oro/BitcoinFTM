@@ -12,13 +12,13 @@ class HistoryKrakenUSD extends HistoryMarket
 		$this->tickerUrl = "https://api.kraken.com/0/public/Ticker?pair=XBTUSD";
 	}
 
-	protected function parseDepthJson($res)
+	public function parseDepthJson($res)
 	{
 		$json = json_decode($res);
 		return $json->result->XXBTZUSD;
 	}
 	
-	protected function parseTickerRow($row){
+	public function parseTickerRow($row){
 		$row['volume'] = $row['volume'] * $row['last'];
 		return $row;
 	}

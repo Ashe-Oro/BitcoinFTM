@@ -36,7 +36,12 @@ controls.printCurrency = function(amount, abbr)
 {
   if (controls.currencies[abbr]) {
     var c = controls.currencies[abbr];
-    return (c.prefix) ? c.symbol + amount.toFixed(c.precision) : amount.toFixed(c.precision) + c.symbol;
+    var sym = c.symbol;
+    if (amount < 0 && c.prefix) {
+      sym = '-'+c.symbol;
+      amount = Math.abs(amount);
+    }
+    return (c.prefix) ? sym + amount.toFixed(c.precision) : amount.toFixed(c.precision) + sym;
   }
   return "";
 }
@@ -82,14 +87,26 @@ controls.updateMarketTicker = function()
     tw.css({'left': 0});
 
     var feed = "";
+    var deltas = controls.json.deltas.markets;
     $.each(controls.json.markets, function(mname, mkt) {
+      var dlt = deltas[mname];
+      var trend = (dlt.last.perc > 0) ? "pos" : (dlt.last.perc < 0) ? "neg" : "neu";
+
       feed += "<div class='market-ticker' id='market-ticker-"+mname+"'>";
       feed += "<span class='market-ticker-name'>"+mname+": </span>";
+
+       feed += "<span class='market-trend "+trend+"'>";
+       feed += dlt.last.perc.toFixed(3)+'%';
+      feed += "<span class='market-trend-icon'></span>";
+      feed += "</span>";
+
       feed += "<span class='market-ticker-last'>"+controls.printCurrency(mkt.last, "USD")+"</span>";
       feed += " (<span class='market-ticker-ask'>"+controls.printCurrency(mkt.ask, "USD")+"</span>";
       feed += "/<span class='market-ticker-bid'>"+controls.printCurrency(mkt.bid, "USD")+"</span>)";
+
       feed += "</div>";
     });
+
     tw.html(feed).fadeIn(500, function() {
       var tWidth = 0;
       tw.find('div').each(function(){
@@ -105,7 +122,7 @@ controls.updateMarketTicker = function()
       var tickerW = hWidth - (titleW + accountW + welcomeW);
 
       var dH = Math.max(0, tWidth - tickerW) + 100;
-      tw.animate({'left': -dH+"px"}, 'linear', controls.jsonInt);
+      tw.animate({'left': -dH+"px"}, controls.jsonInt, 'linear');
     });
   });
 

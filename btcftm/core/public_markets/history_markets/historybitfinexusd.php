@@ -12,12 +12,12 @@ class HistoryBitfinexUSD extends HistoryMarket
 		$this->tickerUrl = "https://api.bitfinex.com/v1/ticker/btcusd";
 	}
 
-	protected function parseDepthJson($res)
+	public function parseDepthJson($res)
 	{
 		return json_decode($res);
 	}
 
-	protected function parseTickerRow($row)
+	public function parseTickerRow($row)
 	{
 		$row['high'] = max($row['last'], $row['mid']);
 		$row['low'] = min($row['last'], $row['mid']);

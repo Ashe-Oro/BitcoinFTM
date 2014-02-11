@@ -30,7 +30,13 @@ matrix.updateMatrix = function()
     $.each(amkt, function(bname, xchg){
       bname = sanitizeMarketName(bname);
       var klass = (xchg < 0) ? 'neg' : (xchg > 0) ? 'pos' : 'neu';
-      $('#matrix-'+aname+'-'+bname).html("<span class='"+klass+"'>"+controls.printCurrency(xchg, "USD")+"</span>");
+      var op = (klass == 'pos') ? 'has-op' : 'no-op';
+      var cell = $('#matrix-'+aname+'-'+bname);
+      cell.find('.matrix-cell-value').html("<span class='"+klass+" "+op+"'>"+controls.printCurrency(xchg, "USD")+"</span>");
+      
+      var perc = controls.json.deltas.mob[aname][bname].perc;
+      klass = (perc < 0) ? 'neg' : (perc > 0) ? 'pos' : 'neu';
+      cell.find('.matrix-cell-perc').html("<span class='"+klass+"'><span class='matrix-perc-icon'></span>"+perc.toFixed(3)+"%</span>")
     });
   });
   matrix.highlightOpportunities();
@@ -44,7 +50,7 @@ matrix.highlightOpportunities = function()
     bname = sanitizeMarketName(bname);
     if (account.balances[aname].usd > 0 && account.balances[bname].btc > 0){
       var cell = $('#matrix-'+aname+'-'+bname);
-      if (cell.find('span').hasClass('pos')){
+      if (cell.find('span').hasClass('has-op')){
         cell.addClass('highlight');
       } else {
         cell.removeClass('highlight');

@@ -13,7 +13,7 @@ abstract class HistoryMarket extends Market
 		$this->refresh = 0; // always update from DB
 	}
 
-	abstract protected function parseTickerRow($row);
+	abstract public function parseTickerRow($row);
 	
 	public function updateTimestamp($timestamp, $period)
 	{

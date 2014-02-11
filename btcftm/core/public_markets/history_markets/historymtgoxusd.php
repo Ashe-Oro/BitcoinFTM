@@ -13,7 +13,7 @@ class HistoryMtGoxUSD extends HistoryMarket
 		$this->tickerUrl = "http://data.mtgox.com/api/1/BTCUSD/ticker";
 	}
 
-	protected function parseDepthJson($res)
+	public function parseDepthJson($res)
 	{
 		$json = json_decode($res);
 		if ($json->result == 'success') {
@@ -22,7 +22,7 @@ class HistoryMtGoxUSD extends HistoryMarket
 		return NULL;
 	}
 
-	protected function parseTickerRow($row)
+	public function parseTickerRow($row)
 	{
 		return $row;
 	}

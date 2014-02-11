@@ -36,3 +36,30 @@ color: #c00;
 	font-size: 11px;
 	color: #aaa;
 }
+
+.matrix-cell-value {
+	display: block;
+	font-size: 16px;
+}
+
+.matrix-cell-perc {
+	display: block;
+	font-size: 12px;
+}
+
+.matrix-perc-icon {
+	background: transparent url('../images/up-down.png') 0px 0px no-repeat;
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin: 0px 2px;
+	padding: 0px;
+}
+
+.neg .matrix-perc-icon {
+	background-position: 0px -16px;
+}
+
+.neu .matrix-perc-icon {
+	display: none;
+}

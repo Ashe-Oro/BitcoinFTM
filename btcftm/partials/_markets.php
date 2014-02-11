@@ -25,81 +25,17 @@ foreach($markets as $mkt) {
 ?>
 </tr>
 
-<tr>
-<td class="value">Last</td>
 <?php
-foreach($markets as $mkt) {
-	echo "<td class='mkt-last' id='mkt-last-{$mktnames[$mkt->name]}'>...</td>";
+$vals = array('last','high','low','ask','bid','sma10','sma25','volume');
+foreach($vals as $v){
+	echo "<tr>";
+	echo "<td class='value'>".ucfirst($v)."</td>";
+	foreach($markets as $mkt) {
+		echo "<td class='mkt-value-row mkt-{$v}' id='mkt-{$v}-{$mktnames[$mkt->name]}'><div class='val'>...</div><div class ='perc'></div></td>";
+	}
+	echo "</tr>";
 }
 ?>
-</tr>
-
-<tr>
-<td class="value">High</td>
-<?php
-foreach($markets as $mkt) {
-	echo "<td class='mkt-high' id='mkt-high-{$mktnames[$mkt->name]}'>...</td>";
-}
-?>
-</tr>
-
-<tr>
-<td class="value">Low</td>
-<?php
-foreach($markets as $mkt) {
-	echo "<td class='mkt-low' id='mkt-low-{$mktnames[$mkt->name]}'>...</td>";
-}
-?>
-</tr>
-
-<tr>
-<td class="value">Bid</td>
-<?php
-foreach($markets as $mkt) {
-	echo "<td class='mkt-bid' id='mkt-bid-{$mktnames[$mkt->name]}'>...</td>";
-}
-?>
-</tr>
-
-<tr>
-<td class="value">Ask</td>
-<?php
-foreach($markets as $mkt) {
-	echo "<td class='mkt-ask' id='mkt-ask-{$mktnames[$mkt->name]}'>...</td>";
-}
-?>
-</tr>
-
-<tr>
-<td class="value">SMA10</td>
-<?php
-foreach($markets as $mkt) {
-	echo "<td class='mkt-sma10' id='mkt-sma10-{$mktnames[$mkt->name]}'>...</td>";
-}
-?>
-</tr>
-
-
-<tr>
-<td class="value">SMA25</td>
-<?php
-foreach($markets as $mkt) {
-	echo "<td class='mkt-sma25' id='mkt-sma25-{$mktnames[$mkt->name]}'>...</td>";
-}
-?>
-</tr>
-
-<tr>
-<td class="value">Volume</td>
-<?php
-foreach($markets as $mkt) {
-	echo "<td class='mkt-vol' id='mkt-vol-{$mktnames[$mkt->name]}'>...</td>";
-}
-?>
-</tr>
-
-
-
 
 </table>
 	</div>

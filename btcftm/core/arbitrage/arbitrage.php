@@ -220,11 +220,25 @@ class Arbitrage
 
 	private function getMasterJSON()
 	{
-		$json = array("markets" => array(), "mob" => array(), "timestamp" => 0);
+		$json = array(
+			"timestamp" => 0, 
+			"markets" 	=> array(), 
+			"mob"				=> array(), 
+			"yesterday" => array(
+				"markets" => array(),
+				"mob" => array()
+			),
+			"deltas" => array(
+				"markets" => array(),
+				"mob" => array()
+			)
+		);
 
 		// add current market values to JSON
 		foreach($this->markets as $mkt) {
 			$t = $mkt->getCurrentTicker();
+			$y = $mkt->getYesterdaysLastTicker();
+
 			$sma10 = $mkt->getSMA(10);
 			$sma25 = $mkt->getSMA(25);
 
@@ -241,6 +255,72 @@ class Arbitrage
 				"sma10" => ($sma10) ? $sma10->getAvg() : -1,
 				"sma25" => ($sma25) ? $sma25->getAvg() : -1
 			);
+
+			$json['yesterday']['markets'][$mkt->mname] = array(
+				"name" => $mkt->mname,
+				"currency" => $mkt->currency,
+				"high" => $y->getHigh(),
+				"low" => $y->getLow(),
+				"last" => $y->getLast(),
+				"bid" => $y->getBid(),
+				"ask" => $y->getAsk(),
+				"volume" => $y->getVolume()
+			);
+
+			$dhigh = $t->getHigh() - $y->getHigh();
+			$dlow = $t->getLow() - $y->getLow();
+			$dlast = $t->getLast() - $y->getLast();
+			$dbid = $t->getBid() - $y->getBid();
+			$dask = $t->getAsk() - $y->getAsk();
+			$dsma10 = $t->getLast() - $sma10->getAvg();
+			$dsma25 = $t->getLast() - $sma25->getAvg();
+			$dvol = $t->getVolume() - $y->getVolume();
+
+			$dhighPerc = $dhigh / $y->getHigh();
+			$dlowPerc = $dlow / $y->getLow();
+			$dlastPerc = $dlast / $y->getLast();
+			$dbidPerc = $dbid / $y->getBid();
+			$daskPerc = $dask / $y->getAsk();
+			$dsma10Perc = ($sma10->getAvg() > 0) ? $dsma10 / $sma10->getAvg() : 0;
+			$dsma25Perc = ($sma25->getAvg() > 0) ? $dsma25 / $sma25->getAvg() : 0;
+			$dvolPerc = ($y->getVolume() > 0) ? $dvol / $y->getVolume() : 0;
+
+			$json['deltas']['markets'][$mkt->mname] = array(
+				"name" => $mkt->mname,
+				"currency" => $mkt->currency,
+				"high" => array(
+					"spread" => $dhigh,
+					"perc" => $dhighPerc*100
+				),
+				"low" => array(
+					"spread" => $dlow,
+					"perc" => $dlowPerc*100
+				),
+				"last" => array(
+					"spread" => $dlast,
+					"perc" => $dlastPerc*100
+				),
+				"bid" => array(
+					"spread" => $dbid,
+					"perc" => $dbidPerc*100
+				),
+				"ask" => array(
+					"spread" => $dask,
+					"perc" => $daskPerc*100
+				),
+				"sma10" => array(
+					"spread" => $dsma10,
+					"perc" => $dsma10Perc*100
+				),
+				"sma25" => array(
+					"spread" => $dsma25,
+					"perc" => $dsma25Perc*100
+				),
+				"volume" => array(
+					"spread" => $dvol,
+					"perc" => $dvolPerc*100
+				),
+			);
 		}
 
 		$matrix = $this->mob->getFullExchangeMatrix();
@@ -250,6 +330,38 @@ class Arbitrage
 			foreach($askM as $bidname => $bidM) {
 				$bname = str_replace("History", "", $bidname);
 				$json['mob'][$aname][$bname] = $bidM['profit'];
+			}
+		}
+
+		$this->setTimestamp(strtotime("midnight today -1 second"), $this->period);
+		foreach($this->markets as $mkt) {
+			$mkt->updateOrderBookData();
+		}
+		$this->_loadMOB();
+
+		$yMatrix = $this->mob->getFullExchangeMatrix();
+		foreach($yMatrix as $askname => $askM) {
+			$aname = str_replace("History", "", $askname);
+			$json['yesterday']['mob'][$aname] = array();
+			foreach($askM as $bidname => $bidM) {
+				$bname = str_replace("History", "", $bidname);
+				$json['yesterday']['mob'][$aname][$bname] = $bidM['profit'];
+			}
+		}
+
+		foreach($matrix as $askname => $askM) {
+			$aname = str_replace("History", "", $askname);
+			$json['deltas']['mob'][$aname] = array();
+			foreach($askM as $bidname => $bidM) {
+				$bname = str_replace("History", "", $bidname);
+
+				$dSpread = $json['mob'][$aname][$bname] - $json['yesterday']['mob'][$aname][$bname];
+				$dPerc = $dSpread / abs($json['yesterday']['mob'][$aname][$bname]);
+
+				$json['deltas']['mob'][$aname][$bname] = array(
+					"spread" => $dSpread,
+					"perc" => $dPerc*100
+				);
 			}
 		}
 

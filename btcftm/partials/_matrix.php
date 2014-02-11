@@ -35,10 +35,10 @@ foreach($full as $askmarket => $mx){
 		$bname = sanitizeMarketName($bidmarket);
 		$m = isset($mx[$bidmarket]) ? $mx[$bidmarket] : NULL;
 		if (!$m || $aname == $bname) {
-			echo "<td class='matrix-cell'>----</td>";
+			echo "<td class='matrix-cell'><span class='matrix-cell-value'>----</span><span class='matrix-cell-perc'></span></td>";
 		} else {
 			//$class = ($m['profit'] > 0) ? 'pos' : 'neg';
-			echo "<td class='matrix-cell' id='matrix-{$aname}-{$bname}'>...</td>";
+			echo "<td class='matrix-cell' id='matrix-{$aname}-{$bname}'><span class='matrix-cell-value'>...</span><span class='matrix-cell-perc'></span></td>";
 		}
 	}
 	echo "</tr>";
