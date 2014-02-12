@@ -64,10 +64,18 @@ arbitrage.updateArbitage = function(){
     var buyComValue = amkt.commission * buyTotalPreCom;
     var sellComValue = bmkt.commission * sellTotalPreCom;
 
-    var buyTotal = buyTotalPreCom - buyComValue;
+    var buyTotal = buyTotalPreCom + buyComValue;
     var sellTotal = sellTotalPreCom  - sellComValue;
     var estProfit = sellTotal - buyTotal;
     /*************************/
+    var askComPrice = (amkt.commission*askPrice) + askPrice;
+
+    var usd = account.balances[arbitrage.askmarket].usd;
+    var btc = account.balances[arbitrage.bidmarket].btc;
+    var usd2btc = usd / askComPrice;
+    var maxBtcVolume = Math.min(usd2btc, btc);
+    $('#arbitrage-max-btc').html(controls.printCurrency(maxBtcVolume, "BTC"));
+    $('#arbitrage-max-usd').html(controls.printCurrency(maxBtcVolume*askComPrice, "USD"));
 
     $('#arbitrage-buy-info .arbitrage-commission-value').html('-'+controls.printCurrency(buyComValue, 'USD')+' (-'+amkt.commission+'%)');
     $('#arbitrage-sell-info .arbitrage-commission-value').html('-'+controls.printCurrency(sellComValue, 'USD')+' (-'+bmkt.commission+'%)');
@@ -88,6 +96,10 @@ arbitrage.updateArbitage = function(){
 
 arbitrage.setButtonStates = function()
 {
+  var arbBtn = $('#arbitrage-btn');
+  var arbBuy = $('#arbitrage-buy-info');
+  var arbSell = $('#arbitrage-sell-info');
+  
   if (controls.json) {
     var amkt = controls.json.markets[arbitrage.askmarket];
     var bmkt = controls.json.markets[arbitrage.bidmarket];
@@ -95,13 +107,8 @@ arbitrage.setButtonStates = function()
     var btc = account.balances[arbitrage.bidmarket].btc;
     var btcVol = parseFloat($('#arbitrage-volume-val').val());
 
-  
     var askPrice = amkt.ask;
     var bidPrice = bmkt.bid;
-
-    var arbBtn = $('#arbitrage-btn');
-    var arbBuy = $('#arbitrage-buy-info');
-    var arbSell = $('#arbitrage-sell-info');
     
     if  (btc < btcVol) {
       arbSell.addClass('disabled');
@@ -129,9 +136,9 @@ arbitrage.setButtonStates = function()
     }
 
   } else {
-    $('#arbitrage-btn').addClass('disabled');
-    $('#arbitrage-buy-info').addClass('disabled');
-    $('#arbitrage-sell-info').addClass('disabled');
+    arbBtn.addClass('disabled');
+    arbBuy.addClass('disabled');
+    arbSell.addClass('disabled');
   }
 }
 

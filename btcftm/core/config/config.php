@@ -45,14 +45,25 @@ function iLog($msg)
 function curl($url){
   global $config;
   if ($config['localhost']){
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-    $data = curl_exec($ch);
-    curl_close($ch);
-    return $data;
+     try {
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, $url);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+      $data = curl_exec($ch);
+      curl_close($ch);
+      return $data;
+    } catch (Exception $e) {
+      iLog("[CONFIG] ERROR: Couldn't open file via curl {$url}");
+      return "";
+    }
   } else { // for some reason CURL doesn't work on my staging server yet.....
-    return file_get_contents($url);
+    try {
+      $str = file_get_contents($url);
+      return $str;
+    } catch (Exception $e) {
+      iLog("[CONFIG] ERROR: Couldn't open file via file_get_contents {$url}");
+      return "";
+    }
   }
 }
 

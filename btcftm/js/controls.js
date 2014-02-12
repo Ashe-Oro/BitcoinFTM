@@ -132,7 +132,7 @@ controls.updateMarketTicker = function()
 controls.bindSidebarMenu = function()
 {
 	$('#sidebar li').click(function(e) {
-		if ($(this).hasClass('active')) { return; }
+		if ($(this).hasClass('active')) { return noEvent(e); }
 
 		var newState = $(this).attr('class');
 
@@ -143,9 +143,7 @@ controls.bindSidebarMenu = function()
 		//window.location.hash = '#'+controls.ftmState;
 		controls.changeFtmState(newState);
 		
-		e.preventDefault();
-		e.stopPropagation();
-		return false;
+		return noEvent(e);
 	});
 
 	/*$('#sidebar li a').click(function(e){

@@ -6,6 +6,7 @@
     <h3>How many Bitcoins do you want to move?</h3>
     <input type="text" name="arbitrage-volume-val" id="arbitrage-volume-val" value="0.1" />
     <div id="arbitrage-capital">Available Capital: <span id="arbitrage-capital-usd"></span> @ <span class="ask-market-name"></span>, <span id="arbitrage-capital-btc"></span> @ <span class="bid-market-name"></span></div>
+    <div id="arbitrage-max">Max Transaction Volume: <span id="arbitrage-max-btc"></span> (<span id="arbitrage-max-usd"></span>)</div>
   </div>
 
   <div id="arbitrage-buysell" class="arbitrage-item">
