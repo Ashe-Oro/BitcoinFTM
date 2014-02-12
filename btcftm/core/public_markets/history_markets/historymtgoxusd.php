@@ -16,7 +16,7 @@ class HistoryMtGoxUSD extends HistoryMarket
 	public function parseDepthJson($res)
 	{
 		$json = json_decode($res);
-		if ($json->result == 'success') {
+		if ($json && $json->result == 'success') {
 			return $json->data;
 		}
 		return NULL;

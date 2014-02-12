@@ -15,8 +15,10 @@ class HistoryCampBXUSD extends HistoryMarket
 	public function parseDepthJson($res)
 	{
 		$data = json_decode($res);
-		$data->asks = $data->Asks;
-		$data->bids = $data->Bids;
+		if ($data) {
+			$data->asks = $data->Asks;
+			$data->bids = $data->Bids;
+		}
 		return $data;
 	}
 	

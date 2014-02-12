@@ -28,15 +28,20 @@ matrix.updateMatrix = function()
   $.each(controls.json.mob, function(aname, amkt){
     aname = sanitizeMarketName(aname);
     $.each(amkt, function(bname, xchg){
-      bname = sanitizeMarketName(bname);
-      var klass = (xchg < 0) ? 'neg' : (xchg > 0) ? 'pos' : 'neu';
-      var op = (klass == 'pos') ? 'has-op' : 'no-op';
-      var cell = $('#matrix-'+aname+'-'+bname);
-      cell.find('.matrix-cell-value').html("<span class='"+klass+" "+op+"'>"+controls.printCurrency(xchg, "USD")+"</span>");
-      
-      var spread = controls.json.deltas.mob[aname][bname].spread;
-      klass = (spread < 0) ? 'neg' : (spread > 0) ? 'pos' : 'neu';
-      cell.find('.matrix-cell-perc').html("<span class='"+klass+"'><span class='matrix-perc-icon'></span>"+controls.printCurrency(spread, "USD")+"</span>")
+       var cell = $('#matrix-'+aname+'-'+bname);
+      if (xchg != null){
+        bname = sanitizeMarketName(bname);
+        var klass = (xchg < 0) ? 'neg' : (xchg > 0) ? 'pos' : 'neu';
+        var op = (klass == 'pos') ? 'has-op' : 'no-op';
+        cell.find('.matrix-cell-value').html("<span class='"+klass+" "+op+"'>"+controls.printCurrency(xchg, "USD")+"</span>");
+        
+        var spread = controls.json.deltas.mob[aname][bname].spread;
+        klass = (spread < 0) ? 'neg' : (spread > 0) ? 'pos' : 'neu';
+        cell.find('.matrix-cell-perc').html("<span class='"+klass+"'><span class='matrix-perc-icon'></span>"+controls.printCurrency(spread, "USD")+"</span>");
+      } else {
+        cell.find('.matrix-cell-value').html("<span class='no-op'>...</span>");
+        cell.find('.matrix-cell-perc').html('');
+      }
     });
   });
   matrix.highlightOpportunities();
@@ -52,8 +57,16 @@ matrix.highlightOpportunities = function()
       var cell = $('#matrix-'+aname+'-'+bname);
       if (cell.find('span').hasClass('has-op')){
         cell.addClass('highlight');
+        cell.on('click', function(e){
+          var askName = $(this).attr('data-ask');
+          var bidName = $(this).attr('data-bid');
+          arbitrage.setArbitrageMarkets(askName, bidName);
+          controls.changeFtmState('arbitrage');
+          return noEvent(e);
+        })
       } else {
         cell.removeClass('highlight');
+        cell.off('click');
       }
     } else {
       $('#matrix-'+aname+'-'+bname).removeClass('highlight');

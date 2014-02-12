@@ -38,7 +38,7 @@ foreach($full as $askmarket => $mx){
 			echo "<td class='matrix-cell'><span class='matrix-cell-value'>----</span><span class='matrix-cell-perc'></span></td>";
 		} else {
 			//$class = ($m['profit'] > 0) ? 'pos' : 'neg';
-			echo "<td class='matrix-cell' id='matrix-{$aname}-{$bname}'><span class='matrix-cell-value'>...</span><span class='matrix-cell-perc'></span></td>";
+			echo "<td class='matrix-cell' id='matrix-{$aname}-{$bname}' data-ask='{$aname}' data-bid='{$bname}'><span class='matrix-cell-value'>...</span><span class='matrix-cell-perc'></span></td>";
 		}
 	}
 	echo "</tr>";
@@ -48,4 +48,5 @@ foreach($full as $askmarket => $mx){
 ?>
 </table>
 	</div>
+<h3>Click any highlighted Arbitrage Opportunity above to begin Arbitrage!</h3>
 </div>

@@ -24,7 +24,7 @@ foreach($markets as $mkt) {
 <?php
 foreach($markets as $mkt) {
 	$asks = $ARB->mob->getMarketAskOrderBook($mkt->mname);
-	$orders = $asks->getOrders();
+	$orders = ($asks) ? $asks->getOrders() : array();
 	echo "<td class='asks-list-price ask-list-price-{$mkt->mname}'>";
 	foreach($orders as $a){
 		echo "$".$a->getPrice()."<br />";
@@ -38,7 +38,7 @@ foreach($markets as $mkt) {
 
 	$bids = $ARB->mob->getMarketBidOrderBook($mkt->mname);
 	//echo $mkt->name.":";var_dump($bids);
-	$orders = $bids->getOrders();
+	$orders = ($bids) ? $bids->getOrders() : array();
 	echo "<td class='bids-list-price bid-list-price-{$mkt->mname}'>";
 	foreach($orders as $a){
 		echo "$".$a->getPrice()."<br />";

@@ -17,7 +17,7 @@ controls.ftmState = "dashboard";
 controls.json = null;
 controls.jsonInt = 15000; // update every 15s for now
 controls.jsonListeners = new Array();
-controls.ftmStateList = ["dashboard","markets","orders","orderbooks","matrix","charts","bots","sims","settings","portfolio"];
+controls.ftmStateList = ["dashboard","markets","orders","orderbooks","matrix","charts","bots","sims","settings","portfolio","arbitrage"];
 controls.currencies = new Array();
 
 controls.loadCurrencies = function()

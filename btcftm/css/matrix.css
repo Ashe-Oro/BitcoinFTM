@@ -7,11 +7,20 @@
 	padding: 5px;
 	margin: 2px;
 	text-align: right;
+	-moz-transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+	transition: all 0.5s;
 }
 
 #matrix td.highlight {
 	border: 1px solid #ff0;
-	background-color: #440;
+	background-color: #220;
+
+}
+
+#matrix td.highlight:hover {
+	cursor: pointer;
+	background-color: #660;
 }
 
 .pos { 

@@ -126,10 +126,10 @@ orders.updateLimitBuySell = function()
 
 		$('.order-limit-value').html('$'+limitPrice);
 
-		$('#buy-button .order-commission-value').html('-$'+buyComValue.toFixed(4)+' (-'+mkt.commission+'%)');
-		$('#sell-button .order-commission-value').html('-$'+sellComValue.toFixed(4)+' (-'+mkt.commission+'%)');
-		$('#order-buy-total').html('-$'+buyTotal.toFixed(4));
-		$('#order-sell-total').html('+$'+sellTotal.toFixed(4));
+		$('#buy-button .order-commission-value').html(controls.printCurrency(-buyComValue, 'USD')+' (-'+mkt.commission+'%)');
+		$('#sell-button .order-commission-value').html(controls.printCurrency(-sellComValue, 'USD')+' (-'+mkt.commission+'%)');
+		$('#order-buy-total').html(controls.printCurrency(-buyTotal, 'USD'));
+		$('#order-sell-total').html('+'+controls.printCurrency(sellTotal, 'USD'));
 
 		orders.setButtonStates();
 
@@ -149,11 +149,11 @@ orders.updateCapital = function()
 		var usd = account.balances[orders.market].usd;
 		var btc = account.balances[orders.market].btc;
 		if (usd != -1 && btc != -1){
-			$('#order-capital-usd').html('$'+usd.toFixed(4));
-			$('#order-capital-btc').html(btc.toFixed(8)+' BTC');
+			$('#order-capital-usd').html(controls.printCurrency(usd, 'USD'));
+			$('#order-capital-btc').html(controls.printCurrency(btc, 'BTC'));
 		} else {
-			$('#order-capital-usd').html('$0.0000');
-			$('#order-capital-btc').html('0.00000000 BTC');
+			$('#order-capital-usd').html(controls.printCurrency(0, 'USD'));
+			$('#order-capital-btc').html(controls.printCurrency(0, 'BTC'));
 		}
 	}
 }
