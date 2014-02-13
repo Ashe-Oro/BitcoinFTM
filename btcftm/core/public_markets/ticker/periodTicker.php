@@ -25,7 +25,7 @@ class PeriodTicker extends Ticker
 	private $close;
 
 	function __construct($timestamp=0, $high=0, $low=0, $open=0, $close=0, $avg=0, $volume=0, $avgvolume=0, $count=0) {
-       if (is_object($timestamp)) {
+    if (is_object($timestamp)) {
 		   	$t = $timestamp;
 			$t->ask = $avg;
 			$t->bid = $avg;
@@ -57,8 +57,11 @@ class PeriodTicker extends Ticker
 			$this->count = (float) $count;
 			$this->open = (float) $open;
 			$this->close = (float) $close;
+	   }
+	   if ($this->avg == 0){
+	   	$this->avg = ($this->open + $this->close) / 2;
 	   }	
-    }
+  }
 	
 	static public function comparePeriodTickers($a, $b)
 	{

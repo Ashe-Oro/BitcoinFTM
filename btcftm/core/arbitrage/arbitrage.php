@@ -218,6 +218,15 @@ class Arbitrage
 		return $json;
 	}
 
+	public function updateChartJSON($starttime, $endtime, $value="avg", $writeFile=false)
+	{
+		$json = $this->getChartJSON($starttime, $endtime, $value);
+		if ($writeFile){
+			file_put_contents("json/chart.json", $json);
+		}
+		return $json;
+	}
+
 	private function getMasterJSON()
 	{
 		$json = array(
@@ -370,6 +379,24 @@ class Arbitrage
 		return json_encode($json);
 	}
 
+	private function getChartJSON($starttime, $endtime, $value="avg")
+	{
+		$json = array();
+		$func = "get".ucfirst($value);
+		foreach($this->markets as $mkt){
+			$mktrow = array("key" => $mkt->mname, "values" => array());
+			$tickers = array_reverse($mkt->getHistorySamples($starttime, $endtime, PERIOD_1H));
+			foreach($tickers as $t){
+				$tval = $t->$func();
+				if ($tval > 0) {
+					array_push($mktrow["values"], array($t->getTimestamp(), $tval));
+				}
+			}
+			array_push($json, $mktrow);
+		}
+		return json_encode($json);
+	}
+
 	function printCurrency($amount, $abbr)
 	{
 		return $this->currencies->printCurrency($amount, $abbr);
@@ -380,7 +407,7 @@ class Arbitrage
 	 *
 	 * @param	$cmds	{string}		arbitrage commands
 	 */
-	public function execCommand($cmds)
+	public function execCommand($cmds, $args="")
 	{
 		if (strlen($cmds)){
 			iLog("[Arbitrage] Execute command: {$cmds} on ".count($this->arbitrers)." Arbitrers");
@@ -395,6 +422,14 @@ class Arbitrage
 				case "json":
 					$this->updateMarketDepths();
 					echo $this->updateMasterJSON();
+					break;
+
+				case "chart-json":
+					$this->updateMarketDepths();
+					$starttime = isset($args['starttime']) ? $args['starttime'] : strtotime("-7 days");
+					$endtime = isset($args['endtime']) ? $args['endtime'] : time();
+					$value = "avg";
+					echo $this->updateChartJSON($starttime, $endtime, $value);
 					break;
 					
 				case "sim":
