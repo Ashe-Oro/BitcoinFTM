@@ -7,8 +7,8 @@
 $curlist = $currencies->getCurrencyList();
 foreach($markets as $mkt) {
 	$pmarket = $client->getPrivateMarket($mkt->mname);
-	$key  = $pmarket->getAPIKey();
-	$secret = $pmarket->getAPISecret();
+	$key  = ($pmarket) ? $pmarket->getAPIKey() : "";
+	$secret = ($pmarket) ? $pmarket->getAPISecret() : "";
 
 	echo "<tr id='portfolio-{$mkt->mname}'>";
 	echo "<td class='portfolio-market'><h3>{$mkt->mname}</h3></td>";
@@ -20,7 +20,7 @@ foreach($markets as $mkt) {
 	echo "<td class='portfolio-balances'>";
 	foreach($curlist as $abbr => $cur) {
 		if ($mkt->supports($abbr)){
-			$c = $currencies->printCurrency($pmarket->getBalance($abbr), $abbr);
+			$c = ($pmarket) ? $currencies->printCurrency($pmarket->getBalance($abbr), $abbr) : $currencies->printCurrency(0, $abbr);
 			echo "<div class='portfolio-{$abbr}'>{$abbr}: <span class='portfolio-value' id='portfolio-value-{$mkt->mname}'>{$c}</span></div>";
 		}
 	}

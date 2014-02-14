@@ -37,9 +37,8 @@ class PeriodTicker extends Ticker
 			$this->count = (float) $t->count;
 			$this->open = (float) $t->open;
 			$this->close = (float) $t->close;
-	   } else
-	   if (is_array($timestamp)) {
-		   	$t = $timestamp;
+	   } else if (is_array($timestamp)) {
+		  $t = $timestamp;
 			$t['ask'] = $avg;
 			$t['bid'] = $avg;
 			$t['last'] = $avg;

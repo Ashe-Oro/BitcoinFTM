@@ -20,6 +20,10 @@ account.initAccount = function() {
     account.balances[mname].totalvaluebtc = -1;
     account.totalusd += (account.balances[mname].usd != -1) ? account.balances[mname].usd : 0;
     account.totalbtc += (account.balances[mname].btc != -1) ? account.balances[mname].btc : 0;
+
+    if (account.balances[mname].usd == -1 && account.balances[mname].btc == -1) {
+      $(this).hide(); // account isn't set up, so hide from dash
+    }
   });
 }
 

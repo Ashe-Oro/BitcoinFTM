@@ -20,14 +20,17 @@ if ($signedIn == 1) {
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>BTC FTM</title>
-<script language="javascript" type="application/javascript" src="jquery/jquery-1.8.2.min.js"></script>
-<script language="javascript" type="application/javascript" src="js/controls.js"></script>
-<?php if ($config['minify']) { ?>
-<script language="javascript" type="application/javascript" src="js/combine-js.php"></script>
-<?php 
-} else { 
-  foreach($panels as $p){
-	 echo "<script language='javascript' type='application/javascript' src='js/{$p}.js'></script>";
+<?php if ($signedIn == 1) { ?>
+  <script language="javascript" type="application/javascript" src="jquery/jquery-1.8.2.min.js"></script>
+  <script language="javascript" type="application/javascript" src="jquery/jquery-cookie/jquery.cookie.js"></script>
+  <script language="javascript" type="application/javascript" src="js/controls.js"></script>
+  <?php if ($config['minify']) { ?>
+  <script language="javascript" type="application/javascript" src="js/combine-js.php"></script>
+  <?php 
+  } else { 
+    foreach($panels as $p){
+  	 echo "<script language='javascript' type='application/javascript' src='js/{$p}.js'></script>";
+    }
   }
 }
 ?>
@@ -35,16 +38,17 @@ if ($signedIn == 1) {
 <link type="text/css" rel="stylesheet" href="css/core.css" />
 <link type="text/css" rel="stylesheet" href="css/controls.css" />
 
-<?php if ($config['minify']) { ?>
-<link type="text/css" rel="stylesheet" href="css/combine-css.php" />
-<?php 
-} else { 
-  foreach($panels as $p){
-    echo "<link type='text/css' rel='stylesheet' href='css/{$p}.css' />";
-  }
-} 
+<?php if($signedIn == 1) { ?>
+  <?php if ($config['minify']) { ?>
+  <link type="text/css" rel="stylesheet" href="css/combine-css.php" />
+  <?php 
+  } else { 
+    foreach($panels as $p){
+      echo "<link type='text/css' rel='stylesheet' href='css/{$p}.css' />";
+    }
+  } 
+}
 ?>
-
 
 </head>
 
@@ -53,8 +57,10 @@ if ($signedIn == 1) {
 if ($signedIn == 1) {
 	// MIGRATE THIS SHIT OUT TO SOMEWHERE ELSE!!!!
 
+  /*
 	$settingsUpdateMessage = "";
 	
+
 	if (isset($_POST['submit-settings'])){
 		//var_dump($_POST);
 		
@@ -77,6 +83,7 @@ if ($signedIn == 1) {
 		}
 		iLog($settingsUpdateMessage);
 	}
+  */
 	
   $client = new Client($_SESSION['username']);
   $cl = new ClientsList($_SESSION['username']);
@@ -84,29 +91,6 @@ if ($signedIn == 1) {
   $ARB = new Arbitrage($cl, $args);
   $markets = $ARB->markets;
   $currencies = $ARB->currencies;
-	
-	/*
-  $range = "1-day";
-	if (isset($_GET['range'])){
-		$range = $_GET['range'];
-	}
-	if (isset($_POST['change-range'])){
-		$range = $_POST['change-range'];
-	}
-	
-	$period = PERIOD_15M;
-	if (isset($_POST['change-period'])){
-		$period = (int) $_POST['change-period'];
-	}
-	
-	$compare = "30-minute";
-	if (isset($_POST['market-compare'])){
-		$compare = $_POST['market-compare'];
-	}
-  */
-	
-	//var_dump($_POST);
-
 ?>
 <header id="header">
 	<h2 class="title">Bitcoin Financial Trade Manager</h2>

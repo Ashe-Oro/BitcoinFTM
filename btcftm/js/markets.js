@@ -39,7 +39,7 @@ markets.updateMarkets = function()
   markets.updateMarketValue(mname, 'bid', mkt.bid);
   markets.updateMarketValue(mname, 'sma10', mkt.sma10);
   markets.updateMarketValue(mname, 'sma25', mkt.sma25);
-  $('#mkt-vol-'+mname+' .val').html((mkt.volume > 0) ? mkt.volume.toFixed(6) : "--");
+  $('#mkt-volume-'+mname+' .val').html((mkt.volume > 0) ? mkt.volume.toFixed(6) : "--");
 
   markets.updateMarketPerc(mname, 'last', dlt.last.perc);
   markets.updateMarketPerc(mname, 'high', dlt.high.perc);
@@ -48,8 +48,34 @@ markets.updateMarkets = function()
   markets.updateMarketPerc(mname, 'bid', dlt.bid.perc);
   markets.updateMarketPerc(mname, 'sma10', dlt.sma10.perc);
   markets.updateMarketPerc(mname, 'sma25', dlt.sma25.perc);
-  markets.updateMarketPerc(mname, 'vol', dlt.volume.perc);
+  markets.updateMarketPerc(mname, 'volume', dlt.volume.perc);
  });
+}
+
+markets.bindHoverState = function()
+{
+  var mkt_cells = $("#markets").find("td, th");
+  mkt_cells.on("mouseover", function() {
+      var el = $(this),
+      pos = el.index();
+      el.parent().find("th, td").addClass("hover");
+      mkt_cells.filter(":nth-child(" + (pos+1) + ")").addClass("hover");
+      if (el.is('td')) { el.addClass("active"); }
+  })
+  .on("mouseout", function() {
+    mkt_cells.removeClass("hover");
+    mkt_cells.removeClass("active");
+  })
+  .on("click", function(e){
+    var el = $(this), pos = el.index();
+    var th = mkt_cells.filter("th.market:nth-child("+(pos+1)+")");
+    if (th){
+      var mname = th.attr('id').replace('market-th-','');
+      orders.changeMarket(mname);
+      controls.changeFtmState('orders');
+    }
+    return noEvent(e);
+  });
 }
 
 markets.updateMarketValue = function(mname, valname, value)
@@ -69,6 +95,7 @@ markets.updateMarketPerc = function(mname, valname, value)
 }
 
 $(document).ready(function() {
+  markets.bindHoverState();
 	controls.addJSONListener(markets.updateMarkets);
   //markets.updateMarkets();
 });

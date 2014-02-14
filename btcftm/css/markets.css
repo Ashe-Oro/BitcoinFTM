@@ -2,11 +2,25 @@
 	width: 100%;
 }
 
+#markets td, #markets th {
+	border: 1px solid transparent;
+}
+
 #markets td {
 	display: table-cell;
 	padding: 5px;
 	margin: 2px;
 	text-align: right;
+}
+
+#markets th.hover, #markets td.hover {
+	border: 1px solid #ff0;
+	background-color: #220;
+	cursor: pointer;
+}
+
+#markets td.active {
+	background-color: #440;
 }
 
 .pos { 

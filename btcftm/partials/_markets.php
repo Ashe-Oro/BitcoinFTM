@@ -19,8 +19,7 @@ $mktnames = array();
 <th></th>
 <?php
 foreach($markets as $mkt) {
-	$mktnames[$mkt->name] = str_replace("USD", "", str_replace("History", "", $mkt->name));
-	echo "<th class='market'>{$mktnames[$mkt->name]}</th>";
+	echo "<th class='market' id='market-th-{$mkt->mname}'>{$mkt->mname}</th>";
 }
 ?>
 </tr>
@@ -31,7 +30,7 @@ foreach($vals as $v){
 	echo "<tr>";
 	echo "<td class='value'>".ucfirst($v)."</td>";
 	foreach($markets as $mkt) {
-		echo "<td class='mkt-value-row mkt-{$v}' id='mkt-{$v}-{$mktnames[$mkt->name]}'><div class='val'>...</div><div class ='perc'></div></td>";
+		echo "<td class='mkt-value-row mkt-{$v}' id='mkt-{$v}-{$mkt->mname}'><div class='val'>...</div><div class ='perc'></div></td>";
 	}
 	echo "</tr>";
 }

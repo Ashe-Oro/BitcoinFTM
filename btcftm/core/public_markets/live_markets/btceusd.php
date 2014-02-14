@@ -23,7 +23,7 @@ class BTCeUSD extends LiveMarket
 		$data->timestamp = $data->updated;
 		$data->ask = $data->sell;
 		$data->bid = $data->buy;
-		$data->volume = $data->vol_cur;	
+		$data->volume = $data->vol_cur / 100;	
 		$ticker = new Ticker($data);
 		$t = $ticker->getTickerArray();
 

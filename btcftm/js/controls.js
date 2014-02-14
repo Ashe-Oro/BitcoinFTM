@@ -77,6 +77,8 @@ controls.changeFtmState = function(state)
 		$('#'+controls.ftmState).addClass('hide');
 		controls.ftmState = state;
 		$('#'+controls.ftmState).removeClass('hide');
+
+    $.cookie('btcftm_ftmstate', state);
 	}
 }
 
@@ -186,8 +188,12 @@ controls.bindAccountMenu = function()
 
 controls.startControls = function()
 {
-  var hash = window.location.hash.replace("#","");
-  controls.changeFtmState(hash);
+  if ($.cookie('btcftm_ftmstate')) {
+    var hash = $.cookie('btcftm_ftmstate');
+    controls.changeFtmState(hash);
+  }
+  //var hash = window.location.hash.replace("#","");
+  //controls.changeFtmState(hash);
 
   $('#main-content .content').each(function(){
     if ($(this).attr('id') == controls.ftmState) {

@@ -218,15 +218,6 @@ class Arbitrage
 		return $json;
 	}
 
-	public function updateChartJSON($starttime, $endtime, $value="avg", $writeFile=false)
-	{
-		$json = $this->getChartJSON($starttime, $endtime, $value);
-		if ($writeFile){
-			file_put_contents("json/chart.json", $json);
-		}
-		return $json;
-	}
-
 	private function getMasterJSON()
 	{
 		$json = array(
@@ -254,45 +245,45 @@ class Arbitrage
 			$json['markets'][$mkt->mname] = array(
 				"name" => $mkt->mname,
 				"currency" => $mkt->currency,
-				"high" => $t->getHigh(),
-				"low" => $t->getLow(),
-				"last" => $t->getLast(),
-				"bid" => $t->getBid(),
-				"ask" => $t->getAsk(),
-				"volume" => $t->getVolume(),
-				"commission" => $mkt->commission,
-				"sma10" => ($sma10) ? $sma10->getAvg() : -1,
-				"sma25" => ($sma25) ? $sma25->getAvg() : -1
+				"high" => (float) $t->getHigh(),
+				"low" => (float) $t->getLow(),
+				"last" => (float) $t->getLast(),
+				"bid" => (float) $t->getBid(),
+				"ask" => (float) $t->getAsk(),
+				"volume" => (float) $t->getVolume(),
+				"commission" => (float) $mkt->commission,
+				"sma10" => (float) (($sma10) ? $sma10->getAvg() : -1),
+				"sma25" => (float) (($sma25) ? $sma25->getAvg() : -1)
 			);
 
 			$json['yesterday']['markets'][$mkt->mname] = array(
 				"name" => $mkt->mname,
 				"currency" => $mkt->currency,
-				"high" => $y->getHigh(),
-				"low" => $y->getLow(),
-				"last" => $y->getLast(),
-				"bid" => $y->getBid(),
-				"ask" => $y->getAsk(),
-				"volume" => $y->getVolume()
+				"high" => (float) $y->getHigh(),
+				"low" => (float) $y->getLow(),
+				"last" => (float) $y->getLast(),
+				"bid" => (float) $y->getBid(),
+				"ask" => (float) $y->getAsk(),
+				"volume" => (float) $y->getVolume()
 			);
 
-			$dhigh = $t->getHigh() - $y->getHigh();
-			$dlow = $t->getLow() - $y->getLow();
-			$dlast = $t->getLast() - $y->getLast();
-			$dbid = $t->getBid() - $y->getBid();
-			$dask = $t->getAsk() - $y->getAsk();
-			$dsma10 = $t->getLast() - $sma10->getAvg();
-			$dsma25 = $t->getLast() - $sma25->getAvg();
-			$dvol = $t->getVolume() - $y->getVolume();
+			$dhigh = (float) ($t->getHigh() - $y->getHigh());
+			$dlow = (float) ($t->getLow() - $y->getLow());
+			$dlast = (float) ($t->getLast() - $y->getLast());
+			$dbid = (float) ($t->getBid() - $y->getBid());
+			$dask = (float) ($t->getAsk() - $y->getAsk());
+			$dsma10 = (float) ($t->getLast() - $sma10->getAvg());
+			$dsma25 = (float) ($t->getLast() - $sma25->getAvg());
+			$dvol = (float) ($t->getVolume() - $y->getVolume());
 
-			$dhighPerc = $dhigh / $y->getHigh();
-			$dlowPerc = $dlow / $y->getLow();
-			$dlastPerc = $dlast / $y->getLast();
-			$dbidPerc = $dbid / $y->getBid();
-			$daskPerc = $dask / $y->getAsk();
-			$dsma10Perc = ($sma10->getAvg() > 0) ? $dsma10 / $sma10->getAvg() : 0;
-			$dsma25Perc = ($sma25->getAvg() > 0) ? $dsma25 / $sma25->getAvg() : 0;
-			$dvolPerc = ($y->getVolume() > 0) ? $dvol / $y->getVolume() : 0;
+			$dhighPerc = (float) (($y->getHigh() > 0) ? $dhigh / $y->getHigh() : 0);
+			$dlowPerc = (float) (($y->getLow() > 0) ? $dlow / $y->getLow() : 0);
+			$dlastPerc = (float) (($y->getLast() > 0) ? $dlast / $y->getLast() : 0);
+			$dbidPerc = (float) (($y->getBid() > 0) ? $dbid / $y->getBid() : 0);
+			$daskPerc = (float) (($y->getAsk() > 0) ? $dask / $y->getAsk() : 0);
+			$dsma10Perc = (float) (($sma10->getAvg() > 0) ? $dsma10 / $sma10->getAvg() : 0);
+			$dsma25Perc = (float) (($sma25->getAvg() > 0) ? $dsma25 / $sma25->getAvg() : 0);
+			$dvolPerc = (float) (($y->getVolume() > 0) ? $dvol / $y->getVolume() : 0);
 
 			$json['deltas']['markets'][$mkt->mname] = array(
 				"name" => $mkt->mname,
@@ -379,13 +370,22 @@ class Arbitrage
 		return json_encode($json);
 	}
 
-	private function getChartJSON($starttime, $endtime, $value="avg")
+	public function updateChartJSON($starttime, $endtime, $period=PERIOD_1H, $value="avg", $writeFile=false)
+	{
+		$json = $this->getChartJSON($starttime, $endtime, $period, $value);
+		if ($writeFile){
+			file_put_contents("json/chart.json", $json);
+		}
+		return $json;
+	}
+
+	private function getChartJSON($starttime, $endtime, $period=PERIOD_1H, $value="avg")
 	{
 		$json = array();
 		$func = "get".ucfirst($value);
 		foreach($this->markets as $mkt){
 			$mktrow = array("key" => $mkt->mname, "values" => array());
-			$tickers = array_reverse($mkt->getHistorySamples($starttime, $endtime, PERIOD_1H));
+			$tickers = array_reverse($mkt->getHistorySamples($starttime, $endtime, $period));
 			foreach($tickers as $t){
 				$tval = $t->$func();
 				if ($tval > 0) {
@@ -426,10 +426,11 @@ class Arbitrage
 
 				case "chart-json":
 					$this->updateMarketDepths();
-					$starttime = isset($args['starttime']) ? $args['starttime'] : strtotime("-7 days");
-					$endtime = isset($args['endtime']) ? $args['endtime'] : time();
+					$starttime = isset($args['start']) ? $args['start'] : strtotime("-7 days");
+					$endtime = isset($args['end']) ? $args['end'] : time();
+					$period = (isset($args['period'])) ? $args['period'] : PERIOD_1H;
 					$value = "avg";
-					echo $this->updateChartJSON($starttime, $endtime, $value);
+					echo $this->updateChartJSON($starttime, $endtime, $period, $value);
 					break;
 					
 				case "sim":
