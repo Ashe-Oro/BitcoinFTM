@@ -4,6 +4,7 @@ $panels = array(
   "dashboard",
   "charts",
   "markets",
+  "transfer",
   "matrix",
   "orderbooks",
   "orders",

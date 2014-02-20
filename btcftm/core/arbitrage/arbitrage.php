@@ -67,10 +67,39 @@ class Arbitrage
 			foreach($cArray as $client) {
 				iLog("[Arbitrage] Client loaded - username: ".$client->getUsername());
 				// create an arbitrer for each client
-				$arb = $this->createArbitrer($client, $args);
-				$this->arbitrers[$client->getID()] = $arb;
+
+				if (!isset($args['noarbitrers'])) {
+					$arb = $this->createArbitrer($client, $args);
+					$this->arbitrers[$client->getID()] = $arb;
+				}
 			}
 		}
+	}
+
+	public function getMarket($mname)
+	{
+		return ($this->markets) ? $this->markets[$mname] : NULL;
+	}
+
+	public function getClient($cid)
+	{
+		return ($this->clients) ? $this->clients->getClient($cid) : NULL;
+	}
+
+	public function getClientPortfolio($cid)
+	{
+		if($c = $this->getClient($cid)){
+			return $c->getPortfolio();
+		}
+		return NULL;
+	}
+
+	public function getClientPrivateMarket($cid, $mname)
+	{
+		if($c = $this->getClient($cid)){
+			return $c->getPrivateMarket($mname);
+		}
+		return NULL;
 	}
 	
 	private function _loadMarkets($args)
@@ -105,7 +134,7 @@ class Arbitrage
 					try {
 						$market_name = ($this->useHistorical) ? "History{$market_name}USD" : $market_name."USD";
 						$market = new $market_name();
-						array_push($this->markets, $market);
+						$this->markets[$market->mname] = $market;
 						$mLoaded++;
 						iLog("[Arbitrage] {$market_name} loaded.");
 					} catch (Exception $e) {
@@ -389,7 +418,7 @@ class Arbitrage
 			foreach($tickers as $t){
 				$tval = $t->$func();
 				if ($tval > 0) {
-					array_push($mktrow["values"], array($t->getTimestamp(), $tval));
+					array_push($mktrow["values"], array((int) $t->getTimestamp(), (float) $tval));
 				}
 			}
 			array_push($json, $mktrow);
@@ -429,7 +458,7 @@ class Arbitrage
 					$starttime = isset($args['start']) ? $args['start'] : strtotime("-7 days");
 					$endtime = isset($args['end']) ? $args['end'] : time();
 					$period = (isset($args['period'])) ? $args['period'] : PERIOD_1H;
-					$value = "avg";
+					$value = (isset($args['value'])) ? $args['value'] : 'avg';
 					echo $this->updateChartJSON($starttime, $endtime, $period, $value);
 					break;
 					

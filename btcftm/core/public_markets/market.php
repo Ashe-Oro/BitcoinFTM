@@ -150,6 +150,7 @@ abstract class Market
 			$row = $DB->fetch_array_assoc($qid);
 			$tclass = "History{$this->mname}{$this->currency}";
 			//echo "hello world: {$tclass}";
+			//require_once()
 			$tvar = new $tclass();
 			$row = $tvar->parseTickerRow($row);
 			return new Ticker($row);
@@ -442,6 +443,44 @@ abstract class Market
 	{
 		return $this->live;
 	}
+
+	public function getPresaleValue($amount, $price, $action='buy')
+  {
+    return $amount * $price * ($action == 'buy' ? -1 : 1);
+  }
+
+  public function getCommissionValue($amount, $price)
+  {
+    return $amount * $price * $this->commission;
+  }
+
+  public function getHoneypotValue($amount, $price)
+  {
+    global $config;
+    return $amount * $price * $this->commission;
+  }
+
+  public function getFinalValue($amount, $price, $action='buy')
+  {
+    $val = $this->getPresaleValue($amount, $price, $action);
+    $com = $this->getCommissionValue($amount, $price);
+    $honey = $this->getHoneypotValue($amount, $price);
+    return $val - $com - $honey;
+  }
+
+  public function getActionValues($amount, $price, $action='buy')
+  {
+    $val = $this->getPresaleValue($amount, $price);
+    $com = $this->getCommissionValue($amount, $price);
+    $honey = $this->getHoneypotValue($amount, $price);
+    $final = $this->getFinalValue($amount, $price);
+    return array(
+      "presale" => $val,
+      "commission" => $com,
+      "honeypot" => $honey,
+      "final" => $final
+    );
+  }
 	
 	public function convertToUSD()
 	{

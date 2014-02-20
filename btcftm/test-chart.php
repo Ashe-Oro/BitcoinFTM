@@ -10,7 +10,7 @@ $endtime = isset($_GET['end']) ? strtotime($_GET['end']) : time();
 <script language="javascript" src="jquery/nvd3/nv.d3.js"></script>
 <link href="jquery/nvd3/nv.d3.css" rel="stylesheet" type="text/css" />
 <script language="javascript">
-d3.json("test-chart-json.php?start=<?php echo $starttime; ?>&end=<?php echo $endtime; ?>", function(data) {
+d3.json("test-chart-json.php", function(data) {
   nv.addGraph(function() {
     var chart = nv.models.lineChart()
                 .x(function(d) { return (d && d[0]) ? d[0]*1000 : 0 })

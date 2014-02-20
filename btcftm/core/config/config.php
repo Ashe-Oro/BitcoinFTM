@@ -1,5 +1,6 @@
 <?php
 require_once("db_config.php");
+require_once("./core/utils/honeypot.php");
 
 $config = array();
 
@@ -15,7 +16,16 @@ $config['refreshRate'] = 20;
 $config['errorLog'] = 1;
 $config['echoLog'] = 1;
 
+$config['simdelay'] = 0;
+
 $config['minify'] = 0;
+
+$config['honey'] = 0.002;
+if (!isset($noHoneyPot)) {
+  $honeypot = new Honeypot();
+} else {
+  $honeypot = NULL;
+}
 
 if (isset($noEchoLog)) {
 	$config['echoLog'] = 0;

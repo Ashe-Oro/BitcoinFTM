@@ -18,6 +18,8 @@ class Client
 	private $active = 0;
 	private $trading = 0;
 	private $bots = array();
+
+	private $gameID = 0;
 	
 	public function __construct($clientID)
 	{
@@ -49,6 +51,8 @@ class Client
 					
 					$this->active = $client['active'];
 					$this->trading = $client['trading'];
+
+					$this->gameID = $client['gameid'];
 					
 					$this->_initTraderBots($client);
 					$this->_initPortfolio($client);
@@ -147,6 +151,11 @@ class Client
 	public function getTraderBots()
 	{
 		return $this->bots;
+	}
+
+	public function getGameID()
+	{
+		return $this->gameID;
 	}
 }
 

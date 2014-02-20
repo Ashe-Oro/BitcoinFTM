@@ -92,7 +92,7 @@ class PrivateKrakenUSD extends PrivateMarket
 		return strtoupper(hash_hmac('sha256', $message, $this->secret));
 	}
 
-	protected function _buy($amount, $price)
+	protected function _buyLive($amount, $price, $crypto="BTC", $fiat="USD")
 	{
 		iLog("[PrivateKrakenUSD] Create BUY limit order {$amount} @{$price}USD");
 		$params = array('amount' => $amount, 'price' => $price);
@@ -112,7 +112,7 @@ class PrivateKrakenUSD extends PrivateMarket
 		return false;
 	}
 
-	protected function _sell($amount, $price)
+	protected function _sellLive($amount, $price, $crypto="BTC", $fiat="USD")
 	{	
 		iLog("[PrivateKrakenUSD] Create SELL limit order {$amount} @{$price}USD");
 		$params = array('amount' => $amount, 'price' => $price);
@@ -132,7 +132,7 @@ class PrivateKrakenUSD extends PrivateMarket
 		return false;
 	}
 
-	public function getInfo()
+	protected function _getLiveInfo()
 	{	
 		global $config;
 		global $DB;
@@ -157,5 +157,14 @@ class PrivateKrakenUSD extends PrivateMarket
 			}			
 		}
 	}
+
+	protected function _withdrawLive($amount, $currency)
+	{
+		// implement eventually
+	}
+  protected function _depositLive($amount, $currency)
+  {
+  	// implement eventually
+  }
 }
 ?>

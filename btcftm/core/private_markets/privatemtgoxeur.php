@@ -13,15 +13,19 @@ class PrivateMtGoxEUR extends PrivateMtGox
 		$this-> sellUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/BTCEUR/private/order/add');
 	}
 
-	public function getInfo()
+	protected function _getLiveInfo()
 	{
 		$params = array("nonce" => $this->_createNonce());
-		$response = $this->_sendRequest($this->infoUrl, $params);
-		if ($response && isset($response['result']) && $response['result'] == 'success') {
-			$this->btcBalance = $this->_fromIntAmount((int) $response['return']['Wallets']["BTC"]["Balance"]["value_int"]);
-			$this->eurBalance = $this->_fromIntAmount((int) $response['return']['Wallets']["EUR"]["Balance"]["value_int"]);
-			//$this->usdBalance = $this->fc->convert($this->eurBalance, "EUR", "USD");
-			return true;
+		try {
+			$response = $this->_sendRequest($this->infoUrl, $params);
+			if ($response && isset($response['result']) && $response['result'] == 'success') {
+				$this->btcBalance = $this->_fromIntAmount((int) $response['return']['Wallets']["BTC"]["Balance"]["value_int"]);
+				$this->eurBalance = $this->_fromIntAmount((int) $response['return']['Wallets']["EUR"]["Balance"]["value_int"]);
+				/iLog("[{$this->mname}] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+				return true;
+			}
+		} catch (Exception $e){
+			iLog("[{$this->mname}] ERROR: Get info failed - ".$e->getMessage());
 		}
 		return false;
 	}

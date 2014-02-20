@@ -72,6 +72,7 @@ orders.updateMarketBuySell = function()
 	var askPrice = mkt.ask;
 	var bidPrice = mkt.bid;
 	var btcVol = parseFloat($('#order-volume-val').val());
+	var com = mkt.commission + controls.honey;
 
 	$('#order-ask-value').html(controls.printCurrency(askPrice, 'USD'));
 	$('#order-bid-value').html(controls.printCurrency(bidPrice, 'USD'));
@@ -80,27 +81,25 @@ orders.updateMarketBuySell = function()
 	var sellComValue = 0;
 	if (!isNaN(btcVol)){
 
-		/***** THIS NEEDS TO BECOME MARKET-LEVEL LOGIC!!!!!!! *******/
 		var buyTotalPreCom = askPrice * btcVol;
 		var sellTotalPreCom = bidPrice * btcVol;
 
-		var buyComValue = mkt.commission * buyTotalPreCom;
-		var sellComValue = mkt.commission * sellTotalPreCom;
+		var buyComValue = com * buyTotalPreCom;
+		var sellComValue = com * sellTotalPreCom;
 
 		var buyTotal = buyTotalPreCom - buyComValue;
 		var sellTotal = sellTotalPreCom  - sellComValue;
-		/*************************/
 
-		$('#buy-button .order-commission-value').html('-$'+buyComValue.toFixed(4)+' (-'+mkt.commission+'%)');
-		$('#sell-button .order-commission-value').html('-$'+sellComValue.toFixed(4)+' (-'+mkt.commission+'%)');
+		$('#buy-button .order-commission-value').html('-$'+buyComValue.toFixed(4)+' ('+controls.printCommission(com)+')');
+		$('#sell-button .order-commission-value').html('-$'+sellComValue.toFixed(4)+' ('+controls.printCommission(com)+')');
 		$('#order-buy-total').html('-$'+buyTotal.toFixed(4));
 		$('#order-sell-total').html('+$'+sellTotal.toFixed(4));
 
 		orders.setButtonStates();
 
 	} else {
-		$('#buy-button .order-commission-value').html('... (-'+mkt.commission+'%)');
-		$('#sell-button .order-commission-value').html('... (-'+mkt.commission+'%)');
+		$('#buy-button .order-commission-value').html('... ('+controls.printCommission(com)+')');
+		$('#sell-button .order-commission-value').html('... ('+controls.printCommission(com)+')');
 		$('#order-buy-total').html('...');
 		$('#order-sell-total').html('...');
 	}
@@ -111,23 +110,22 @@ orders.updateLimitBuySell = function()
 	var mkt = controls.json.markets[orders.market];
 	var btcVol = parseFloat($('#order-volume-val').val());
 	var limitPrice = parseFloat($('#order-limit-price-val').val());
+	var com = mkt.commission + controls.honey;
 
 	if (!isNaN(btcVol) && !isNaN(limitPrice)){
-		/***** THIS NEEDS TO BECOME MARKET-LEVEL LOGIC!!!!!!! *******/
 		var buyTotalPreCom = limitPrice * btcVol;
 		var sellTotalPreCom = limitPrice * btcVol;
 
-		var buyComValue = mkt.commission * buyTotalPreCom;
-		var sellComValue = mkt.commission * sellTotalPreCom;
+		var buyComValue = com * buyTotalPreCom;
+		var sellComValue = com * sellTotalPreCom;
 
 		var buyTotal = buyTotalPreCom + buyComValue; // inv since buyCom is neg
 		var sellTotal = sellTotalPreCom  - sellComValue;
-		/*************************/
 
 		$('.order-limit-value').html('$'+limitPrice);
 
-		$('#buy-button .order-commission-value').html(controls.printCurrency(-buyComValue, 'USD')+' (-'+mkt.commission+'%)');
-		$('#sell-button .order-commission-value').html(controls.printCurrency(-sellComValue, 'USD')+' (-'+mkt.commission+'%)');
+		$('#buy-button .order-commission-value').html(controls.printCurrency(-buyComValue, 'USD')+' ('+controls.printCommission(com)+')');
+		$('#sell-button .order-commission-value').html(controls.printCurrency(-sellComValue, 'USD')+' ('+controls.printCommission(com)+')');
 		$('#order-buy-total').html(controls.printCurrency(-buyTotal, 'USD'));
 		$('#order-sell-total').html('+'+controls.printCurrency(sellTotal, 'USD'));
 
@@ -136,8 +134,8 @@ orders.updateLimitBuySell = function()
 	} else {
 		$('.order-limit-value').html('...');
 
-		$('#buy-button .order-commission-value').html('... (-'+mkt.commission+'%)');
-		$('#sell-button .order-commission-value').html('... (-'+mkt.commission+'%)');
+		$('#buy-button .order-commission-value').html('... ('+controls.printCommission(com)+')');
+		$('#sell-button .order-commission-value').html('... ('+controls.printCommission(com)+')');
 		$('#order-buy-total').html('...');
 		$('#order-sell-total').html('...');
 	}
@@ -157,6 +155,55 @@ orders.updateCapital = function()
 		}
 	}
 }
+
+orders.placeOrder = function(buysell)
+{
+	var bsBtn = $('#'+buysell+'-button');
+	bsBtn.addClass('disabled');
+	if (orders.ordertype == 'limit') {
+		$.growl.notice("Limit orders coming soon");
+		bsBtn.removeClass('disabled');
+	} else {
+		var mkt = controls.json.markets[orders.market];
+		var price = 0;
+		if (buysell == 'buy') {
+			price = mkt.ask;
+		} else if (buysell == 'sell') {
+			price = mkt.bid;
+		}
+		var btcVol = parseFloat($('#order-volume-val').val());
+
+		var opts = {
+			cid: controls.client.cid,
+			mkt: orders.market,
+			amt: btcVol,
+			val: price,
+			crypt: 'BTC',
+			fiat: 'USD',
+			action: buysell
+		};
+
+		$.getJSON("ajax-market-buysell.php", opts, function(data) {
+			if (data.success){
+				account.balances[orders.market].usd = parseFloat(data.usd); 
+				account.balances[orders.market].btc = parseFloat(data.btc); 
+				$.growl({
+					title: "Success",
+	      	message: data.message
+	      });
+			} else {
+				$.growl.error({
+					title: "Oh noes!",
+	      	message: data.message
+	      });
+			}
+
+			bsBtn.removeClass('disabled');
+			controls.updateBalance(); 
+		});
+	}
+}
+
 
 orders.setButtonStates = function()
 {
@@ -236,13 +283,13 @@ orders.initButtons = function()
 
 	$('#buy-button').click(function() {
 		if (!$(this).hasClass('disabled')){
-			alert("Buy functionality coming soon.")
+			orders.placeOrder('buy');
 		}
 	});
 
 	$('#sell-button').click(function() {
 		if (!$(this).hasClass('disabled')){
-			alert("Sell functionality coming soon.")
+			orders.placeOrder('sell');
 		}
 	});
 
@@ -252,6 +299,10 @@ orders.initButtons = function()
 $(document).ready(function() {
 	orders.initButtons();
 	orders.changeMarket("MtGox");
+	controls.addBalanceListener(function(){
+		orders.updateCapital();
+		orders.updateBuySell();
+	})
 	controls.addJSONListener(orders.updateBuySell);
 });
 

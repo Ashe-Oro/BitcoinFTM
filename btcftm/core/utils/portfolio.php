@@ -154,10 +154,30 @@ class Portfolio
 	{
 		$balances = array();
 		foreach($this->privateMarkets as $pname => $pmarket){
-			$balances[$pname] = array("BTC" => $this->privateMarkets->getBalance("BTC"), "USD" => $this->privateMarkets->getBalance("USD"));
-			iLog("[Portfolio] Balance at {$pname} - {$balances[$pname]['BTC']}BTC, {$balances[$pname]['USD']}USD");
+			$balances[$pname] = array(
+				"btc" => $pmarket->getBalance("BTC"), 
+				"usd" => $pmarket->getBalance("USD"),
+				"ltc" => $pmarket->getBalance("LTC"),
+				"eur" => $pmarket->getBalance("EUR")
+			);
+			iLog("[Portfolio] Balance at {$pname} - {$balances[$pname]['btc']}BTC, {$balances[$pname]['usd']}USD");
 		}
 		return $balances;
+	}
+
+	public function getFullBalances()
+	{
+		$bals = $this->getBalances();
+		$full = array();
+		foreach($bals as $pname => $b){
+			$mkt = $this->getPrivateMarket($pname);
+			if ($mkt) {
+				$full[$pname] = array(
+					//"btc2usd" => $b['btc'] * $mkt->
+				);
+			}
+		}
+		return $full;
 	}
 	
 	public function updateBalances()
@@ -165,6 +185,28 @@ class Portfolio
 		foreach($this->privateMarkets as $pname => $pmarket){
 			$this->privateMarkets[$pname]->getInfo();
 		}
+	}
+
+	public function arbitrage($askname, $ask, $bidname, $bid, $volume, $crypt, $fiat)
+	{
+		$amkt = $this->getPrivateMarket($askname);
+		$bmkt = $this->getPrivateMarket($bidname);
+
+		if ($amkt && $bmkt && $ask > 0 && $bid > 0 && $volume > 0 && is_string($crypt) && is_string($fiat)){
+			return ($amkt->buy($volume, $ask, $crypt, $fiat) && $bmkt->sell($volume, $bid, $crypt, $fiat));
+		}
+		return false;
+	}
+
+	public function transfer($fromname, $toname, $volume, $crypt)
+	{
+		$fmkt = $this->getPrivateMarket($fromname);
+		$tmkt = $this->getPrivateMarket($toname);
+
+		if ($fmkt && $tmkt && $volume > 0 && is_string($crypt)){
+			return ($fmkt->withdraw($volume, $crypt) && $tmkt->deposit($volume, $crypt));
+		}
+		return false;
 	}
 	
 	public function addTrade($trade)

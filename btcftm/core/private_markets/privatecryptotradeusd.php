@@ -25,7 +25,7 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         $this->clientID = $clientID;
     }
 
-    protected function _sendRequest($url, $params=array(), $method)
+    protected function _sendRequest($url, $params=array(), $extraHeaders=NULL)
     {
         $rUrl = $url . self::API . $this->apiVersion . $method;                
         $response = array();
@@ -34,6 +34,8 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         $response['return'] = false;
         iLog("[PrivateCryptoTradeUSD] Sending Request: {$rUrl}");
         
+        $method = $params['method'];
+        unset($params['method']);
         
         if ($method == self::METHOD_TRADE) {
                 iLog("[PrivateCryptoTradeUSD] WARNING: Request not sent. Live sell and buy functions currently disabled.");
@@ -85,7 +87,7 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         return hash_hmac('sha512', $post_data, $this->secret);
     }
 
-    protected function _buy($amount, $price)
+    protected function _buyLive($amount, $price, $crypto="BTC", $fiat="USD")
     {
         iLog("[PrivateCryptoTradeUSD] Create BUY limit order {$amount} @{$price}USD");
 
@@ -112,7 +114,7 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         return false;
     }
 
-    protected function _sell($amount, $price)
+    protected function _sellLive($amount, $price, $crypto="BTC", $fiat="USD")
     {        
         iLog("[PrivateCryptoTradeUSD] Create BUY limit order {$amount} @{$price}USD");
         
@@ -139,7 +141,7 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         return false;
     }
 
-    public function getInfo()
+    protected function _getLiveInfo()
     {
         global $config;
         global $DB;
@@ -184,5 +186,14 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         }
         return false;
     }
+
+  protected function _withdrawLive($amount, $currency)
+  {
+    // implement eventually
+  }
+  protected function _depositLive($amount, $currency)
+  {
+    // implement eventually
+  }
 }
 ?>

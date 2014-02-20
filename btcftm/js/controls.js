@@ -17,8 +17,19 @@ controls.ftmState = "dashboard";
 controls.json = null;
 controls.jsonInt = 15000; // update every 15s for now
 controls.jsonListeners = new Array();
-controls.ftmStateList = ["dashboard","markets","orders","orderbooks","matrix","charts","bots","sims","settings","portfolio","arbitrage"];
+controls.balanceListeners = new Array();
+controls.ftmStateList = ["dashboard","markets","orders","transfer","orderbooks","matrix","charts","bots","sims","settings","portfolio","arbitrage"];
 controls.currencies = new Array();
+controls.honey = 0;
+controls.client = new Object();
+
+controls.loadClient = function() {
+  var cd = $('#client-data');
+  controls.client.cid = cd.attr('data-cid');
+  controls.client.uname = cd.attr('data-uname');
+  controls.client.fname = cd.attr('data-fname');
+  controls.client.lname = cd.attr('data-lname');
+}
 
 controls.loadCurrencies = function()
 {
@@ -30,6 +41,8 @@ controls.loadCurrencies = function()
     controls.currencies[abbr].prefix = $(this).attr('data-prefix') == '1' ? true : false;
     controls.currencies[abbr].precision = parseInt($(this).attr('data-precision'));
   });
+
+  controls.honey = parseFloat($('#honeypot-data').attr('data-honey'));
 }
 
 controls.printCurrency = function(amount, abbr)
@@ -46,12 +59,26 @@ controls.printCurrency = function(amount, abbr)
   return "";
 }
 
+controls.printCommission = function(com)
+{
+  if (com) {
+    return "-"+(com*100).toFixed(2)+"%";
+  }
+  return "";
+}
+
 controls.updateMasterJSON = function()
 {
 	setInterval(function(){
 		controls.getMasterJSON();
 	}, controls.jsonInt);
   controls.getMasterJSON();
+}
+
+controls.updateBalance = function() {
+  for(i = 0; i < controls.balanceListeners.length; i++){
+    controls.balanceListeners[i]();
+  }
 }
 
 controls.getMasterJSON = function() {
@@ -62,12 +89,20 @@ controls.getMasterJSON = function() {
 			controls.jsonListeners[i]();
 		}
      $('#loading-data').stop().fadeOut();
-	});
+	})
+  .fail(function() {
+    $.growl.warning({title: "Uh oh...", message: "Live update feed failed to load."});
+  });
 }
 
 controls.addJSONListener = function(callback)
 {
 	controls.jsonListeners.push(callback);
+}
+
+controls.addBalanceListener = function(callback)
+{
+  controls.balanceListeners.push(callback);
 }
 
 controls.changeFtmState = function(state)
@@ -206,6 +241,7 @@ controls.startControls = function()
 }
 
 $(document).ready(function(){
+  controls.loadClient();
   controls.loadCurrencies();
 	controls.updateMasterJSON();
   controls.addJSONListener(controls.updateMarketTicker);

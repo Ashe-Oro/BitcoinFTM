@@ -28,11 +28,11 @@ class PrivateBitstampUSD extends PrivateMarket
 		$response = array();
 		$response['result'] = 'success';
 		$response['return'] = false;
-		iLog("[PrivateBitstampUSD] Sending Request: {$rUrl}");
+		iLog("[{$this->mname}] Sending Request: {$rUrl}");
 		
 		
 		if ($rUrl == $this->buyUrl['url'] || $rUrl == $this->sellUrl['url']) {
-			iLog("[PrivateBitstampUSD] WARNING: Request not sent. Live sell and buy functions currently disabled.");
+			iLog("[{$this->mname}] WARNING: Request not sent. Live sell and buy functions currently disabled.");
 			return $response; 
 		}
 		
@@ -85,85 +85,76 @@ class PrivateBitstampUSD extends PrivateMarket
 		return strtoupper(hash_hmac('sha256', $message, $this->secret));
 	}
 
-	protected function _buy($amount, $price)
+	protected function _buyLive($amount, $price, $crypto="BTC", $fiat="USD")
 	{
-		iLog("[PrivateBitstampUSD] Create BUY limit order {$amount} @{$price}USD");
+		iLog("[{$this->mname}] Create BUY limit order {$amount} @{$price}USD");
 		$params = array('amount' => $amount, 'price' => $price);
 		try {
 			$response = $this->_sendRequest($this->buyUrl, $params);
 			if ($response){
 				if (isset($response['error'])) {
-					iLog("[PrivateBitstampUSD] ERROR: Buy failed {$response['error']['message']}");
+					iLog("[{$this->mname}] ERROR: Buy failed {$response['error']['message']}");
 				} else {
 					alert('BUY'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
 					return true;
 				}
 			}
 		} catch (Exception $e) {
-			iLog("[PrivateBitstampUSD] ERROR: Buy failed - ".$e->getMessage());
+			iLog("[{$this->mname}] ERROR: Buy failed - ".$e->getMessage());
 		}
 		return false;
 	}
 
-	protected function _sell($amount, $price)
+	protected function _sellLive($amount, $price, $crypto="BTC", $fiat="USD")
 	{	
-		iLog("[PrivateBitstampUSD] Create SELL limit order {$amount} @{$price}USD");
+		iLog("[{$this->mname}] Create SELL limit order {$amount} @{$price}USD");
 		$params = array('amount' => $amount, 'price' => $price);
 		try { 
 			$response = $this->_sendRequest($this->sellUrl, $params);
 			if ($response) {
 				if(isset($response['error'])) {
-					iLog("[PrivateBitstampUSD] ERROR: Sell failed {$response['error']['message']}");
+					iLog("[{$this->mname}] ERROR: Sell failed {$response['error']['message']}");
 				} else {
 					alert('SELL'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
 					return true;
 				}
 			}
 		} catch (Exception $e) {
-			iLog("[PrivateBitstampUSD] ERROR: Buy failed - ".$e->getMessage());
+			iLog("[{$this->mname}] ERROR: Buy failed - ".$e->getMessage());
 		}
 		return false;
 	}
 
-	public function getInfo()
+	public function _getLiveInfo()
 	{
-		global $config;
 		global $DB;
 		
-		if ($config['live']) { // LIVE TRADING USES LIVE DATA
-			$params = array();
-			try {
-				$response = $this->_sendRequest($this->balanceUrl, $params);
-				if($response && isset($response['btc_available']) && isset($response['usd_available'])) {
-					$this->btcBalance = (float) $response['btc_available'];
-					$this->usdBalance = (float) $response['usd_available'];
-					iLog("[PrivateBitstampUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
-					return true;
-				} else if ($response && isset($response['error'])) {
-					iLog("[PrivateBitstampUSD] ERROR: Get info failed - {$response['error']}");
-					return false;
-				}
-			} catch (Exception $e) {
-				iLog("[PrivateBitstampUSD] ERROR: Get info failed - ".$e->getMessage());
+		$params = array();
+		try {
+			$response = $this->_sendRequest($this->balanceUrl, $params);
+			if($response && isset($response['btc_available']) && isset($response['usd_available'])) {
+				$this->btcBalance = (float) $response['btc_available'];
+				$this->usdBalance = (float) $response['usd_available'];
+				iLog("[PrivateBitstampUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+				return true;
+			} else if ($response && isset($response['error'])) {
+				iLog("[PrivateBitstampUSD] ERROR: Get info failed - {$response['error']}");
 				return false;
 			}
-		} else {	// SIMULATED TRADING USES DATABASE DATA
-			try {
-				$result = $DB->query("SELECT * FROM privatemarkets WHERE marketid = {$this->publicmarketid} AND clientid = {$this->clientId}");
-				if ($client = $DB->fetch_array_assoc($result)){
-					$this->btcBalance = (float) ($client['btc'] != NULL ? $client['btc'] : 0);
-					$this->usdBalance = (float) ($client['usd'] != NULL ? $client['usd'] : 0);
-					$this->ltcBalance = (float) ($client['ltc'] != NULL ? $client['ltc'] : 0);
-					$this->eurBalance = (float) ($client['eur'] != NULL ? $client['eur'] : 0);
-					iLog("[PrivateBitstampUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
-					return true;
-				}
-			} catch (Exception $e){
-				iLog("[PrivateBitstampUSD] ERROR: Get info failed - ".$e->getMessage());
-				return false;
-			}
+		} catch (Exception $e) {
+			iLog("[PrivateBitstampUSD] ERROR: Get info failed - ".$e->getMessage());
+			return false;
 		}
 		return false;
 	}
+
+	protected function _withdrawLive($amount, $currency)
+	{
+		// implement eventually
+	}
+  protected function _depositLive($amount, $currency)
+  {
+  	// implement eventually
+  }
 }
 ?>

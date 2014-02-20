@@ -136,12 +136,27 @@ class MOB
 	
 	public function compareMarketOrderBooks($askMarketName, $bidMarketName)
 	{
+		global $config;
+
 		$aOrder = $this->getMarketAskTopOrder($askMarketName);
 		$bOrder = $this->getMarketBidTopOrder($bidMarketName);
+
+		$amkt = $this->markets[$askMarketName];
+		$bmkt = $this->markets[$bidMarketName];
 		
-		if ($aOrder && $bOrder) {
-			$aPrice = $aOrder->getPrice();
-			$bPrice = $bOrder->getPrice();
+		if ($aOrder && $bOrder && $amkt && $bmkt) {
+			$acom = $amkt->commission + $config['honey'];
+			$bcom = $bmkt->commission + $config['honey'];
+
+			$ask = $aOrder->getPrice();
+			$bid = $bOrder->getPrice();
+
+			$askCom = $ask * $acom;
+			$bidCom = $bid * $bcom;
+
+			$aPrice = $ask + $askCom;
+			$bPrice = $bid - $bidCom;
+
 			$dPrice = $bPrice - $aPrice;
 			iLog("[MOB] Ask Market {$askMarketName}: {$aPrice}, Bid Market {$bidMarketName}: {$bPrice}, Spread: {$dPrice}");
 			return $dPrice;

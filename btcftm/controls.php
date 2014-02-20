@@ -21,15 +21,22 @@ if ($signedIn == 1) {
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>BTC FTM</title>
 <?php if ($signedIn == 1) { ?>
-  <script language="javascript" type="application/javascript" src="jquery/jquery-1.8.2.min.js"></script>
-  <script language="javascript" type="application/javascript" src="jquery/jquery-cookie/jquery.cookie.js"></script>
-  <script language="javascript" type="application/javascript" src="js/controls.js"></script>
+  <script language="javascript" type="text/javascript" src="jquery/jquery-1.8.2.min.js"></script>
+  <script language="javascript" type="text/javascript" src="jquery/jquery-cookie/jquery.cookie.js"></script>
+  <script language="javascript" type="text/javascript" src="jquery/jquery-growl/jquery.growl.js" ></script>
+  <link type="text/css" rel="stylesheet" href="jquery/jquery-growl/jquery.growl.css" />
+  
+  <script language="javascript" src="jquery/d3-master/d3.min.js"></script>
+  <script language="javascript" src="jquery/nvd3/nv.d3.js"></script>
+  <link href="jquery/nvd3/nv.d3.css" rel="stylesheet" type="text/css" />
+ 
+  <script language="javascript" type="text/javascript" src="js/controls.js"></script>
   <?php if ($config['minify']) { ?>
-  <script language="javascript" type="application/javascript" src="js/combine-js.php"></script>
+  <script language="javascript" type="text/javascript" src="js/combine-js.php"></script>
   <?php 
   } else { 
     foreach($panels as $p){
-  	 echo "<script language='javascript' type='application/javascript' src='js/{$p}.js'></script>";
+  	 echo "<script language='javascript' type='text/javascript' src='js/{$p}.js'></script>";
     }
   }
 }
@@ -117,9 +124,10 @@ if ($signedIn == 1) {
     <ul>
     <li class="dashboard"><a href="#dashboard">Dashboard</a></li>
     <li class="orders"><a href="#orders">Buy/Sell</a></li>
+    <li class="transfer"><a href="#transfer">Transfer</a></li>
+    <li class="matrix"><a href="#matrix">Arbitrage</a></li>
     <li class="markets"><a href="#markets">Markets</a></li>
     <li class="orderbooks"><a href="#orderbooks">Order Books</a></li>
-    <li class="matrix"><a href="#matrix">Arbitrage</a></li>
     <li class="charts"><a href="#charts">Charts</a></li>
     <li class="bots"><a href="#bots">Bots</a></li>
     <li class="sims"><a href="#sims">Simulations</a></li>
@@ -141,6 +149,9 @@ if ($signedIn == 1) {
     </div>
     <div id="markets" class="content init">
     	<?php include("partials/_markets.php"); ?>
+    </div>
+     <div id="transfer" class="content init">
+      <?php include("partials/_transfer.php"); ?>
     </div>
     <div id="orderbooks" class="content init">
       <?php include("partials/_orderbooks.php"); ?>
@@ -175,6 +186,8 @@ if ($signedIn == 1) {
   foreach($curlist as $abbr => $c){
     echo "<div class='currency-data' id='currency-{$abbr}' data-precision='{$c->precision}' data-prefix='{$c->prefix}' data-symbol='{$c->symbol}'></div>";
   }
+  echo "<div class='client-data' id='client-data' data-cid='".$client->getID()."' data-uname='".$client->getUsername()."' data-fname='".$client->getFirstName()."' data-lname='".$client->getLastName()."'></div>";
+  echo "<div class='honeypot-data' id='honeypot-data' data-honey='".$config['honey']."' ></div>";
   ?>
 </div>
 

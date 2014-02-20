@@ -26,7 +26,7 @@ class PrivateBTCeUSD extends PrivateMarket
 		$this->clientID = $clientID;
 	}
 
-	protected function _sendRequest($url, $params=array(), $method, $extraHeaders=NULL)
+	protected function _sendRequest($url, $params=array(), $extraHeaders=NULL)
 	{
 		$rUrl = $url;		
 		$response = array();
@@ -87,14 +87,14 @@ class PrivateBTCeUSD extends PrivateMarket
 		return hash_hmac('sha512', $post_data, $this->secret);
 	}
 
-	protected function _buy($amount, $price)
+	protected function _buyLive($amount, $price, $crypto="BTC", $fiat="USD")
 	{
 		iLog("[PrivateBTCeUSD] Create BUY limit order {$amount} @{$price}USD");
 		
 	   	//BTCe requires specifying the pair (what currencies are being traded), in this case we just do btc_usd
-		$params = array('amount' => $amount, 'pair' => 'btc_usd', 'type' => 'buy', 'rate' => $price);
+		$params = array('amount' => $amount, 'pair' => 'btc_usd', 'type' => 'buy', 'rate' => $price, 'method' => self::METHOD_TRADE);
 		try {
-			$response = $this->_sendRequest(self::API_URL, $params, self::METHOD_TRADE);
+			$response = $this->_sendRequest(self::API_URL, $params);
 			if ($response){
 				if (isset($response['success']) && $response['success'] == 1) {
 					alert('BUY'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
@@ -109,14 +109,14 @@ class PrivateBTCeUSD extends PrivateMarket
 		return false;
 	}
 
-	protected function _sell($amount, $price)
+	protected function _sellLive($amount, $price, $crypto="BTC", $fiat="USD")
 	{	
 		iLog("[PrivateBTCeUSD] Create SELL limit order {$amount} @{$price}USD");
 
 	   	//BTCe requires specifying the pair (what currencies are being traded), in this case we just do btc_usd
-		$params = array('amount' => $amount, 'pair' => 'btc_usd', 'type' => 'sell', 'rate' => $price);
+		$params = array('amount' => $amount, 'pair' => 'btc_usd', 'type' => 'sell', 'rate' => $price, 'method' => self::METHOD_TRADE);
 		try { 
-			$response = $this->_sendRequest(self::API_URL, $params, self::METHOD_TRADE);
+			$response = $this->_sendRequest(self::API_URL, $params);
 			if ($response) {
 				if(isset($response['success']) && $response['success'] == 1) {
 					alert('SELL'); // WE NEED TO ADD IN POST SALE LOGIC HERE LATER
@@ -131,49 +131,40 @@ class PrivateBTCeUSD extends PrivateMarket
 		return false;
 	}
 
-	public function getInfo()
+	protected function _getLiveInfo()
 	{
-		global $config;
 		global $DB;
 		
-		if ($config['live']) { // LIVE TRADING USES LIVE DATA
-			try {
-				//no params need to be sent, that is the empty string param below
-				$response = $this->_sendRequest(self::API_URL, "", self::METHOD_GET_INFO);
-				if($response && isset($response['success']) && $response['success'] == 1) {
-					$retVal = $response['return'];
-					$funds = $retVal['funds'];
-					
-					$this->btcBalance = (float) $funds['btc'];
-					$this->usdBalance = (float) $funds['usd'];
-					iLog("[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
-					return true;
-				}
-				else {
-					iLog("[PrivateBTCeUSD] ERROR: Get info failed - {$response}");
-					return false;
-				}			
-			} catch (Exceptin $e){
-				iLog("[PrivateBTCeUSD] ERROR: Get info failed - ".$e->getMessage());
-				return false;			
+		try {
+			//no params need to be sent, that is the empty string param below
+			$response = $this->_sendRequest(self::API_URL, array("method" => self::METHOD_GET_INFO));
+			if($response && isset($response['success']) && $response['success'] == 1) {
+				$retVal = $response['return'];
+				$funds = $retVal['funds'];
+				
+				$this->btcBalance = (float) $funds['btc'];
+				$this->usdBalance = (float) $funds['usd'];
+				iLog("[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
+				return true;
 			}
-		} else {
-			try {
-				$result = $DB->query("SELECT * FROM privatemarkets WHERE marketid = {$this->publicmarketid} AND clientid = {$this->clientId}");
-				if ($client = $DB->fetch_array_assoc($result)){
-					$this->btcBalance = (float) ($client['btc'] != NULL ? $client['btc'] : 0);
-					$this->usdBalance = (float) ($client['usd'] != NULL ? $client['usd'] : 0);
-					$this->ltcBalance = (float) ($client['ltc'] != NULL ? $client['ltc'] : 0);
-					$this->eurBalance = (float) ($client['eur'] != NULL ? $client['eur'] : 0);
-					iLog("[PrivateBTCeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
-					return true;
-				}
-			} catch (Exception $e){
-				iLog("[PrivateBTCeUSD] ERROR: Get info failed - ".$e->getMessage());
+			else {
+				iLog("[PrivateBTCeUSD] ERROR: Get info failed - {$response}");
 				return false;
-			}
+			}			
+		} catch (Exceptin $e){
+			iLog("[PrivateBTCeUSD] ERROR: Get info failed - ".$e->getMessage());
+			return false;			
 		}
 		return false;
 	}
+
+	protected function _withdrawLive($amount, $currency)
+	{
+		// implement eventually
+	}
+  protected function _depositLive($amount, $currency)
+  {
+  	// implement eventually
+  }
 }
 ?>

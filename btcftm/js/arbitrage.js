@@ -1,6 +1,6 @@
 var arbitrage = new Object();
-arbitrage.askmarket = null;
-arbitrage.bidmarket = null;
+arbitrage.askmarket = "Bitstamp";
+arbitrage.bidmarket = "Bitfinex";
 
 arbitrage.setArbitrageMarkets = function(aname, bname)
 {
@@ -15,24 +15,26 @@ arbitrage.setArbitrageMarkets = function(aname, bname)
 
 arbitrage.updateCapital = function()
 {
-  if (account.balances[orders.market]){
-    var usd = account.balances[arbitrage.askmarket].usd;
-    var btc = account.balances[arbitrage.bidmarket].btc;
-    if (usd != -1 && btc != -1){
-      $('#arbitrage-capital-usd').html(controls.printCurrency(usd, 'USD'));
-      $('#arbitrage-capital-btc').html(controls.printCurrency(btc, 'BTC'));
-    } else {
-      $('#arbitrage-capital-usd').html(controls.printCurrency(0, 'USD'));
-      $('#arbitrage-capital-btc').html(controls.printCurrency(0, 'BTC'));
-    }
-    $('#arbitrage-capital .ask-market-name').html(arbitrage.askmarket);
-    $('#arbitrage-capital .bid-market-name').html(arbitrage.bidmarket);
-    $('#arbitrage-ask-market').html(arbitrage.askmarket);
-    $('#arbitrage-sell-market').html(arbitrage.bidmarket);
+  var usd = (arbitrage.askmarket) ? account.balances[arbitrage.askmarket].usd : -1;
+  var btc = (arbitrage.bidmarket) ? account.balances[arbitrage.bidmarket].btc : -1;
+  if (usd != -1){
+    $('#arbitrage-capital-usd').html(controls.printCurrency(usd, 'USD'));
+  } else {
+    $('#arbitrage-capital-usd').html(controls.printCurrency(0, 'USD'));
   }
+  if (btc != -1){
+    $('#arbitrage-capital-btc').html(controls.printCurrency(btc, 'BTC'));
+  } else {
+    $('#arbitrage-capital-btc').html(controls.printCurrency(0, 'BTC'));
+  }
+  $('#arbitrage-capital .ask-market-name').html(arbitrage.askmarket);
+  $('#arbitrage-capital .bid-market-name').html(arbitrage.bidmarket);
+  $('#arbitrage-ask-market').html(arbitrage.askmarket);
+  $('#arbitrage-sell-market').html(arbitrage.bidmarket);
 }
 
-arbitrage.updateArbitage = function(){
+arbitrage.updateArbitage = function()
+{
   if (!arbitrage.askmarket || !arbitrage.bidmarket) { return; }
 
   // do arbitrage buy/sell update here
@@ -48,6 +50,9 @@ arbitrage.updateArbitage = function(){
   var bmkt = controls.json.markets[arbitrage.bidmarket];
   var askPrice = amkt.ask;
   var bidPrice = bmkt.bid;
+  var acom = amkt.commission + controls.honey;
+  var bcom = bmkt.commission + controls.honey;
+
   var btcVol = parseFloat($('#arbitrage-volume-val').val());
 
   $('#arbitrage-ask-value').html(controls.printCurrency(askPrice, 'USD'));
@@ -57,28 +62,28 @@ arbitrage.updateArbitage = function(){
   var sellComValue = 0;
   if (!isNaN(btcVol)){
 
-    /***** THIS NEEDS TO BECOME MARKET-LEVEL LOGIC!!!!!!! *******/
     var buyTotalPreCom = askPrice * btcVol;
     var sellTotalPreCom = bidPrice * btcVol;
 
-    var buyComValue = amkt.commission * buyTotalPreCom;
-    var sellComValue = bmkt.commission * sellTotalPreCom;
+    var buyComValue = acom * buyTotalPreCom;
+    var sellComValue = bcom * sellTotalPreCom;
 
     var buyTotal = buyTotalPreCom + buyComValue;
     var sellTotal = sellTotalPreCom  - sellComValue;
     var estProfit = sellTotal - buyTotal;
-    /*************************/
-    var askComPrice = (amkt.commission*askPrice) + askPrice;
+    
+    var askComPrice = (acom*askPrice) + askPrice;
 
     var usd = account.balances[arbitrage.askmarket].usd;
     var btc = account.balances[arbitrage.bidmarket].btc;
     var usd2btc = usd / askComPrice;
     var maxBtcVolume = Math.min(usd2btc, btc);
+
     $('#arbitrage-max-btc').html(controls.printCurrency(maxBtcVolume, "BTC"));
     $('#arbitrage-max-usd').html(controls.printCurrency(maxBtcVolume*askComPrice, "USD"));
 
-    $('#arbitrage-buy-info .arbitrage-commission-value').html('-'+controls.printCurrency(buyComValue, 'USD')+' (-'+amkt.commission+'%)');
-    $('#arbitrage-sell-info .arbitrage-commission-value').html('-'+controls.printCurrency(sellComValue, 'USD')+' (-'+bmkt.commission+'%)');
+    $('#arbitrage-buy-info .arbitrage-commission-value').html('-'+controls.printCurrency(buyComValue, 'USD')+' ('+controls.printCommission(acom)+')');
+    $('#arbitrage-sell-info .arbitrage-commission-value').html('-'+controls.printCurrency(sellComValue, 'USD')+' ('+controls.printCommission(bcom)+')');
     $('#arbitrage-buy-total').html('-'+controls.printCurrency(buyTotal, 'USD'));
     $('#arbitrage-sell-total').html('+'+controls.printCurrency(sellTotal, 'USD'));
 
@@ -86,8 +91,8 @@ arbitrage.updateArbitage = function(){
     $('#arbitrage-profit-btc').html(controls.printCurrency(btcVol, 'BTC'));
     
   } else {
-    $('#arbitrage-buy-info .arbitrage-commission-value').html('... (-'+amkt.commission+'%)');
-    $('#arbitrage-sell-info .arbitrage-commission-value').html('... (-'+bmkt.commission+'%)');
+    $('#arbitrage-buy-info .arbitrage-commission-value').html('... ('+controls.printCommission(acom)+')');
+    $('#arbitrage-sell-info .arbitrage-commission-value').html('... ('+controls.printCommission(bcom)+')');
     $('#arbitrage-buy-total').html('...');
     $('#arbitrage-sell-total').html('...');
   }
@@ -143,7 +148,48 @@ arbitrage.setButtonStates = function()
 }
 
 arbitrage.beginArbitrage = function(){
-  alert("Arbitrage functionality coming soon...");
+  var arbBtn = $('#arbitrage-btn');
+  if (controls.json){
+    var amkt = controls.json.markets[arbitrage.askmarket];
+    var bmkt = controls.json.markets[arbitrage.bidmarket];
+    var askPrice = amkt.ask;
+    var bidPrice = bmkt.bid;
+    var btcVol = parseFloat($('#arbitrage-volume-val').val());
+
+    var opts = {
+      cid: controls.client.cid,
+      amkt: arbitrage.askmarket,
+      bmkt: arbitrage.bidmarket,
+      amt: btcVol,
+      ask: askPrice,
+      bid: bidPrice,
+      crypt: 'BTC',
+      fiat: 'USD',
+    };
+
+    arbBtn.addClass('disabled');
+    $.getJSON("ajax-arbitrage.php", opts, function(data) {
+      if (data.success){
+        account.balances[arbitrage.askmarket].usd = parseFloat(data.amkt.usd); 
+        account.balances[arbitrage.askmarket].btc = parseFloat(data.amkt.btc); 
+        account.balances[arbitrage.bidmarket].usd = parseFloat(data.bmkt.usd); 
+        account.balances[arbitrage.bidmarket].btc = parseFloat(data.bmkt.btc); 
+
+        $.growl.notice({
+          title: "Success!",
+          message: data.message
+        });
+      } else {
+        $.growl.error({
+          title: "Oh no!",
+          message: data.message
+        });
+      }
+
+      arbBtn.removeClass('disabled');
+      controls.updateBalance(); 
+    });
+  }
 }
 
 arbitrage.initButtons = function()
@@ -176,4 +222,8 @@ arbitrage.initButtons = function()
 $(document).ready(function(){
   arbitrage.initButtons();
   controls.addJSONListener(arbitrage.updateArbitage);
+  controls.addBalanceListener(function() {
+    arbitrage.updateCapital();
+    arbitrage.updateArbitage();
+  });
 });

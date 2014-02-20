@@ -76,6 +76,7 @@ matrix.highlightOpportunities = function()
 }
 
 $(document).ready(function() {
+  controls.addBalanceListener(matrix.updateMatrix);
 	controls.addJSONListener(matrix.updateMatrix);
  // matrix.updateMatrix();
 });

@@ -1,7 +1,7 @@
 <?php
 require_once("privatemarket.php");
 
-class PrivateMtGox extends PrivateMarket
+abstract class PrivateMtGox extends PrivateMarket
 {
 	protected $orderUrl;
 	protected $openOrdersUrl;
@@ -26,7 +26,7 @@ class PrivateMtGox extends PrivateMarket
 		$this->withdrawUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/bitcoin/send_simple');
 		$this->depositUrl = array('method' => 'POST', 'url' => 'https://mtgox.com/api/1/generic/bitcoin/address');
 	}
-	
+
 	protected function _loadClient($clientID, $key, $secret)
 	{
 		$this->privatekey = $key;
@@ -146,20 +146,21 @@ class PrivateMtGox extends PrivateMarket
 		return NULL;
 	}
 
-	protected function _buy($amount, $price)
+	protected function _buyLive($amount, $price, $crypto="BTC", $fiat="USD")
 	{
-		iLog("[PrivateMtGox] Create BUY limit order {$amount} @{$price}USD");
+		iLog("[{$this->mname}] Create BUY market order {$amount} @{$price}{$this->currency}");
 		return $this->trade($amount, "bid", $price);
 	}
 
-	protected function _sell($amount, $price)
-	{
-		iLog("[PrivateMtGox] Create SELL limit order {$amount} @{$price}USD");
+  protected function _sellLive($amount, $price, $crypto="BTC", $fiat="USD")
+  {
+  	iLog("[{$this->mname}] Create SELL market order {$amount} @{$price}{$this->currency}");
 		return $this->trade($amount, "ask", $price);
-	}
+  }
 
-	public function withdraw($amount, $address)
+	protected function _withdrawLive($amount, $currency)
 	{
+		$address = ""; /* need to get this value set up! */
 		$params = array("nonce" => $this->_createNonce(), 
 					"amount_int" => $this->_toIntAmount($amount), 
 					"address" => $address);
@@ -170,12 +171,12 @@ class PrivateMtGox extends PrivateMarket
 				return $response['return'];
 			}
 		} catch (Exception $e) {
-			iLog("[PrivateMtGox] ERROR: Withdraw failed - ".$e->getMessage());
+			iLog("[{$this->mname}] ERROR: Withdraw failed - ".$e->getMessage());
 		}
 		return NULL;
 	}
 
-	public function deposit()
+	public function _depositLive($amount, $currency)
 	{
 		$params = array("nonce" => $this->_createNonce());
 		try {
@@ -184,7 +185,7 @@ class PrivateMtGox extends PrivateMarket
 				return $response['return'];
 			}
 		} catch (Exception $e) {
-			iLog("[PrivateMtGox] ERROR: Deposit failed - ".$e->getMessage());
+			iLog("[{$this->mname}] ERROR: Deposit failed - ".$e->getMessage());
 		}
 		return NULL;
 	}
