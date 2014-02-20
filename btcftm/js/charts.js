@@ -46,6 +46,17 @@ charts.getJSONUrl = function()
   return "test-chart-json.php?range="+range+"&disp="+disp
 }
 
+charts.getDateFormat = function()
+{
+  if (charts.hdwRange == 'hour') {
+    return '%m/%d %H:%M';
+  }
+  if (charts.hdwRange == 'day') {
+    return '%m/%d %H:%M';
+  }
+  return '%m/%d/%y';
+}
+
 charts.loadSVGChart = function()
 {
   $('#charts-overlay').fadeIn(200);
@@ -63,7 +74,7 @@ charts.loadSVGChart = function()
 
     chart.xAxis
         .tickFormat(function(d) {
-          return d3.time.format('%m/%d/%y %H:%M')(new Date(d))
+          return d3.time.format(charts.getDateFormat())(new Date(d))
         });
 
     chart.yAxis
