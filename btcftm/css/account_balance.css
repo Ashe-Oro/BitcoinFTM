@@ -46,4 +46,22 @@
 	border-top: 1px solid #444;
 }
 
+#account-pie-charts svg {
+	height: 200px;
+}
 
+#account-pie-charts .account-pie {
+	display: block;
+	float: left;
+	width: 200px;
+	height: 200px;
+	margin-right: 20px;
+}
+
+#account-market-chart {
+	width: 550px !important;
+}
+
+#account-pie-charts .account-pie:last-child {
+	margin-right: 0px;
+}

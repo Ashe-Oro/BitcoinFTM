@@ -399,29 +399,33 @@ class Arbitrage
 		return json_encode($json);
 	}
 
-	public function updateChartJSON($starttime, $endtime, $period=PERIOD_1H, $value="avg", $writeFile=false)
+	public function updateChartJSON($starttime, $endtime, $period=PERIOD_1H, $value="avg", $nomtgox=false, $writeFile=false)
 	{
-		$json = $this->getChartJSON($starttime, $endtime, $period, $value);
+		$json = $this->getChartJSON($starttime, $endtime, $period, $value, $nomtgox);
 		if ($writeFile){
 			file_put_contents("json/chart.json", $json);
 		}
 		return $json;
 	}
 
-	private function getChartJSON($starttime, $endtime, $period=PERIOD_1H, $value="avg")
+	private function getChartJSON($starttime, $endtime, $period=PERIOD_1H, $value="avg", $nomtgox=false)
 	{
 		$json = array();
 		$func = "get".ucfirst($value);
 		foreach($this->markets as $mkt){
-			$mktrow = array("key" => $mkt->mname, "values" => array());
-			$tickers = array_reverse($mkt->getHistorySamples($starttime, $endtime, $period));
-			foreach($tickers as $t){
-				$tval = $t->$func();
-				if ($tval > 0) {
-					array_push($mktrow["values"], array((int) $t->getTimestamp(), (float) $tval));
+			if ($mkt->mname != 'MtGox' || !$nomtgox) { 
+				$mktrow = array("key" => $mkt->mname, "values" => array());
+				$tickers = $mkt->getHistorySamples($starttime, $endtime, $period);
+				$tickers = array_reverse($tickers);
+				//var_dump($tickers);
+				foreach($tickers as $t){
+					$tval = $t->$func();
+					if ($tval > 0) {
+						array_push($mktrow["values"], array((int) $t->getTimestamp(), (float) $tval));
+					}
 				}
+				array_push($json, $mktrow);
 			}
-			array_push($json, $mktrow);
 		}
 		return json_encode($json);
 	}
@@ -459,7 +463,8 @@ class Arbitrage
 					$endtime = isset($args['end']) ? $args['end'] : time();
 					$period = (isset($args['period'])) ? $args['period'] : PERIOD_1H;
 					$value = (isset($args['value'])) ? $args['value'] : 'avg';
-					echo $this->updateChartJSON($starttime, $endtime, $period, $value);
+					$nomtgox = (isset($args['nomtgox'])) ? ($args['nomtgox'] == 1) : false;
+					echo $this->updateChartJSON($starttime, $endtime, $period, $value, $nomtgox);
 					break;
 					
 				case "sim":

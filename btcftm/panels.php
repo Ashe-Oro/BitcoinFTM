@@ -1,6 +1,7 @@
 <?php
 $panels = array(
   "account_balance",
+//  "portfolio_perc",
   "dashboard",
   "charts",
   "markets",

@@ -18,15 +18,9 @@ define("PERIOD_1W", 604800);
 
 class PeriodTicker extends Ticker 
 {
-	private $avg;
-	private $avgvolume;
-	private $count;
-	private $open;
-	private $close;
-
 	function __construct($timestamp=0, $high=0, $low=0, $open=0, $close=0, $avg=0, $volume=0, $avgvolume=0, $count=0) {
     if (is_object($timestamp)) {
-		   	$t = $timestamp;
+		  $t = $timestamp;
 			$t->ask = $avg;
 			$t->bid = $avg;
 			$t->last = $avg;
@@ -113,31 +107,6 @@ class PeriodTicker extends Ticker
 			return new PeriodTicker($tArray);
 		}
 		return NULL;
-	}
-	
-	public function getOpen()
-	{
-		return $this->open;
-	}
-	
-	public function getClose()
-	{
-		return $this->close;
-	}
-	
-	public function getAvgVolume()
-	{
-		return $this->avgvolume;
-	}
-	
-	public function getAvg()
-	{
-		return $this->avg;
-	}
-	
-	public function getCount()
-	{
-		return $this->count;
 	}
 }
 ?>

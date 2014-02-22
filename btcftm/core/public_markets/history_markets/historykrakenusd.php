@@ -15,7 +15,7 @@ class HistoryKrakenUSD extends HistoryMarket
 	public function parseDepthJson($res)
 	{
 		$json = json_decode($res);
-		return $json->result->XXBTZUSD;
+		return ($json && $json->result) ? $json->result->XXBTZUSD : "";
 	}
 	
 	public function parseTickerRow($row){

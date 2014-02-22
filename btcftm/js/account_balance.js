@@ -85,8 +85,81 @@ account.updateMarkets = function() {
       $('#account-mkt-btc2usd-total').html(controls.printCurrency(account.totalbtc2usd, "USD"));
       $('#account-mkt-usdtotal-total').html(controls.printCurrency(account.totalvalueusd, "USD"));
       $('#account-mkt-btctotal-total').html(controls.printCurrency(account.totalvaluebtc, "BTC"));
+
+      account.updatePieCharts();
     }
   });
+}
+
+account.updateMarketPieChart = function()
+{
+  var percData = new Array();
+  var i = 0;
+
+  var mktCount = 0;
+  for (key in controls.json.markets) {
+    if (controls.json.markets.hasOwnProperty(key)) mktCount++;
+  }
+
+  $.each(controls.json.markets, function(mname, mkt){
+    mname = mname.replace("History","").replace("USD", "");
+    if (account.balances[mname].totalvalueusd > 0) {
+      percData.push({ "label": mname, "value": account.balances[mname].totalvalueusd });
+    }
+    if (++i == mktCount){
+     nv.addGraph(function() {
+        var chart = nv.models.pieChart()
+            .x(function(d) { return d.label })
+            .y(function(d) { return d.value })
+            .showLabels(true)     //Display pie labels
+            .labelThreshold(.05)  //Configure the minimum slice size for labels to show up
+            .labelType("percent") //Configure what type of data to show in the label. Can be "key", "value" or "percent"
+            .donut(true)          //Turn on Donut mode. Makes pie chart look tasty!
+            .donutRatio(0.25)     //Configure how big you want the donut hole size to be.
+       
+          d3.select("#account-market-chart svg")
+              .datum(percData)
+              .transition().duration(350)
+              .call(chart);
+       
+        return chart;
+      });
+    }
+  });
+}
+
+account.updateCurrencyPieChart = function()
+{
+  var percData = new Array();
+  var i = 0;
+  var currencyCount = 2;
+
+  percData.push({"label": 'USD', "value": account.totalusd});
+  percData.push({"label": 'BTC', "value": account.totalbtc2usd});
+
+  nv.addGraph(function() {
+      var chart = nv.models.pieChart()
+          .x(function(d) { return d.label })
+          .y(function(d) { return d.value })
+          .showLabels(true)     //Display pie labels
+          .labelThreshold(.05)  //Configure the minimum slice size for labels to show up
+          .labelType("percent") //Configure what type of data to show in the label. Can be "key", "value" or "percent"
+          .donut(true)          //Turn on Donut mode. Makes pie chart look tasty!
+          .donutRatio(0.25)     //Configure how big you want the donut hole size to be.
+     
+        d3.select("#account-currency-chart svg")
+            .datum(percData)
+            .transition().duration(350)
+            .call(chart);
+     
+      return chart;
+  });
+}
+
+account.updatePieCharts = function()
+{
+  account.updateMarketPieChart();
+  account.updateCurrencyPieChart();
 }
 
 account.hasCapitalAtMarket = function(mname)

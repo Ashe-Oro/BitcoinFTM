@@ -14,7 +14,7 @@ class KrakenUSD extends LiveMarket
 	public function parseDepthJson($res)
 	{
 		$json = json_decode($res);
-		return $json->result->XXBTZUSD;
+		return ($json && $json->result) ? $json->result->XXBTZUSD : "";
 	}
 
 	public function parseTickerJson($res)

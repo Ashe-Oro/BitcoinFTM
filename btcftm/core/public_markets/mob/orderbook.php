@@ -60,6 +60,7 @@ abstract class OrderBook
 	public function addOrder($order)
 	{
 		if (is_array($order)){
+			//var_dump($order);
 			//iLog("[OrderBook] addOrder ARRAY {$order[0]} {$order[1]}");
 			$this->orders[] = new Order($order[0], $order[1]);
 		} else {

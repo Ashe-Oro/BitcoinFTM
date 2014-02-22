@@ -21,6 +21,7 @@
 			<option value="hour">hour(s)</option>
 			<option value="day">day(s)</option>
 			<option value="week">week(s)</option>
+			<option value="month">month(s)</option>
 		</select>
 	</div>
 	<div class="chart-item">
@@ -32,6 +33,13 @@
 			<option value="high">High</option>
 			<option value="low">Low</option>
 		</select>
+	</div>
+	<div class="chart-item">
+		<label for="chart-nomtgox">Hide MtGox?: </label>
+		<input type="checkbox" name="chart-nomtgox" id="chart-nomtgox" />
+	</div>
+	<div class="chart-item">
+		<input type="submit" id="chart-submit" value="Update Chart" />
 	</div>
 </div>
 

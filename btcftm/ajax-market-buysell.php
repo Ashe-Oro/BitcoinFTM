@@ -58,11 +58,11 @@ if (is_numeric($cid) && is_string($mkt) && is_numeric($amt) && is_numeric($val) 
         $fBal = $pm->getBalance(strtoupper($fiat));
 
         $json['success'] = true;
-        $json['message'] = "Your market buy order was successful";
+        $json['message'] = "Your market {$action} order was successful";
         $json[strtolower($crypt)] = $cBal;
         $json[strtolower($fiat)] = $fBal;
       } else {
-        $json['message'] .= " Buy failed on {$mkt} for client {$cid}";
+        $json['message'] .= " {action} failed on {$mkt} for client {$cid}";
       }
     } else {
       $json['message'] .= " Couldn't load private market {$mkt} for client {$cid}";

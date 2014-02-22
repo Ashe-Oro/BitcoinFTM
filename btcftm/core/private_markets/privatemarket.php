@@ -44,7 +44,7 @@ abstract class PrivateMarket
   abstract protected function _getLiveInfo();
   abstract protected function _createNonce();
   abstract protected function _loadClient($clientID, $key, $secret); 
-  abstract protected function _sendRequest($url, $params, $extraHeaders=NULL);
+  abstract protected function _sendRequest($url, $params=array(), $extraHeaders=NULL);
 
   protected function _setPublicMarket()
   {

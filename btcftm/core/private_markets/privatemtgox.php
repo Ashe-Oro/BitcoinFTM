@@ -71,7 +71,7 @@ abstract class PrivateMtGox extends PrivateMarket
 		return ($amount / 100000);
 	}
 
-	protected function _sendRequest($url, $params, $extraHeaders=NULL)
+	protected function _sendRequest($url, $params=array(), $extraHeaders=NULL)
 	{
 		$rUrl = $url['url'];
 		iLog("[PrivateMtGox] Sending Request: {$rUrl}");

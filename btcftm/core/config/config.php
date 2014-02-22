@@ -54,7 +54,7 @@ function iLog($msg)
 
 function curl($url){
   global $config;
-  if ($config['localhost']){
+  if (false && $config['localhost']){
      try {
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $url);

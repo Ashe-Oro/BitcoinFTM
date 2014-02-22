@@ -32,6 +32,10 @@
 	text-align: left;
 }
 
+#chart-controls input, #chart-controls select {
+	margin-top: 4px;
+}
+
 #chart-controls .chart-item {
 	display: inline-block;
 	float: left;

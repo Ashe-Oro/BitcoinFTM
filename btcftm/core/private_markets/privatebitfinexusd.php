@@ -22,7 +22,7 @@ class PrivateBitfinexUSD extends PrivateMarket
 		$this->clientID = $clientID;
 	}
 
-	protected function _sendRequest($url, $params, $extraHeaders=NULL)
+	protected function _sendRequest($url, $params=array(), $extraHeaders=NULL)
 	{
 		$rUrl = $url;		
 		$response = array();

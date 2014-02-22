@@ -3,6 +3,7 @@ charts.range = "-2 week";
 charts.intRange = "2";
 charts.hdwRange = "week";
 charts.display = "avg";
+charts.nomtgox = 0;
 charts.chartID = '#ftm-chart svg';
 //charts.bitwisdom = "http://bitcoinwisdom.com/markets/";
 //charts.market = "MtGoxUSD";
@@ -25,7 +26,13 @@ charts.setRange = function(interval, hdw)
   charts.intRange = interval;
   charts.hdwRange = hdw;
   charts.range = "-"+interval+" "+hdw;
-  charts.updateChart();
+  //charts.updateChart();
+}
+
+charts.setNoMtGox = function()
+{
+  var nogox = $('#chart-nomtgox');
+  charts.nomtgox = nogox.is(":checked") ? 1 : 0;
 }
 
 
@@ -43,7 +50,8 @@ charts.getJSONUrl = function()
 {
   var range = encodeURIComponent(charts.range);
   var disp = encodeURIComponent(charts.display);
-  return "test-chart-json.php?range="+range+"&disp="+disp
+  var gox = charts.nomtgox;
+  return "test-chart-json.php?range="+range+"&disp="+disp+"&nomtgox="+gox;
 }
 
 charts.getDateFormat = function()
@@ -101,7 +109,16 @@ charts.bindButtons = function() {
 
  $('#chart-display').change(function(){
   charts.display = $(this).find("option:selected").val();
+  //charts.updateChart();
+ });
+
+ $('#chart-nomtgox').click(function(e){
+  charts.setNoMtGox();
+ });
+
+ $('#chart-submit').click(function(e){
   charts.updateChart();
+  return noEvent(e);
  });
 }
 

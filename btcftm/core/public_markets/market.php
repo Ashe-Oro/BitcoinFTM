@@ -161,7 +161,7 @@ abstract class Market
 	public function getHistoryTickers($startDate, $endDate="")
 	{
 		global $DB;
-		$tickers = NULL;
+		$tickers = array();
 		
 		if (is_string($startDate)){ $startDate = strtotime($startDate); }
 		if (empty($endDate)){ $endDate = time(); }
@@ -173,7 +173,6 @@ abstract class Market
 				$ret = $DB->query("SELECT * FROM {$this->table}_ticker WHERE timestamp >= {$startDate} AND timestamp < {$endDate} ORDER BY timestamp DESC");
 				$rowcount = $DB->num_rows($ret);
 				if ($rowcount > 0){
-					$tickers = array();
 					while ($row = $DB->fetch_array_assoc($ret)){
 						$tclass = "History{$this->mname}{$this->currency}";
 						$tvar = new $tclass();
@@ -196,7 +195,7 @@ abstract class Market
 	public function getHistorySamples($startDate, $endDate="", $period=PERIOD_1D)
 	{
 		global $DB;
-		$tickers = NULL;
+		$tickers = array();
 		
 		if (is_string($startDate)){ $startDate = strtotime($startDate); }
 		if (empty($endDate)){ $endDate = time(); }
@@ -214,7 +213,6 @@ abstract class Market
 				$ret = $DB->query($q);
 				$rowcount = $DB->num_rows($ret);
 				if ($rowcount > 0){
-					$tickers = array();
 					while ($row = $DB->fetch_array_assoc($ret)){
 						//$row['timestamp'] = $row['timestamp'] / 1000000; // convert microseconds to timestamp
 						array_push($tickers, new $tclass($row));
@@ -226,6 +224,7 @@ abstract class Market
 				iLog("[{$this->name}] ERROR: History sample ticker query failed: ".$e->getMessage());
 			}
 		}
+		return $tickers;
 	}
 
 	protected function getPeriodTable($period="")

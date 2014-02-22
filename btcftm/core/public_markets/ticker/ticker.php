@@ -9,6 +9,13 @@ class Ticker
 	protected $volume;
 	protected $ask;
 
+	// PERIOD TICKER STUFF, BUT WE KEEP IT HERE SO WE CAN INTERFACE
+	protected $avg;
+	protected $avgvolume;
+	protected $count;
+	protected $open;
+	protected $close;
+
 	function __construct($timestamp=0, $high=0, $low=0, $last=0, $ask=0, $bid=0, $volume=0) {
     if (is_object($timestamp)) {
 		  $t = $timestamp;
@@ -38,6 +45,12 @@ class Ticker
 			$this->volume = (float) $volume;
 			$this->ask = (float) $ask;
 	  }	
+
+	  $this->avg = $this->last;
+	  $this->avgvolume = $this->volume;
+	  $this->count = 1;
+	  $this->open = $this->last;
+	  $this->close = $this->last;
   }
 
 	public function getTickerObject() 
@@ -121,6 +134,32 @@ class Ticker
 	public function getTimestamp()
 	{
 		return $this->timestamp;
+	}
+
+	
+	public function getOpen()
+	{
+		return $this->open;
+	}
+	
+	public function getClose()
+	{
+		return $this->close;
+	}
+	
+	public function getAvgVolume()
+	{
+		return $this->avgvolume;
+	}
+	
+	public function getAvg()
+	{
+		return $this->avg;
+	}
+	
+	public function getCount()
+	{
+		return $this->count;
 	}
 }
 ?>
