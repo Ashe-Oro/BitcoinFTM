@@ -46,10 +46,11 @@ class CurrencyList
 		return $this->cList;
 	}
 
-  public function printCurrency($amount, $abbr)
+  public function printCurrency($amount, $abbr, $precision=0)
   {
     if ($c = $this->getCurrency($abbr)){
       $c->setAmount($amount);
+      $c->setPrecision($precision);
       return "{$c}";
     }
     return "";

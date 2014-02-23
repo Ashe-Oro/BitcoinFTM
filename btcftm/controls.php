@@ -1,5 +1,5 @@
 <?php
-$VERSION = "0.4 pre-alpha";
+$VERSION = "0.46 pre-alpha";
 $noEchoLog = 1;
 session_start();
 $signedIn = (isset($_SESSION['adminAccess']) && isset($_SESSION['clientID']) && isset($_SESSION['username'])) ? 1 : 0;
@@ -98,6 +98,8 @@ if ($signedIn == 1) {
   $ARB = new Arbitrage($cl, $args);
   $markets = $ARB->markets;
   $currencies = $ARB->currencies;
+
+  require_once("css/market-colors.php"); // add in market color styles for consistency across site
 ?>
 <header id="header">
 	<h2 class="title">Bitcoin Financial Trade Manager</h2>

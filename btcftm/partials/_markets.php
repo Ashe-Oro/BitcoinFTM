@@ -19,13 +19,13 @@ $mktnames = array();
 <th></th>
 <?php
 foreach($markets as $mkt) {
-	echo "<th class='market' id='market-th-{$mkt->mname}'>{$mkt->mname}</th>";
+	echo "<th class='market mkt-bg-{$mkt->mname}' id='market-th-{$mkt->mname}'>{$mkt->mname}</th>";
 }
 ?>
 </tr>
 
 <?php
-$vals = array('last','high','low','ask','bid','sma10','sma25','volume');
+$vals = array('ask', 'bid', 'last','high','low','sma10','sma25','volume');
 foreach($vals as $v){
 	echo "<tr>";
 	echo "<td class='value'>".ucfirst($v)."</td>";

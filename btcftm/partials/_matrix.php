@@ -13,14 +13,13 @@
 
 	<table>
 	<tr>
-	<th class="ask">ASK MARKETS</th>
-	<th class="bid" style="text-align: center;" colspan="<?php echo count($full); ?>">BID MARKETS</th>
+	<th class="cur-bg-usd" rowspan="2">ASK MARKETS</th>
+	<th class="cur-bg-btc" style="text-align: center;" colspan="<?php echo count($full); ?>">BID MARKETS</th>
 	</tr>
 	<tr>
 	<?php
-	echo "<th class='ask'></th>";
 	foreach($full as $askmarket => $mx){
-		echo "<th class='bid'>".sanitizeMarketName($askmarket)."</th>";
+		echo "<th class='mkt-bg-{$askmarket}'>".sanitizeMarketName($askmarket)."</th>";
 	}
 	?>
 	</tr>
@@ -30,7 +29,7 @@ $fclone = $full;
 foreach($full as $askmarket => $mx){
 	$aname = sanitizeMarketName($askmarket);
 	echo "<tr>";
-	echo "<th class='ask'>{$aname}</th>";
+	echo "<th class='mkt-bg-dark1-{$aname}'>{$aname}</th>";
 	foreach($fclone as $bidmarket => $mx2){
 		$bname = sanitizeMarketName($bidmarket);
 		$m = isset($mx[$bidmarket]) ? $mx[$bidmarket] : NULL;

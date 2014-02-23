@@ -414,7 +414,7 @@ class Arbitrage
 		$func = "get".ucfirst($value);
 		foreach($this->markets as $mkt){
 			if ($mkt->mname != 'MtGox' || !$nomtgox) { 
-				$mktrow = array("key" => $mkt->mname, "values" => array());
+				$mktrow = array("key" => $mkt->mname, "color" => $mkt->getColor(), "values" => array());
 				$tickers = $mkt->getHistorySamples($starttime, $endtime, $period);
 				$tickers = array_reverse($tickers);
 				//var_dump($tickers);
@@ -430,9 +430,9 @@ class Arbitrage
 		return json_encode($json);
 	}
 
-	function printCurrency($amount, $abbr)
+	function printCurrency($amount, $abbr, $precision=0)
 	{
-		return $this->currencies->printCurrency($amount, $abbr);
+		return $this->currencies->printCurrency($amount, $abbr, $precision);
 	}
 	
 	/**

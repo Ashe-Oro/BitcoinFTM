@@ -163,6 +163,15 @@ class MOB
 		}
 		return NULL;
 	}
+
+	public function printOrderBooks($tablecell=true)
+	{
+		$str = "";
+		foreach($this->orderbooks as $mname => $obook) {
+			$str .= $obook->printOrderBooks($mname, $tablecell);
+		}
+		return $str;
+	}
 	
 	public function dumpOrderBooks()
 	{

@@ -1,12 +1,20 @@
 <h1>Order Book Depths</h1>
 
+<div id="orderbooks-controls">
+	<div class="orderbooks-item">
+		<label for="orderbooks-btcvol">Bitcoin Volume: </label>
+		<input type="text" name="orderbooks-btcvol" id="orderbooks-btcvol" size="20" value="10" />
+	</div>
+</div>
+
 <div id="orderbooks-list">
 <table>
 <tr>
 <?php
 //var_dump($ARB->mob);
 foreach($markets as $mkt) {
-	echo "<th class='marketname marketname-{$mkt->mname}' colspan='4'>{$mkt->mname}</th>";
+	echo "<th class='marketname marketname-{$mkt->mname} mkt-bg-{$mkt->mname}' id='orderbooks-marketname-{$mkt->mname}' colspan='4'>{$mkt->mname}";
+	echo "&nbsp;<input type='checkbox' class='orderbook-toggle' id='orderbook-toggle-{$mkt->mname}' value='1' checked='checked' /></th>";
 }
 ?>	
 </tr>
@@ -14,14 +22,16 @@ foreach($markets as $mkt) {
 <tr>
 <?php
 foreach($markets as $mkt) {
-	echo "<th class='asks-list asks-list-{$mkt->mname}' colspan='2'>Asks</th>";
-	echo "<th class='bids-list bids-list-{$mkt->mname}' colspan='2'>Bids</th>";
+	echo "<th class='asks-list asks-list-{$mkt->mname} mkt-bg-dark1-{$mkt->mname}' colspan='2'>Asks <span class='list-wval' id='ask-list-wval-{$mkt->mname}'>...</span></th>";
+	echo "<th class='bids-list bids-list-{$mkt->mname} mkt-bg-dark2-{$mkt->mname}' colspan='2'>Bids <span class='list-wval' id='bid-list-wval-{$mkt->mname}'>...</span></th>";
 }
 ?>
 </tr>
 
 <tr>
 <?php
+echo $ARB->mob->printOrderBooks(true);
+/*
 foreach($markets as $mkt) {
 	$asks = $ARB->mob->getMarketAskOrderBook($mkt->mname);
 	$orders = ($asks) ? $asks->getOrders() : array();
@@ -50,6 +60,7 @@ foreach($markets as $mkt) {
 	}
 	echo "</td>";
 }
+*/
 ?>
 </tr>
 </table>

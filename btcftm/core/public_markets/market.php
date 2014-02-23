@@ -12,6 +12,7 @@ abstract class Market
 	public $commission = '';
 	public $expiration = 0;
 	public $refresh = 0;
+	public $color = "ffffff";
 	
 	public $supportsUSD = 0;
 	public $supportsEUR = 0;
@@ -52,6 +53,7 @@ abstract class Market
 				$this->refresh = (int) $row['refresh'];
 				$this->expiration = (int) $row['expiration'];
 				$this->commission = (float) $row['commission'];
+				$this->color = $row['color'];
 
 				$this->supportsUSD = $row['usd'];
 				$this->supportsEUR = $row['eur'];
@@ -95,14 +97,19 @@ abstract class Market
 		iLog("[Market] Formating Order Book...");
 		//var_dump($depth);
 		if ($depth) {
-			try {
-				return new MarketOrderBook($depth->asks, $depth->bids);
-			} catch (Exception $e) {
-				echo "Market {$this->mname} failed format order book!";
+			if (property_exists($depth, 'asks') && property_exists($depth, 'bids')){
+				try {
+					return new MarketOrderBook($depth->asks, $depth->bids);
+				} catch (Exception $e) {
+					echo "Market {$this->mname} failed format order book!";
+				}
+			} else {
+				iLog("[Market] Market {$this->mname} depth JSON feed was invalid");
 			}
 		} else {
 			iLog("[Market] Market {$this->mname} had no depths...");
 		}
+		return new MarketOrderBook(); // return empty orderbook just to keep things moving along
 	}	
 	
 	public function getOrderBook()
@@ -490,6 +497,11 @@ abstract class Market
 	public function getName()
 	{
 		return str_replace("History","", str_replace($this->currency, "", $this->name));
+	}
+
+	public function getColor()
+	{
+		return "#{$this->color}";
 	}
 	
 }

@@ -34,5 +34,13 @@ class MarketOrderBook
 	{
 		return $this->bidOrderBook->getTopOrder();
 	}
+
+	function printOrderBooks($mname="", $tablecell=true)
+	{
+		$str = "";
+		$str .= $this->askOrderBook->printOrderBook($mname, $tablecell);
+		$str .= $this->bidOrderBook->printOrderBook($mname, $tablecell);
+		return $str;
+	}
 }
 ?>

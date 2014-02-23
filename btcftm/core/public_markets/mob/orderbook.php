@@ -68,5 +68,27 @@ abstract class OrderBook
 			$this->orders[] = new Order($order->price, $order->amount);
 		}
 	}
+
+	public function printOrderBook($mname="", $tablecell=true)
+  {
+  	//$this->_sortOrderBook();
+    $td = $tablecell ? "td" : "div";
+    $str = "";
+    $dark = ($this->type == 'ask') ? 1 : 2; 
+  	$str .= "<{$td} class='orderbook-list-col mkt-bg-dark{$dark}-{$mname} {$this->type}-list-price {$this->type}-list-price-{$mname}'><div class='orderbook-list-wrapper orderbook-list-wrapper-{$mname}'>";
+	  foreach($this->orders as $o){
+	    $str .= "<span class='orderbook-list-item {$this->type}-list-price-item {$this->type}-list-price-item-{$mname}' data-price='".$o->getPrice()."'>";
+	    $str .= printCurrency($o->getPrice(), "USD", 2, true)."</span>";
+	  }
+  	$str .= "</div></{$td}>";
+  	$dark = ($this->type == 'ask') ? 3 : 4; 
+	  $str .= "<{$td} class='orderbook-list-col mkt-bg-dark{$dark}-{$mname} {$this->type}-list-volume {$this->type}-list-volume-{$mname}'><div class='orderbook-list-wrapper orderbook-list-wrapper-{$mname}'>";
+	  foreach($this->orders as $o){
+	    $str .= "<span class='orderbook-list-item {$this->type}-list-volume-item {$this->type}-list-volume-item-{$mname}' data-volume='".$o->getAmount()."'>";
+	    $str .= printCurrency($o->getAmount(), "BTC", 2, true)."</span>";
+	  }
+	  $str .= "</div></{$td}>";
+	  return $str;
+  }
 }
 ?>

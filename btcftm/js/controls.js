@@ -20,8 +20,11 @@ controls.jsonListeners = new Array();
 controls.balanceListeners = new Array();
 controls.ftmStateList = ["dashboard","markets","orders","transfer","orderbooks","matrix","charts","bots","sims","settings","portfolio","arbitrage"];
 controls.currencies = new Array();
+controls.marketColors = new Array();
+controls.currencyColors = new Array();
 controls.honey = 0;
 controls.client = new Object();
+
 
 controls.loadClient = function() {
   var cd = $('#client-data');
@@ -45,16 +48,17 @@ controls.loadCurrencies = function()
   controls.honey = parseFloat($('#honeypot-data').attr('data-honey'));
 }
 
-controls.printCurrency = function(amount, abbr)
+controls.printCurrency = function(amount, abbr, precision)
 {
   if (controls.currencies[abbr]) {
     var c = controls.currencies[abbr];
     var sym = c.symbol;
+    var prec = (precision) ? precision : c.precision;
     if (amount < 0 && c.prefix) {
       sym = '-'+c.symbol;
       amount = Math.abs(amount);
     }
-    return (c.prefix) ? sym + amount.toFixed(c.precision) : amount.toFixed(c.precision) + sym;
+    return (c.prefix) ? sym + amount.toFixed(prec) : amount.toFixed(prec) + sym;
   }
   return "";
 }
