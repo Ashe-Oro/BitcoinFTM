@@ -1,8 +1,10 @@
 <h1>Transfer Bitcoins Between Markets</h1>
 
+<div class="disclaimer">*All prices are weighted based on current market orderbook and your BTC volume</div>
+
 <div id="transfer-volume" class="transfer-item">
   <h3>How many Bitcoins do you want to move?</h3>
-  <input type="text" name="transfer-volume-val" id="transfer-volume-val" value="0.1" />
+  <input type="text" name="transfer-volume-val" id="transfer-volume-val" value="1.0" />
 </div>
 
 <div id="transfer-markets" class="transfer-item">

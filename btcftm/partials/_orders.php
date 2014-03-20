@@ -21,7 +21,7 @@
 		<div id="order-vol-price" class="order-item">
 			<div id="order-volume" class="order-volprice-item">
 				<h3>How many Bitcoins do you want to move?</h3>
-				<input type="text" name="order-volume-val" id="order-volume-val" value="0.1" />
+				<input type="text" name="order-volume-val" id="order-volume-val" value="1.0" />
 				<div id="order-capital">Available Capital: <span id="order-capital-usd"></span>, <span id="order-capital-btc"></span></div>
 			</div>
 			<div id="order-limit-price" class="order-volprice-item">

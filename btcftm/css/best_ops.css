@@ -1,0 +1,74 @@
+#best_ops table {
+  width: 100%;
+}
+
+#best_ops td {
+  display: table-cell;
+  padding: 5px;
+  margin: 2px;
+  text-align: right;
+  -moz-transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+}
+
+#best_ops td.highlight {
+  border: 1px solid #ff0;
+  background-color: #220;
+
+}
+
+#best_ops td.highlight:hover {
+  cursor: pointer;
+  background-color: #440;
+}
+
+.pos { 
+color: #0c0;
+}
+
+.neg {
+color: #c00;
+}
+
+.ask {
+  background-color: #009;
+  color: #fff;
+}
+
+.bid {
+  background-color: #990;
+  color: #fff;
+}
+
+.matrix-cell-value {
+  display: block;
+  font-size: 16px;
+}
+
+.matrix-cell-vol {
+  display: block;
+  font-size: 12px;
+}
+
+.matrix-cell-perc {
+  display: block;
+  font-size: 12px;
+}
+
+.matrix-perc-icon {
+  background: transparent url('../images/up-down.png') 0px 0px no-repeat;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin: 0px 2px;
+  padding: 0px;
+}
+
+.neg .matrix-perc-icon {
+  background-position: 0px -16px;
+}
+
+.neu .matrix-perc-icon {
+  display: none;
+}

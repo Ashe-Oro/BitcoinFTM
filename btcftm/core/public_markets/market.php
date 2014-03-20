@@ -158,6 +158,9 @@ abstract class Market
 			$tclass = "History{$this->mname}{$this->currency}";
 			//echo "hello world: {$tclass}";
 			//require_once()
+			if (!class_exists($tclass)){
+				require_once("history_markets/".strtolower($tclass).".php");
+			}
 			$tvar = new $tclass();
 			$row = $tvar->parseTickerRow($row);
 			return new Ticker($row);

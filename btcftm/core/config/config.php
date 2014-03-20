@@ -20,7 +20,7 @@ $config['simdelay'] = 0;
 
 $config['minify'] = 0;
 
-$config['honey'] = 0.002;
+$config['honey'] = 0.000;
 if (!isset($noHoneyPot)) {
   $honeypot = new Honeypot();
 } else {

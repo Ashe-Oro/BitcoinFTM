@@ -25,7 +25,9 @@ $signedIn = (isset($_SESSION['adminAccess']) && isset($_SESSION['clientID']) && 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Bitcoin Financial Trade Manager</title>
+<title>GetDemCoins.com</title>
+<script language="javascript" type="text/javascript" src="jquery/jquery-1.8.2.min.js"></script>
+<script language="javascript" src="js/index.js"></script>
 <link rel="stylesheet" type="text/css" href="css/index.css" />
 </head>
 
@@ -36,7 +38,7 @@ $signedIn = (isset($_SESSION['adminAccess']) && isset($_SESSION['clientID']) && 
 if ($signedIn) {
 ?>
 
-<h2>CAN I HAZ BITCOINZ?</h2>
+<h2>Gotta Get Dem Coins!</h2>
 
 <p>Loading your profile, please wait...</p>
 
@@ -52,7 +54,7 @@ document.location.href = "controls.php";
 if (strlen($errs)){ echo "<p>{$errs}</p>"; }
 ?>
 
-<h1>Financial Trade Manager</h1>
+<h1>GetDemCoins.com</h1>
 
 <h3>Please Sign In</h3>
 

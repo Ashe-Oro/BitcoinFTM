@@ -88,10 +88,13 @@ abstract class HistoryMarket extends Market
 	{
 		global $DB;
 		$tPeriod = $this->getPeriodTable();
+
+		$ts = $this->timestamp;
+		if ($ts <= 0) { $ts = time(); }
 		
-		iLog("[{$this->name}] Getting current ticker for TS: {$this->timestamp} P: {$this->period}...");
+		iLog("[{$this->name}] Getting current ticker for TS: {$ts} P: {$this->period}...");
 		try {
-			$res = $DB->query("SELECT * FROM {$this->table}_{$tPeriod} WHERE timestamp <= {$this->timestamp} ORDER BY timestamp DESC LIMIT 1");
+			$res = $DB->query("SELECT * FROM {$this->table}_{$tPeriod} WHERE timestamp <= {$ts} ORDER BY timestamp DESC LIMIT 1");
 			if($row = $DB->fetch_array_assoc($res)){
 				if ($tPeriod == "ticker"){
 					$row = $this->parseTickerRow($row);
@@ -105,7 +108,7 @@ abstract class HistoryMarket extends Market
 				}
 				return $ticker;
 			} else {
-				iLog("[{$this->name}] ERROR: no historical ticker found for for TS: {$this->timestamp} P: {$this->period}");
+				iLog("[{$this->name}] ERROR: no historical ticker found for for TS: {$ts} P: {$this->period}");
 			}
 			
 		} catch (Exception $e) {

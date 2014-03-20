@@ -3,7 +3,7 @@ charts.range = "-2 week";
 charts.intRange = "2";
 charts.hdwRange = "week";
 charts.display = "avg";
-charts.nomtgox = 0;
+charts.nomtgox = 1;
 charts.chartID = '#ftm-chart svg';
 //charts.bitwisdom = "http://bitcoinwisdom.com/markets/";
 //charts.market = "MtGoxUSD";
@@ -19,7 +19,7 @@ charts.updateChart = function()
   dispSelect.val(charts.hdwRange).prop('selected', true);
 
   charts.loadSVGChart();
-}
+};
 
 charts.setRange = function(interval, hdw)
 {
@@ -27,13 +27,13 @@ charts.setRange = function(interval, hdw)
   charts.hdwRange = hdw;
   charts.range = "-"+interval+" "+hdw;
   //charts.updateChart();
-}
+};
 
 charts.setNoMtGox = function()
 {
   var nogox = $('#chart-nomtgox');
   charts.nomtgox = nogox.is(":checked") ? 1 : 0;
-}
+};
 
 
 charts.sizeChart = function() {
@@ -44,7 +44,7 @@ charts.sizeChart = function() {
   $('#ftm-chart').css({width: cw+'px', height: (ch-dh)+'px'});
   //var dh = $('#bitcoin-markets').outerHeight() + $('#charts h1').outerHeight();
   //$('#bitcoin-chart iframe').css({width: cw+'px', height: (ch-dh)+'px'});
-}
+};
 
 charts.getJSONUrl = function()
 {
@@ -52,7 +52,7 @@ charts.getJSONUrl = function()
   var disp = encodeURIComponent(charts.display);
   var gox = charts.nomtgox;
   return "test-chart-json.php?range="+range+"&disp="+disp+"&nomtgox="+gox;
-}
+};
 
 charts.getDateFormat = function()
 {
@@ -63,7 +63,7 @@ charts.getDateFormat = function()
     return '%m/%d %H:%M';
   }
   return '%m/%d/%y';
-}
+};
 
 charts.loadSVGChart = function()
 {
@@ -98,7 +98,7 @@ charts.loadSVGChart = function()
     return chart;
     });
   });
-}
+};
 
 charts.bindButtons = function() {
  $('#chart-int-range, #chart-hdw-range').change(function(){
@@ -120,7 +120,7 @@ charts.bindButtons = function() {
   charts.updateChart();
   return noEvent(e);
  });
-}
+};
 
 $(document).ready(function() {
   charts.bindButtons();
@@ -129,71 +129,4 @@ $(document).ready(function() {
 	//charts.showChart();
   charts.updateChart();
 });
-
-/*
-charts.showChart = function(args) {
-  var cUrl = charts.bitwisdom;
-  var cParam = "";
-  if (args && typeof(args.m) != 'undefined') {
-    charts.market = args.m;
-  }
-  switch(charts.market){
-    case 'BitstampUSD':
-      cParam = '/bitstamp/btcusd/';
-      break;
-
-    case 'BTCeUSD':
-      cParam = '/btce/btcusd/';
-      break;
-
-    case 'CampBXUSD':
-      cParam = '/campbx/btcusd/';
-      break;
-
-    case 'BitfinexUSD':
-      cParam = '/bitfinex/btcusd/';
-      break;
-
-    case 'CryptoTradeUSD':
-      cParam = '/cryptotrade/btcusd/';
-      break;
-
-    case 'KrakenUSD':
-      cParam = "";
-      break;
-
-    case 'MtGoxUSD':
-    default:
-      cParam = '/mtgox/btcusd/';
-      break;
-  }
-  
-  $('.bitcoin-market-chart').removeClass('active');
-  $('#btcmarket_'+charts.market).addClass('active');
-
-  //$('#bitcoin-chart iframe').attr('src', cUrl+cParam)
-}
-
-charts.bindChartLinks = function() {
-  $('.bitcoin-market-chart').each(function(e){
-    $(this).click(function(e){
-
-      var market = $(this).attr('id').replace('btcmarket_','');
-      var args = {
-        m: market 
-      };
-      charts.showChart(args);
-
-      e.stopPropagation();
-      e.preventDefault();
-      return false;
-    })
-
-    $(this).find('a').click(function(e){
-      return false;
-    });
-  })
-}
-*/
-
 

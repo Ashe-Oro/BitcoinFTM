@@ -215,7 +215,9 @@ abstract class PrivateMarket
           // simulate buy delay here
         } else {
           if ($this->_subtractBalance($totVal, $fiat) && $this->_addBalance($amount, $crypto)){
-            $honeypot->addHoney($this->clientId, $this->publicmarketid, 'buy', $amount, $price, $valHoney);
+            if ($honeypot){
+              $honeypot->addHoney($this->clientId, $this->publicmarketid, 'buy', $amount, $price, $valHoney);
+            }
             $this->recordTransaction("buy", $amount, $price, $crypto, $fiat);
             return true;
           }
@@ -255,7 +257,9 @@ abstract class PrivateMarket
           // simulate sell delay here
         } else {
           if ($this->_subtractBalance($amount, $crypto) && $this->_addBalance($totVal, $fiat)){
-            $honeypot->addHoney($this->clientId, $this->publicmarketid, 'sell', $amount, $price, $valHoney);
+            if ($honeypot) {
+              $honeypot->addHoney($this->clientId, $this->publicmarketid, 'sell', $amount, $price, $valHoney);
+            }
             $this->recordTransaction("sell", $amount, $price, $crypto, $fiat);
             return true;
           }

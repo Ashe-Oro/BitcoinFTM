@@ -1,6 +1,13 @@
-<h1>Arbitrage Exchange Matrix</h1>
+<h1>Arbitrage Spread Matrix</h1>
 
 <div id="enter-the-matrix">
+<div id="matrix-controls">
+	<div class="matrix-item">
+		<label for="matrix-btcvol">Bitcoin Volume: </label>
+		<input type="text" name="matrix-btcvol" id="matrix-btcvol" size="20" value="1.0" />
+	</div>
+</div>
+
 <?php /*	<div class="updating">
 	Updating... this may take a few seconds...
 	</div>
@@ -8,7 +15,7 @@
 	Waiting 15 seconds...
 	</div>
 */ ?>
-	<?php $full = $ARB->mob->getFullExchangeMatrix(); ?>
+	<?php $full = $matrix; ?>
 	<div id="full-matrix">
 
 	<table>
@@ -47,5 +54,5 @@ foreach($full as $askmarket => $mx){
 ?>
 </table>
 	</div>
-<h3>Click any highlighted Arbitrage Opportunity above to begin Arbitrage!</h3>
+<h3>Click any highlighted Arbitrage Spread above to begin Arbitrage!</h3>
 </div>

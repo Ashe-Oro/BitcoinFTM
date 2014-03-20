@@ -1,5 +1,5 @@
 var orders = new Object();
-orders.market = "MtGox";
+orders.market = "Bitstamp";
 orders.ordertype = "market";
 orders.buyprice = -1;
 orders.sellprice = -1;
@@ -7,7 +7,7 @@ orders.sellprice = -1;
 orders.changeMarket = function(mname)
 {
 	orders.market = mname;
-	$('#buysell-bitcoin-markets li').removeClass('active')
+	$('#buysell-bitcoin-markets li').removeClass('active');
 	$('#buysell-btcmarket-'+mname).addClass('active');
 
 	if (!account.hasCapitalAtMarket(orders.market)){
@@ -33,7 +33,8 @@ orders.changeMarket = function(mname)
 		orders.updateBuySell();
 	}
 	orders.setButtonStates();
-}
+};
+
 
 orders.changeOrderType = function(otype)
 {
@@ -55,16 +56,18 @@ orders.changeOrderType = function(otype)
 			$('#order-vol-price').removeClass('limit');
 		}
 	}
-}
+};
 
 orders.updateBuySell = function()
 {
-	if (orders.ordertype == 'market') {
-		orders.updateMarketBuySell();
-	} else if (orders.ordertype == 'limit') {
-		orders.updateLimitBuySell();
+	if (controls.json){
+		if (orders.ordertype == 'market') {
+			orders.updateMarketBuySell();
+		} else if (orders.ordertype == 'limit') {
+			orders.updateLimitBuySell();
+		}
 	}
-}
+};
 
 orders.updateMarketBuySell = function()
 {
@@ -103,7 +106,7 @@ orders.updateMarketBuySell = function()
 		$('#order-buy-total').html('...');
 		$('#order-sell-total').html('...');
 	}
-}
+};
 
 orders.updateLimitBuySell = function()
 {
@@ -119,7 +122,8 @@ orders.updateLimitBuySell = function()
 		var buyComValue = com * buyTotalPreCom;
 		var sellComValue = com * sellTotalPreCom;
 
-		var buyTotal = buyTotalPreCom + buyComValue; // inv since buyCom is neg
+		// inv since buyCom is neg
+		var buyTotal = buyTotalPreCom + buyComValue; 
 		var sellTotal = sellTotalPreCom  - sellComValue;
 
 		$('.order-limit-value').html('$'+limitPrice);
@@ -139,7 +143,7 @@ orders.updateLimitBuySell = function()
 		$('#order-buy-total').html('...');
 		$('#order-sell-total').html('...');
 	}
-}
+};
 
 orders.updateCapital = function()
 {
@@ -154,7 +158,7 @@ orders.updateCapital = function()
 			$('#order-capital-btc').html(controls.printCurrency(0, 'BTC'));
 		}
 	}
-}
+};
 
 orders.placeOrder = function(buysell)
 {
@@ -202,7 +206,13 @@ orders.placeOrder = function(buysell)
 			controls.updateBalance(); 
 		});
 	}
-}
+};
+
+orders.updateVolume = function()
+{
+	$('#order-volume-val').val(controls.volume);
+	orders.updateBuySell();
+};
 
 
 orders.setButtonStates = function()
@@ -250,7 +260,7 @@ orders.setButtonStates = function()
 		$('#buy-button').addClass('disabled');
 		$('#sell-button').addClass('disabled');
 	}
-}
+};
 
 orders.initButtons = function()
 {
@@ -274,11 +284,15 @@ orders.initButtons = function()
 	});
 
 	$('#order-volume-val').on('keyup', function(e){
-		orders.updateBuySell();
+		if (!isArrowKey(e)){
+			controls.updateVolume($(this).val());
+		}
 	});
 
 	$('#order-limit-price-val').on('keyup', function(e){
-		orders.updateBuySell();
+		if (!isArrowKey(e)){
+			orders.updateBuySell();
+		}
 	});
 
 	$('#buy-button').click(function() {
@@ -294,15 +308,18 @@ orders.initButtons = function()
 	});
 
 	orders.setButtonStates();
-}
+};
 
 $(document).ready(function() {
 	orders.initButtons();
-	orders.changeMarket("MtGox");
+	orders.changeMarket("Bitstamp");
 	controls.addBalanceListener(function(){
 		orders.updateCapital();
 		orders.updateBuySell();
-	})
+	});
 	controls.addJSONListener(orders.updateBuySell);
+	controls.addVolumeListener(orders.updateVolume);
+	controls.addOrderbookListener(orders.updateBuySell);
 });
+
 

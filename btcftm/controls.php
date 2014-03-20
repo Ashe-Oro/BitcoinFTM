@@ -1,5 +1,5 @@
 <?php
-$VERSION = "0.46 pre-alpha";
+$VERSION = "0.48 pre-alpha";
 $noEchoLog = 1;
 session_start();
 $signedIn = (isset($_SESSION['adminAccess']) && isset($_SESSION['clientID']) && isset($_SESSION['username'])) ? 1 : 0;
@@ -32,7 +32,8 @@ if ($signedIn == 1) {
  
   <script language="javascript" type="text/javascript" src="js/controls.js"></script>
   <?php if ($config['minify']) { ?>
-  <script language="javascript" type="text/javascript" src="js/combine-js.php"></script>
+  <!--<script language="javascript" type="text/javascript" src="js/combine-js.php"></script>-->
+  <script language="javascript" type="text/javascript" src="js/combine.min.js"></script>
   <?php 
   } else { 
     foreach($panels as $p){
@@ -56,7 +57,7 @@ if ($signedIn == 1) {
   } 
 }
 ?>
-
+<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW"> <!-- remove once live -->
 </head>
 
 <body>
@@ -98,11 +99,29 @@ if ($signedIn == 1) {
   $ARB = new Arbitrage($cl, $args);
   $markets = $ARB->markets;
   $currencies = $ARB->currencies;
+  $matrix = $ARB->mob->getFullExchangeMatrix();
 
   require_once("css/market-colors.php"); // add in market color styles for consistency across site
 ?>
+<script language="javascript" type="text/javascript">
+$(document).ready(function(){
+  <?php 
+  echo "controls.json = ";
+  $ARB->execCommand('json');
+  echo ";";
+  echo "controls.updateJSON();"; 
+  ?>
+});
+</script>
+
+
 <header id="header">
-	<h2 class="title">Bitcoin Financial Trade Manager</h2>
+	<h2 class="title">GetThemCoins.com</h2>
+  <div id="currency-options">
+    <select id="currency-select">
+      <option value="usd2btc" selected="selected">USD/BTC</option>
+    </select>
+  </div>
  	 <div id="loading-data"></div>
 	    
 	<div class="account">
@@ -110,7 +129,6 @@ if ($signedIn == 1) {
 		<span class="account-icon"></span>
 		<ul class="account-dropdown">
 			<li class="settings"><a href="#settings">Account Settings</a></li>
-			<li class="portfolio"><a href="#portfolio">Manage Portfolio</a></li>
 			<li class="signout"><a href="controls.php?signout=1">Sign Out</a></li>
 		</ul>
 	</div>
@@ -125,14 +143,15 @@ if ($signedIn == 1) {
 	<aside id="sidebar" role="complementary">
     <ul>
     <li class="dashboard"><a href="#dashboard">Dashboard</a></li>
+    <li class="portfolio"><a href="#portfolio">Portfolio</a></li>
     <li class="orders"><a href="#orders">Buy/Sell</a></li>
     <li class="transfer"><a href="#transfer">Transfer</a></li>
-    <li class="matrix"><a href="#matrix">Arbitrage</a></li>
     <li class="markets"><a href="#markets">Markets</a></li>
+    <li class="matrix"><a href="#matrix">Spreads</a></li>
     <li class="orderbooks"><a href="#orderbooks">Order Books</a></li>
     <li class="charts"><a href="#charts">Charts</a></li>
-    <li class="bots"><a href="#bots">Bots</a></li>
-    <li class="sims"><a href="#sims">Simulations</a></li>
+    <!--<li class="bots"><a href="#bots">Bots</a></li>
+    <li class="sims"><a href="#sims">Simulations</a></li>-->
     </ul>
   </aside>
     
@@ -164,12 +183,14 @@ if ($signedIn == 1) {
     <div id="matrix" class="content init">
     	<?php include("partials/_matrix.php"); ?>
     </div>
+    <!--
     <div id="bots" class="content init">
-      <?php include("partials/_bots.php"); ?>
+      <?php //include("partials/_bots.php"); ?>
     </div>
     <div id="sims" class="content init">
-   		<?php include("partials/_sims.php"); ?>
+   		<?php //include("partials/_sims.php"); ?>
     </div>
+    -->
     <div id="settings" class="content init">
     	<?php include("partials/_settings.php"); ?>
     </div>
@@ -194,7 +215,8 @@ if ($signedIn == 1) {
 </div>
 
 <footer id="footer">
-	<span class="copyright">Verion <?php echo $VERSION; ?> &copy; 2013-<?php echo date('Y'); ?>&nbsp;BTC Financial Trade Manager</span>
+  <?php include("partials/_trading_status.php"); ?>
+	<div class="version"><span class="copyright">Verion <?php echo $VERSION; ?> &copy; 2013-<?php echo date('Y'); ?>&nbsp;BTC Financial Trade Manager</span></div>
 </footer>
 
 <?php

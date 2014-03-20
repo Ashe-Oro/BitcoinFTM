@@ -10,8 +10,11 @@ class TickerCalculator
 	{
 		if (is_array($tickers)){
 			$this->tickers = $tickers;
-			$this->_sortTickers();
-			$this->tickerClass = get_class($this->tickers[0]);
+
+			if ($this->getTickerCount()){
+				$this->_sortTickers();
+				$this->tickerClass = get_class($this->tickers[0]);
+			}
 		} else {
 			iLog("[TickerCalculator] ERROR: Invalid ticker array.");
 		}

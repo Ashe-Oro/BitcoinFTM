@@ -1,29 +1,41 @@
-function noEvent(e)
-{
-	e.preventDefault();
-	e.stopPropagation();
-	return false;
-}
-
-function sanitizeMarketName(mname)
-{
-	return mname.replace("History","").replace("USD","");
-}
-
 /******* CONTROLS OBJECT *********/
 
 var controls = new Object();
 controls.ftmState = "dashboard";
 controls.json = null;
+
 controls.jsonInt = 15000; // update every 15s for now
+controls.orderbookInt = 15000; // update every 30s for now (build into market refresh)
+
 controls.jsonListeners = new Array();
 controls.balanceListeners = new Array();
-controls.ftmStateList = ["dashboard","markets","orders","transfer","orderbooks","matrix","charts","bots","sims","settings","portfolio","arbitrage"];
+controls.volumeListeners = new Array();
+controls.orderbookListeners = new Array();
+
 controls.currencies = new Array();
 controls.marketColors = new Array();
 controls.currencyColors = new Array();
 controls.honey = 0;
 controls.client = new Object();
+
+controls.volume = 1.0; // global btc vol will make moving between panels much easier
+
+controls.markets = new Array(); // global market representation of market ask/bid and weight
+
+controls.ftmStateList = [
+  "dashboard",
+  "markets",
+  "orders",
+  "transfer",
+  "orderbooks",
+  "matrix",
+  "charts",
+  "bots",
+  "sims",
+  "settings",
+  "portfolio",
+  "arbitrage"
+];
 
 
 controls.loadClient = function() {
@@ -32,7 +44,7 @@ controls.loadClient = function() {
   controls.client.uname = cd.attr('data-uname');
   controls.client.fname = cd.attr('data-fname');
   controls.client.lname = cd.attr('data-lname');
-}
+};
 
 controls.loadCurrencies = function()
 {
@@ -46,7 +58,7 @@ controls.loadCurrencies = function()
   });
 
   controls.honey = parseFloat($('#honeypot-data').attr('data-honey'));
-}
+};
 
 controls.printCurrency = function(amount, abbr, precision)
 {
@@ -61,7 +73,15 @@ controls.printCurrency = function(amount, abbr, precision)
     return (c.prefix) ? sym + amount.toFixed(prec) : amount.toFixed(prec) + sym;
   }
   return "";
-}
+};
+
+controls.printPercentage = function(perc)
+{
+  if (perc) {
+    return (perc*100).toFixed(2)+"%";
+  }
+  return "";
+};
 
 controls.printCommission = function(com)
 {
@@ -69,45 +89,79 @@ controls.printCommission = function(com)
     return "-"+(com*100).toFixed(2)+"%";
   }
   return "";
-}
+};
 
 controls.updateMasterJSON = function()
 {
 	setInterval(function(){
 		controls.getMasterJSON();
 	}, controls.jsonInt);
-  controls.getMasterJSON();
+  //controls.getMasterJSON();
+};
+
+controls.updateJSON = function()
+{
+  for(i = 0; i < controls.jsonListeners.length; i++){
+    controls.jsonListeners[i]();
+  }
 }
 
-controls.updateBalance = function() {
+controls.updateBalance = function() 
+{
   for(i = 0; i < controls.balanceListeners.length; i++){
     controls.balanceListeners[i]();
   }
-}
+};
+
+controls.updateVolume = function(volume)
+{
+  volume = (volume == '0.' || volume == '.') ? NaN : parseFloat(volume);
+  if (!isNaN(volume)){
+    controls.volume = volume;
+    for(j = 0; j < controls.volumeListeners.length; j++){
+      controls.volumeListeners[j]();
+    }
+  }
+};
+
+controls.updateOrderbooks = function() 
+{
+  for(i = 0; i < controls.orderbookListeners.length; i++){
+    controls.orderbookListeners[i]();
+  }
+};
 
 controls.getMasterJSON = function() {
   $('#loading-data').stop().fadeIn();
 	$.getJSON("master-json.php", function( data ) {
 		controls.json = data;
-		for(i = 0; i < controls.jsonListeners.length; i++){
-			controls.jsonListeners[i]();
-		}
-     $('#loading-data').stop().fadeOut();
+		controls.updateJSON();
+    $('#loading-data').stop().fadeOut();
 	})
   .fail(function() {
     $.growl.warning({title: "Uh oh...", message: "Live update feed failed to load."});
   });
-}
+};
 
 controls.addJSONListener = function(callback)
 {
 	controls.jsonListeners.push(callback);
-}
+};
 
 controls.addBalanceListener = function(callback)
 {
   controls.balanceListeners.push(callback);
-}
+};
+
+controls.addVolumeListener = function(callback)
+{
+  controls.volumeListeners.push(callback);
+};
+
+controls.addOrderbookListener = function(callback)
+{
+  controls.orderbookListeners.push(callback);
+};
 
 controls.changeFtmState = function(state)
 {
@@ -119,7 +173,7 @@ controls.changeFtmState = function(state)
 
     $.cookie('btcftm_ftmstate', state);
 	}
-}
+};
 
 controls.updateMarketTicker = function()
 {
@@ -162,13 +216,13 @@ controls.updateMarketTicker = function()
       var welcomeW = header.find('.welcome').outerWidth();
       var tickerW = hWidth - (titleW + accountW + welcomeW);
 
-      var dH = Math.max(0, tWidth - tickerW) + 100;
+      var dH = Math.max(0, tWidth - tickerW) + titleW;
       tw.animate({'left': -dH+"px"}, controls.jsonInt, 'linear');
     });
   });
 
   //tw.marquee();
-}
+};
 
 controls.bindSidebarMenu = function()
 {
@@ -190,7 +244,7 @@ controls.bindSidebarMenu = function()
 	/*$('#sidebar li a').click(function(e){
 		return false;
 	});*/
-}
+};
 
 controls.bindAccountMenu = function()
 {
@@ -223,7 +277,7 @@ controls.bindAccountMenu = function()
 			return false;
 		}
 	});
-}
+};
 
 controls.startControls = function()
 {
@@ -231,6 +285,8 @@ controls.startControls = function()
     var hash = $.cookie('btcftm_ftmstate');
     controls.changeFtmState(hash);
   }
+
+  controls.updateVolume(controls.volume);
   //var hash = window.location.hash.replace("#","");
   //controls.changeFtmState(hash);
 
@@ -242,7 +298,7 @@ controls.startControls = function()
     }
     $(this).removeClass('init');
   });
-}
+};
 
 $(document).ready(function(){
   controls.loadClient();
@@ -253,3 +309,28 @@ $(document).ready(function(){
 	controls.bindAccountMenu();
   controls.startControls();
 });
+
+function noEvent(e)
+{
+  e.preventDefault();
+  e.stopPropagation();
+  return false;
+};
+
+function sanitizeMarketName(mname)
+{
+  return mname.replace("History","").replace("USD","");
+};
+
+function isArrowKey(e)
+{
+  return e.keyCode >= 37 && e.keyCode <= 40;
+}
+
+function getObjectSize(obj) {
+  var size = 0, key;
+  for (key in obj) {
+      if (obj.hasOwnProperty(key)) size++;
+  }
+  return size;
+};

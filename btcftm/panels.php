@@ -1,18 +1,19 @@
 <?php
 $panels = array(
   "account_balance",
+  "orderbooks",
 //  "portfolio_perc",
   "dashboard",
   "charts",
   "markets",
   "transfer",
   "matrix",
-  "orderbooks",
   "orders",
   "portfolio",
   "settings",
-  "bots",
-  "sims",
-  "arbitrage"
+//  "bots",
+//  "sims",
+  "arbitrage",
+  "best_ops"
 );
 ?>

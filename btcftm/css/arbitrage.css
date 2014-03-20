@@ -114,11 +114,11 @@
   background-color: #444;
 }
 
-#return-to-the-matrix a {
+#return-to-the-matrix a, #return-to-best-ops a {
   color: #ddd;
 }
 
-#return-to-the-matrix a:hover {
+#return-to-the-matrix a:hover, #return-to-best-ops a:hover {
   color: #fff;
 }
 

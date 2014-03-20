@@ -113,7 +113,7 @@ class Arbitrage
 		// load markets from DB
 		if (!$markets) {
 			$markets = array();
-			$res = $DB->query("SELECT * FROM markets ORDER BY id ASC");
+			$res = $DB->query("SELECT * FROM markets WHERE active=1 ORDER BY id ASC");
 			while($row = $DB->fetch_array_assoc($res)){
 				array_push($markets, $row['name']);
 			}
@@ -252,7 +252,6 @@ class Arbitrage
 		$json = array(
 			"timestamp" => 0, 
 			"markets" 	=> array(), 
-			"mob"				=> array(), 
 			"yesterday" => array(
 				"markets" => array(),
 				"mob" => array()
@@ -274,12 +273,12 @@ class Arbitrage
 			$json['markets'][$mkt->mname] = array(
 				"name" => $mkt->mname,
 				"currency" => $mkt->currency,
-				"high" => (float) $t->getHigh(),
-				"low" => (float) $t->getLow(),
-				"last" => (float) $t->getLast(),
-				"bid" => (float) $t->getBid(),
-				"ask" => (float) $t->getAsk(),
-				"volume" => (float) $t->getVolume(),
+				"high" => (float) ($t ? $t->getHigh() : -1),
+				"low" => (float) ($t ? $t->getLow() : -1),
+				"last" => (float) ($t ? $t->getLast() : -1),
+				"bid" => (float) ($t ? $t->getBid() : -1),
+				"ask" => (float) ($t ? $t->getAsk() : -1),
+				"volume" => (float) ($t ? $t->getVolume() : -1),
 				"commission" => (float) $mkt->commission,
 				"sma10" => (float) (($sma10) ? $sma10->getAvg() : -1),
 				"sma25" => (float) (($sma25) ? $sma25->getAvg() : -1)
@@ -288,31 +287,31 @@ class Arbitrage
 			$json['yesterday']['markets'][$mkt->mname] = array(
 				"name" => $mkt->mname,
 				"currency" => $mkt->currency,
-				"high" => (float) $y->getHigh(),
-				"low" => (float) $y->getLow(),
-				"last" => (float) $y->getLast(),
-				"bid" => (float) $y->getBid(),
-				"ask" => (float) $y->getAsk(),
-				"volume" => (float) $y->getVolume()
+				"high" => (float) ($y ? $y->getHigh() : -1),
+				"low" => (float) ($y ? $y->getLow() : -1),
+				"last" => (float) ($y ? $y->getLast() : -1),
+				"bid" => (float) ($y ? $y->getBid() : -1),
+				"ask" => (float) ($y ? $y->getAsk() : -1),
+				"volume" => (float) ($y ? $y->getVolume() : -1)
 			);
 
-			$dhigh = (float) ($t->getHigh() - $y->getHigh());
-			$dlow = (float) ($t->getLow() - $y->getLow());
-			$dlast = (float) ($t->getLast() - $y->getLast());
-			$dbid = (float) ($t->getBid() - $y->getBid());
-			$dask = (float) ($t->getAsk() - $y->getAsk());
-			$dsma10 = (float) ($t->getLast() - $sma10->getAvg());
-			$dsma25 = (float) ($t->getLast() - $sma25->getAvg());
-			$dvol = (float) ($t->getVolume() - $y->getVolume());
+			$dhigh = (float) (($t && $y) ? ($t->getHigh() - $y->getHigh()) : -1);
+			$dlow = (float) (($t && $y) ? ($t->getLow() - $y->getLow()) : -1);
+			$dlast = (float) (($t && $y) ? ($t->getLast() - $y->getLast()) : -1);
+			$dbid = (float) (($t && $y) ? ($t->getBid() - $y->getBid()) : -1);
+			$dask = (float) (($t && $y) ? ($t->getAsk() - $y->getAsk()) : -1);
+			$dsma10 = (float) (($t && $sma10) ? ($t->getLast() - $sma10->getAvg()) : -1);
+			$dsma25 = (float) (($t && $sma25) ? ($t->getLast() - $sma25->getAvg()) : -1);
+			$dvol = (float) (($t && $y) ? ($t->getVolume() - $y->getVolume()) : -1);
 
-			$dhighPerc = (float) (($y->getHigh() > 0) ? $dhigh / $y->getHigh() : 0);
-			$dlowPerc = (float) (($y->getLow() > 0) ? $dlow / $y->getLow() : 0);
-			$dlastPerc = (float) (($y->getLast() > 0) ? $dlast / $y->getLast() : 0);
-			$dbidPerc = (float) (($y->getBid() > 0) ? $dbid / $y->getBid() : 0);
-			$daskPerc = (float) (($y->getAsk() > 0) ? $dask / $y->getAsk() : 0);
-			$dsma10Perc = (float) (($sma10->getAvg() > 0) ? $dsma10 / $sma10->getAvg() : 0);
-			$dsma25Perc = (float) (($sma25->getAvg() > 0) ? $dsma25 / $sma25->getAvg() : 0);
-			$dvolPerc = (float) (($y->getVolume() > 0) ? $dvol / $y->getVolume() : 0);
+			$dhighPerc = (float) (($y && $y->getHigh() > 0) ? $dhigh / $y->getHigh() : 0);
+			$dlowPerc = (float) (($y && $y->getLow() > 0) ? $dlow / $y->getLow() : 0);
+			$dlastPerc = (float) (($y && $y->getLast() > 0) ? $dlast / $y->getLast() : 0);
+			$dbidPerc = (float) (($y && $y->getBid() > 0) ? $dbid / $y->getBid() : 0);
+			$daskPerc = (float) (($y && $y->getAsk() > 0) ? $dask / $y->getAsk() : 0);
+			$dsma10Perc = (float) (($sma10 && $sma10->getAvg() > 0) ? $dsma10 / $sma10->getAvg() : 0);
+			$dsma25Perc = (float) (($sma25 && $sma25->getAvg() > 0) ? $dsma25 / $sma25->getAvg() : 0);
+			$dvolPerc = (float) (($y && $y->getVolume() > 0) ? $dvol / $y->getVolume() : 0);
 
 			$json['deltas']['markets'][$mkt->mname] = array(
 				"name" => $mkt->mname,
@@ -352,6 +351,7 @@ class Arbitrage
 			);
 		}
 
+		/*
 		$matrix = $this->mob->getFullExchangeMatrix();
 		foreach($matrix as $askname => $askM) {
 			$aname = str_replace("History", "", $askname);
@@ -393,6 +393,7 @@ class Arbitrage
 				);
 			}
 		}
+		*/
 
 		$json['timestamp'] = time();
 

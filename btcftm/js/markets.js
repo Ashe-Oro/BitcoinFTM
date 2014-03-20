@@ -22,7 +22,7 @@ markets.updateMarketsLive = function()
       markets.updateMarkets();
     }, markets.timeMS);
   }
-}
+};
 
 // new JSON-based function using callback listener
 markets.updateMarkets = function()
@@ -50,7 +50,7 @@ markets.updateMarkets = function()
   markets.updateMarketPerc(mname, 'sma25', dlt.sma25.perc);
   markets.updateMarketPerc(mname, 'volume', dlt.volume.perc);
  });
-}
+};
 
 markets.bindHoverState = function()
 {
@@ -76,7 +76,7 @@ markets.bindHoverState = function()
     }
     return noEvent(e);
   });
-}
+};
 
 markets.updateMarketValue = function(mname, valname, value)
 {
@@ -85,14 +85,14 @@ markets.updateMarketValue = function(mname, valname, value)
  } else {
   $('#mkt-'+valname+'-'+mname+' .val').html('...');
  }
-}
+};
 
 markets.updateMarketPerc = function(mname, valname, value)
 {
   var percVal = value.toFixed(3)+'%';
   var klass = (value > 0) ? 'pos' : (value < 0) ? 'neg' : 'neu';
   $('#mkt-'+valname+'-'+mname+' .perc').html("<span class='"+klass+"'><span class='market-perc-icon'></span>"+percVal+"</span>");
-}
+};
 
 $(document).ready(function() {
   markets.bindHoverState();

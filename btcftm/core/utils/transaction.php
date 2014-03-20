@@ -89,7 +89,7 @@ class Transaction
 
 		$ts = time();
 
-		$query = "INSERT INTO transaction SET clientid = {$this->clientid}, marketid = {$this->marketid}, timestamp = {$ts}, type = '{$this->type}', volume = {$this->volume},  price = {$this->price}, pre = {$this->pre}, com = {$this->com}, honey = {$this->honey}, final = {$this->final}, fiat = '{$this->fiat}', crypt = '{$this->crypt}', live = {$config['live']}"; 
+		$query = "INSERT INTO transactions SET clientid = {$this->clientid}, marketid = {$this->marketid}, timestamp = {$ts}, type = '{$this->type}', volume = {$this->volume},  price = {$this->price}, pre = {$this->pre}, com = {$this->com}, honey = {$this->honey}, final = {$this->final}, fiat = '{$this->fiat}', crypt = '{$this->crypt}', live = {$config['live']}"; 
 		
 		$res = $DB->query($query);
 		if ($res) {
@@ -109,7 +109,7 @@ class Transaction
 
 		$ts = time();
 
-		$query = "UPDATE transaction SET timestamp = {$ts}, type = '{$this->type}', volume = {$this->volume},  price = {$this->price}, pre = {$this->pre}, com = {$this->com}, honey = {$this->honey}, final = {$this->final}, fiat = '{$this->fiat}', crypt = '{$this->crypt}', live = {$config['live']} WHERE clientid = {$this->clientid} AND marketid = {$this->marketid} AND txid = {$this->txid}"; 
+		$query = "UPDATE transactions SET timestamp = {$ts}, type = '{$this->type}', volume = {$this->volume},  price = {$this->price}, pre = {$this->pre}, com = {$this->com}, honey = {$this->honey}, final = {$this->final}, fiat = '{$this->fiat}', crypt = '{$this->crypt}', live = {$config['live']} WHERE clientid = {$this->clientid} AND marketid = {$this->marketid} AND txid = {$this->txid}"; 
 		
 		$res = $DB->query($query);
 		if ($res) {

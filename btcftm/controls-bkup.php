@@ -83,7 +83,7 @@ if ($signedIn == 1) {
 <div id="container">
 
 <div id="topbar" class="clearfix full">
-<h2 class="title">Bitcoin Finance Trade Manager</h2>
+<h2 class="title">GetDemCoins.com</h2>
     
 <h3 class="welcome">Welcome, <b><?php echo $client->getName(); ?></b>! <small>(<a href="controls.php?signout=1">Sign Out</a>)</small></h3>
 </div>

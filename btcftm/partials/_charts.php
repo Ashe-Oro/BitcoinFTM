@@ -36,7 +36,7 @@
 	</div>
 	<div class="chart-item">
 		<label for="chart-nomtgox">Hide MtGox?: </label>
-		<input type="checkbox" name="chart-nomtgox" id="chart-nomtgox" />
+		<input type="checkbox" name="chart-nomtgox" id="chart-nomtgox" checked="checked" />
 	</div>
 	<div class="chart-item">
 		<input type="submit" id="chart-submit" value="Update Chart" />

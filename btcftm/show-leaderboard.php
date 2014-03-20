@@ -4,12 +4,14 @@ require_once("core/include.php");
 
 $args = array("nomob"=>true, "history"=>1);
 $a = new Arbitrage(NULL, $args);
-$cList = $a->clients;
+$cList = $a->clients->getClientsList();
 $markets = $a->markets;
 
 $usd = 0;
 $btc = 0;
 $gameid = 1;
+
+$totals = array();
 
 foreach($cList as $c){
   if ($c->getGameID() == $gameid) {

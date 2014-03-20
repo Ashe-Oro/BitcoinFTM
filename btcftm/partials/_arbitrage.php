@@ -4,7 +4,7 @@
 
   <div id="arbitrage-volume" class="arbitrage-item">
     <h3>How many Bitcoins do you want to move?</h3>
-    <input type="text" name="arbitrage-volume-val" id="arbitrage-volume-val" value="0.1" />
+    <input type="text" name="arbitrage-volume-val" id="arbitrage-volume-val" value="1.0" />
     <div id="arbitrage-capital">Available Capital: <span id="arbitrage-capital-usd"></span> @ <span class="ask-market-name"></span>, <span id="arbitrage-capital-btc"></span> @ <span class="bid-market-name"></span></div>
     <div id="arbitrage-max">Max Transaction Volume: <span id="arbitrage-max-btc"></span> (<span id="arbitrage-max-usd"></span>)</div>
   </div>
@@ -60,4 +60,5 @@
   </div>
 </div>
 
+<h3 id="return-to-best-ops"><a href="#dashboard">Return to the Dashboard</a></h3>
 <h3 id="return-to-the-matrix"><a href="#matrix">Return to the Arbitrage Exchange Matrix</a></h3>

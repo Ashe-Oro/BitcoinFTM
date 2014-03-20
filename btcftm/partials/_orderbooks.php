@@ -3,7 +3,7 @@
 <div id="orderbooks-controls">
 	<div class="orderbooks-item">
 		<label for="orderbooks-btcvol">Bitcoin Volume: </label>
-		<input type="text" name="orderbooks-btcvol" id="orderbooks-btcvol" size="20" value="10" />
+		<input type="text" name="orderbooks-btcvol" id="orderbooks-btcvol" size="20" value="1.0" />
 	</div>
 </div>
 
@@ -28,7 +28,7 @@ foreach($markets as $mkt) {
 ?>
 </tr>
 
-<tr>
+<tr id="orderbooks-data">
 <?php
 echo $ARB->mob->printOrderBooks(true);
 /*

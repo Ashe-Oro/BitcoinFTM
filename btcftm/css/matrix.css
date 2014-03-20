@@ -1,3 +1,8 @@
+#matrix-controls {
+	padding: 5px;
+	text-align: left;
+}
+
 #matrix table {
 	width: 100%;
 }

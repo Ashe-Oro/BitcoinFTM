@@ -173,6 +173,8 @@ class Portfolio
 			$mkt = $this->getPrivateMarket($pname);
 			if ($mkt) {
 				$full[$pname] = array(
+					// finish this after building MarketsList
+					
 					//"btc2usd" => $b['btc'] * $mkt->
 				);
 			}

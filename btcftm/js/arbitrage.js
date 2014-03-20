@@ -1,6 +1,7 @@
 var arbitrage = new Object();
 arbitrage.askmarket = "Bitstamp";
 arbitrage.bidmarket = "Bitfinex";
+arbitrage.refer = "matrix";
 
 arbitrage.setArbitrageMarkets = function(aname, bname)
 {
@@ -11,7 +12,7 @@ arbitrage.setArbitrageMarkets = function(aname, bname)
   if (controls.json){
     arbitrage.updateArbitage();
   }
-}
+};
 
 arbitrage.updateCapital = function()
 {
@@ -31,11 +32,11 @@ arbitrage.updateCapital = function()
   $('#arbitrage-capital .bid-market-name').html(arbitrage.bidmarket);
   $('#arbitrage-ask-market').html(arbitrage.askmarket);
   $('#arbitrage-sell-market').html(arbitrage.bidmarket);
-}
+};
 
 arbitrage.updateArbitage = function()
 {
-  if (!arbitrage.askmarket || !arbitrage.bidmarket) { return; }
+  if (!controls.json || !arbitrage.askmarket || !arbitrage.bidmarket) { return; }
 
   // do arbitrage buy/sell update here
   var buySelect = $('#arbitrage-select-buy');
@@ -97,7 +98,7 @@ arbitrage.updateArbitage = function()
     $('#arbitrage-sell-total').html('...');
   }
   arbitrage.setButtonStates();
-}
+};
 
 arbitrage.setButtonStates = function()
 {
@@ -145,7 +146,7 @@ arbitrage.setButtonStates = function()
     arbBuy.addClass('disabled');
     arbSell.addClass('disabled');
   }
-}
+};
 
 arbitrage.beginArbitrage = function(){
   var arbBtn = $('#arbitrage-btn');
@@ -190,12 +191,49 @@ arbitrage.beginArbitrage = function(){
       controls.updateBalance(); 
     });
   }
+};
+
+arbitrage.setVolume = function(vol)
+{
+  if (!isNaN(vol)){
+    $('#arbitrage-volume-val').val(vol);
+    arbitrage.updateArbitage();
+    arbitrage.setButtonStates();
+  }
+};
+
+arbitrage.updateVolume = function()
+{
+  $('#arbitrage-volume-val').val(controls.volume);
+  arbitrage.updateArbitage();
+};
+
+arbitrage.setReferral = function(ref)
+{
+  arbitrage.refer = ref;
+  arbitrage.updateReferral();
+}
+
+arbitrage.updateReferral = function()
+{
+  if (arbitrage.refer == 'matrix'){
+    $('#return-to-the-matrix').show();
+    $('#return-to-best-ops').hide();
+  } else if (arbitrage.refer == 'dashboard'){
+    $('#return-to-the-matrix').hide();
+    $('#return-to-best-ops').show();
+  } else {
+    $('#return-to-the-matrix').hide();
+    $('#return-to-best-ops').hide();
+  }
 }
 
 arbitrage.initButtons = function()
 {
   $('#arbitrage-volume-val').on('keyup', function(e){
-    arbitrage.updateArbitage();
+    if (!isArrowKey(e)){
+      controls.updateVolume($(this).val());
+    }
   });
 
   $('#arbitrage-select-buy').change(function(e){
@@ -216,8 +254,10 @@ arbitrage.initButtons = function()
   $('#arbitrage-btn').click(function(e){
     arbitrage.beginArbitrage();
     return noEvent(e);
-  })
-}
+  });
+
+  arbitrage.updateReferral();
+};
 
 $(document).ready(function(){
   arbitrage.initButtons();
@@ -226,4 +266,6 @@ $(document).ready(function(){
     arbitrage.updateCapital();
     arbitrage.updateArbitage();
   });
+  controls.addVolumeListener(arbitrage.updateVolume);
+  controls.addOrderbookListener(arbitrage.updateArbitage);
 });

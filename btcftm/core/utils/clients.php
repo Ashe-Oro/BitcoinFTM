@@ -44,15 +44,15 @@ class Client
 				
 				if ($client) {
 					iLog("[Clients] Initializing client - ID: {$client['clientid']}, username: {$client['username']}");
-					$this->clientID = $client['clientid'];
+					$this->clientID = (int) $client['clientid'];
 					$this->firstName = $client['firstname'];
 					$this->lastName = $client['lastname'];
 					$this->userName = $client['username'];
 					
-					$this->active = $client['active'];
-					$this->trading = $client['trading'];
+					$this->active = (bool) $client['active'];
+					$this->trading = (bool) $client['trading'];
 
-					$this->gameID = $client['gameid'];
+					$this->gameID = (int) $client['gameid'];
 					
 					$this->_initTraderBots($client);
 					$this->_initPortfolio($client);

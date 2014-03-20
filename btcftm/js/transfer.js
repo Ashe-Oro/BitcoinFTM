@@ -11,7 +11,7 @@ transfer.setTransferMarkets = function(from, to)
   if (controls.json){
     transfer.updateTransfer();
   }
-}
+};
 
 transfer.updateCapital = function()
 {
@@ -30,7 +30,13 @@ transfer.updateCapital = function()
   } else {
     $('#transfer-to-btc').html(controls.printCurrency(0, 'BTC'));
   }
-}
+};
+
+transfer.updateVolume = function()
+{
+  $('#transfer-volume-val').val(controls.volume);
+  transfer.updateTransfer();
+};
 
 transfer.updateTransfer = function()
 {
@@ -49,34 +55,45 @@ transfer.updateTransfer = function()
   var tomkt = controls.json.markets[transfer.tomarket];
   var fromPrice = frommkt.bid;
   var toPrice = tomkt.bid;
+  var fromWPrice = orderbooks.markets[transfer.frommarket].bidW;
+  var toWPrice = orderbooks.markets[transfer.tomarket].bidW;
 
   var btcVol = parseFloat($('#transfer-volume-val').val());
 
-  $('#transfer-from-bid').html(controls.printCurrency(fromPrice, 'USD'));
-  $('#transfer-to-bid').html(controls.printCurrency(toPrice, 'USD'));
+//  $('#transfer-from-bid').html(controls.printCurrency(fromPrice, 'USD'));
+//  $('#transfer-to-bid').html(controls.printCurrency(toPrice, 'USD'));
+  $('#transfer-from-bid').html(controls.printCurrency(fromWPrice, 'USD'));
+  $('#transfer-to-bid').html(controls.printCurrency(toWPrice, 'USD'));
 
-  var fromVal = btcVol * fromPrice;
-  var toVal = btcVol * toPrice;
+  var fromVal = btcVol * fromWPrice;
+  var toVal = btcVol * toWPrice;
 
-  $('#transfer-from-value').html(controls.printCurrency(fromPrice, 'USD'));
-  $('#transfer-to-value').html(controls.printCurrency(toPrice, 'USD'));
+  $('#transfer-from-value').html(controls.printCurrency(fromVal, 'USD'));
+  $('#transfer-to-value').html(controls.printCurrency(toVal, 'USD'));
 
-  var spread = toPrice - fromPrice;
+  var spread = toWPrice - fromWPrice;
   var dVal = toVal - fromVal;
 
   $('#transfer-spread').html(controls.printCurrency(spread, 'USD'));
   $('#transfer-profit').html(controls.printCurrency(dVal, 'USD'));
-}
+
+  if (btcVol <= account.balances[transfer.frommarket].btc) {
+    $('#transfer-btn').removeClass('disabled');
+  } else {
+    $('#transfer-btn').addClass('disabled');
+  }
+};
 
 transfer.beginTransfer = function()
 {
   var xfrBtn = $('#transfer-btn');
-  if (controls.json){
+  if (controls.json && !xfrBtn.hasClass('disabled')){
     var fmkt = controls.json.markets[transfer.frommarket];
     var tmkt = controls.json.markets[transfer.tomarket];
     var btcVol = parseFloat($('#transfer-volume-val').val());
 
-    var crypt = 'btc'; // hard-code this for now
+    // hard-code this for now
+    var crypt = 'btc'; 
 
     var opts = {
       cid: controls.client.cid,
@@ -107,12 +124,14 @@ transfer.beginTransfer = function()
       controls.updateBalance(); 
     });
   }
-}
+};
 
 transfer.initButtons = function()
 {
   $('#transfer-volume-val').on('keyup', function(e){
-    transfer.updateTransfer();
+    if (!isArrowKey(e)){
+      controls.updateVolume($(this).val());
+    }
   });
 
   $('#transfer-select-from').change(function(e){
@@ -128,11 +147,11 @@ transfer.initButtons = function()
   $('#transfer-btn').click(function(e){
     transfer.beginTransfer();
     return noEvent(e);
-  })
+  });
 
   transfer.updateCapital();
   transfer.updateTransfer();
-}
+};
 
 
 $(document).ready(function(){
@@ -142,4 +161,6 @@ $(document).ready(function(){
     transfer.updateCapital();
     transfer.updateTransfer();
   });
+  controls.addVolumeListener(transfer.updateVolume);
+  controls.addOrderbookListener(transfer.updateTransfer);
 });
