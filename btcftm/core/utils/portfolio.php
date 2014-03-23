@@ -5,6 +5,7 @@ class Portfolio
 {
 	private $portfolioID = 0;
 	private $trades = array(); // array of trades
+	private $pmarketData = array();
 	public $privateMarkets = array(); // array of private market accounts
 	private $tradeCount = 0;
 	private $client = NULL;
@@ -12,10 +13,16 @@ class Portfolio
 	public function __construct($client, $clientArray, $portfolio=NULL)
 	{
 		global $config;
+		global $DB;
 		
 		$this->client = $client;
-		
-		$markets = $config['markets'];
+		$markets = array();
+
+		$res = $DB->query("SELECT * FROM privatemarkets LEFT OUTER JOIN markets ON privatemarkets.marketid = markets.id WHERE privatemarkets.clientid = ".$this->client->getID());
+		while ($pmkts = $DB->fetch_array_assoc($res)){
+			$this->pmarketData[$pmkts['name']] = $pmkts;
+			array_push($markets, $pmkts['name']);
+		}
 		
 		if ($portfolio) {
 			// load portfolio from DB here
@@ -29,24 +36,23 @@ class Portfolio
 	{		
 		foreach ($markets as $mname) {
 			$lowername = strtolower($mname);
-			$lowernameEx = str_replace("usd", "", $lowername);
-			$pFile = "./core/private_markets/private{$lowername}.php";
+			$pFile = "./core/private_markets/private{$lowername}usd.php";
 			if (file_exists($pFile)){
 				require_once($pFile);
-				$pName = "private".$mname;
+				$pName = "Private".$mname."USD";
 				try {
-					$cid = (int) (isset($cArray["{$lowernameEx}id"])) ? $cArray["{$lowernameEx}id"] : $this->client->getID();
-					$ckey = $this->getAPIKey($cid, $lowernameEx);
-					$csecret = $this->getAPISecret($cid, $lowernameEx);
+					$cid = (int) (isset($cArray["{$lowername}id"])) ? $cArray["{$lowername}id"] : $this->client->getID();
+					$ckey = $this->getAPIKey($cid, $mname);
+					$csecret = $this->getAPISecret($cid, $mname);
 					
 					if ($cid && strlen($ckey) && strlen($csecret)) {
 						$this->privateMarkets[$mname] = new $pName($cid, $ckey, $csecret);
 					} else {
 						if (!strlen($ckey)){	
-							iLog("[Portfolio] ERROR: Private market {$mname} missing key in client DB {$lowernameEx}key - ".$client["{$lowernameEx}key"]);
+							iLog("[Portfolio] ERROR: Private market {$mname} missing key in client DB {$lowername}key");
 						} else
 						if (!strlen($csecret)){
-							iLog("[Portfolio] ERROR: Private market {$mname} missing secret in client DB - ".$client["{$lowernameEx}secret"]);
+							iLog("[Portfolio] ERROR: Private market {$mname} missing secret in client DB");
 						}
 						
 					}
@@ -61,6 +67,10 @@ class Portfolio
 	
 	private function getAPIKey($cid, $market) {
 		global $DB;
+
+		if (isset($this->pmarketData[$market])){
+			return $this->pmarketData[$market]['apiKey'];
+		}
 
 		try {
 			$mid = $this->getMarketId($market);
@@ -85,6 +95,10 @@ class Portfolio
 
 	private function getAPISecret($cid, $market) {
 		global $DB;
+
+		if (isset($this->pmarketData[$market])){
+			return $this->pmarketData[$market]['apiSecret'];
+		}
 
 		try {
 			$mid = $this->getMarketId($market);
@@ -140,10 +154,32 @@ class Portfolio
 	{
 		$balances = array();
 		foreach($this->privateMarkets as $pname => $pmarket){
-			$balances[$pname] = array("BTC" => $this->privateMarkets->getBalance("BTC"), "USD" => $this->privateMarkets->getBalance("USD"));
-			iLog("[Portfolio] Balance at {$pname} - {$balances[$pname]['BTC']}BTC, {$balances[$pname]['USD']}USD");
+			$balances[$pname] = array(
+				"btc" => $pmarket->getBalance("BTC"), 
+				"usd" => $pmarket->getBalance("USD"),
+				"ltc" => $pmarket->getBalance("LTC"),
+				"eur" => $pmarket->getBalance("EUR")
+			);
+			iLog("[Portfolio] Balance at {$pname} - {$balances[$pname]['btc']}BTC, {$balances[$pname]['usd']}USD");
 		}
 		return $balances;
+	}
+
+	public function getFullBalances()
+	{
+		$bals = $this->getBalances();
+		$full = array();
+		foreach($bals as $pname => $b){
+			$mkt = $this->getPrivateMarket($pname);
+			if ($mkt) {
+				$full[$pname] = array(
+					// finish this after building MarketsList
+					
+					//"btc2usd" => $b['btc'] * $mkt->
+				);
+			}
+		}
+		return $full;
 	}
 	
 	public function updateBalances()
@@ -151,6 +187,28 @@ class Portfolio
 		foreach($this->privateMarkets as $pname => $pmarket){
 			$this->privateMarkets[$pname]->getInfo();
 		}
+	}
+
+	public function arbitrage($askname, $ask, $bidname, $bid, $volume, $crypt, $fiat)
+	{
+		$amkt = $this->getPrivateMarket($askname);
+		$bmkt = $this->getPrivateMarket($bidname);
+
+		if ($amkt && $bmkt && $ask > 0 && $bid > 0 && $volume > 0 && is_string($crypt) && is_string($fiat)){
+			return ($amkt->buy($volume, $ask, $crypt, $fiat) && $bmkt->sell($volume, $bid, $crypt, $fiat));
+		}
+		return false;
+	}
+
+	public function transfer($fromname, $toname, $volume, $crypt)
+	{
+		$fmkt = $this->getPrivateMarket($fromname);
+		$tmkt = $this->getPrivateMarket($toname);
+
+		if ($fmkt && $tmkt && $volume > 0 && is_string($crypt)){
+			return ($fmkt->withdraw($volume, $crypt) && $tmkt->deposit($volume, $crypt));
+		}
+		return false;
 	}
 	
 	public function addTrade($trade)

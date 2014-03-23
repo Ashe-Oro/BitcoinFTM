@@ -1,0 +1,128 @@
+#arbitrage-wrapper {
+  display: block;
+  position: relative;
+  width: 80%;
+  height: auto;
+  border: 1px solid #444;
+  margin: 0px auto;
+}
+
+#arbitrage .arbitrage-item {
+  margin-bottom: 20px;
+}
+
+
+#arbitrage-vol-price {
+  position: relative;
+  display: block;
+  margin-bottom: 20px;
+}
+
+#arbitrage-volume {
+  position: relative;
+  display: block;
+  width: 100%;
+  float: none;
+}
+
+#arbitrage .buy-market {
+  display: block;
+  float: left;
+  width: 48%;
+}
+
+#arbitrage .sell-market {
+  display: block;
+  float: left;
+  width: 48%;
+}
+
+/***/
+
+#arbitrage .buysell-btn {
+  display: inline-block;
+  padding: 5px 15px;
+  color: #fff;
+  text-shadow: 0px 1px 1px rgba(0,0,0,0.5);
+  width: 310px;
+  height: 95px;
+}
+
+#arbitrage .buysell-btn .order-label {
+  display: block;
+  font-size: 42px;
+  line-height: 95px;
+  width: 75px;
+  height: 95px;
+  float: left;
+  margin-right: 25px;
+}
+
+#arbitrage .buysell-btn .order-realtime {
+  display: block;
+  width: 180px;
+  height: 75px;
+  font-size: 16px;
+  line-height: 25px;
+  float: left;
+  text-align: left;
+}
+
+
+#arbitrage-buy-info {
+  background-color: #090;
+}
+
+#arbitrage-sell-info {
+  background-color: #900;
+}
+
+#arbitrage-btn.buysell-btn {
+  display: block;
+  width: 600px;
+  margin: 0px auto;
+   padding: 15px 15px;
+   text-shadow: 0px 1px 1px rgba(0,0,0,0.5);
+  cursor: pointer;
+  height: 75px;
+  color: #fff;
+  background-color: #f26522;
+}
+
+#arbitrage-btn:hover {
+  background-color: #f7941d;
+}
+
+#arbitrage-btn.buysell-btn .order-label {
+  display: block;
+  font-size: 42px;
+  line-height: 75px;
+  width: 250px;
+  height: 75px;
+  float: left;
+  margin-right: 25px;
+}
+
+#arbitrage-btn.buysell-btn .order-realtime {
+  width: 300px;
+}
+
+#arbitrage-btn.disabled, #arbitrage-btn.disabled:hover, #arbitrage-btn.disabled:active,
+#arbitrage-buy-info.disabled, #arbitrage-sell-info.disabled {
+  cursor:  default;
+  color: #ccc;
+  background-color: #444;
+}
+
+#return-to-the-matrix a, #return-to-best-ops a {
+  color: #ddd;
+}
+
+#return-to-the-matrix a:hover, #return-to-best-ops a:hover {
+  color: #fff;
+}
+
+
+
+
+

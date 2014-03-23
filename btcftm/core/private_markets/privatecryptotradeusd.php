@@ -9,9 +9,6 @@ class PrivateCryptoTradeUSD extends PrivateMarket
     const METHOD_TRADE = "/private/trade/";
 
     private $apiVersion = 1;
-    private $privatekey = '';
-    private $secret = '';
-    private $clientID = '';
     
     private $ch = NULL;
 
@@ -28,7 +25,7 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         $this->clientID = $clientID;
     }
 
-    protected function _sendRequest($url, $params=array(), $method)
+    protected function _sendRequest($url, $params=array(), $extraHeaders=NULL)
     {
         $rUrl = $url . self::API . $this->apiVersion . $method;                
         $response = array();
@@ -37,6 +34,8 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         $response['return'] = false;
         iLog("[PrivateCryptoTradeUSD] Sending Request: {$rUrl}");
         
+        $method = $params['method'];
+        unset($params['method']);
         
         if ($method == self::METHOD_TRADE) {
                 iLog("[PrivateCryptoTradeUSD] WARNING: Request not sent. Live sell and buy functions currently disabled.");
@@ -71,7 +70,7 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         if ($res === false) {
             throw new Exception('Could not get reply: ' . curl_error($this->ch));
         }
-        $json = json_decode($res, true);
+        $json = json_decode($res);
         if (!$json) {
             throw new Exception('Invalid data received, please make sure connection is working and requested API exists');
         }
@@ -88,7 +87,7 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         return hash_hmac('sha512', $post_data, $this->secret);
     }
 
-    protected function _buy($amount, $price)
+    protected function _buyLive($amount, $price, $crypto="BTC", $fiat="USD")
     {
         iLog("[PrivateCryptoTradeUSD] Create BUY limit order {$amount} @{$price}USD");
 
@@ -115,7 +114,7 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         return false;
     }
 
-    protected function _sell($amount, $price)
+    protected function _sellLive($amount, $price, $crypto="BTC", $fiat="USD")
     {        
         iLog("[PrivateCryptoTradeUSD] Create BUY limit order {$amount} @{$price}USD");
         
@@ -142,7 +141,7 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         return false;
     }
 
-    public function getInfo()
+    protected function _getLiveInfo()
     {
         global $config;
         global $DB;
@@ -171,10 +170,12 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         }
         else {
             try {
-                $result = $DB->query("SELECT * FROM privatemarkets WHERE apiKey = '{$this->privatekey}' AND clientid = '{$this->clientId}'");
+                $result = $DB->query("SELECT * FROM privatemarkets WHERE marketid = {$this->publicmarketid} AND clientid = {$this->clientId}");
                 if ($client = $DB->fetch_array_assoc($result)){
-                    $this->btcBalance = $client['btc'];
-                    $this->usdBalance = $client['usd'];
+                    $this->btcBalance = (float) ($client['btc'] != NULL ? $client['btc'] : 0);
+                    $this->usdBalance = (float) ($client['usd'] != NULL ? $client['usd'] : 0);
+                    $this->ltcBalance = (float) ($client['ltc'] != NULL ? $client['ltc'] : 0);
+                    $this->eurBalance = (float) ($client['eur'] != NULL ? $client['eur'] : 0);
                     iLog("[PrivateCryptoTradeUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
                     return true;
                 }
@@ -185,5 +186,14 @@ class PrivateCryptoTradeUSD extends PrivateMarket
         }
         return false;
     }
+
+  protected function _withdrawLive($amount, $currency)
+  {
+    // implement eventually
+  }
+  protected function _depositLive($amount, $currency)
+  {
+    // implement eventually
+  }
 }
 ?>

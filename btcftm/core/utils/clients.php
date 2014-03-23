@@ -18,6 +18,8 @@ class Client
 	private $active = 0;
 	private $trading = 0;
 	private $bots = array();
+
+	private $gameID = 0;
 	
 	public function __construct($clientID)
 	{
@@ -42,13 +44,15 @@ class Client
 				
 				if ($client) {
 					iLog("[Clients] Initializing client - ID: {$client['clientid']}, username: {$client['username']}");
-					$this->clientID = $client['clientid'];
+					$this->clientID = (int) $client['clientid'];
 					$this->firstName = $client['firstname'];
 					$this->lastName = $client['lastname'];
 					$this->userName = $client['username'];
 					
-					$this->active = $client['active'];
-					$this->trading = $client['trading'];
+					$this->active = (bool) $client['active'];
+					$this->trading = (bool) $client['trading'];
+
+					$this->gameID = (int) $client['gameid'];
 					
 					$this->_initTraderBots($client);
 					$this->_initPortfolio($client);
@@ -92,7 +96,8 @@ class Client
 	
 	public function getMarketBalance($mname, $currency)
 	{
-		if ($mkt = $this->getPrivateMarket($mname."USD")){
+		if ($mkt = $this->getPrivateMarket($mname)){
+			//var_dump($mkt);
 			return $mkt->getBalance($currency);
 		}
 		return -1;
@@ -113,6 +118,16 @@ class Client
 		return $this->clientID;
 	}
 	
+	public function getFirstName()
+	{
+		return $this->firstName;
+	}
+
+	public function getLastName()
+	{
+		return $this->lastName;
+	}
+
 	public function getName()
 	{
 		return $this->firstName.' '.$this->lastName;
@@ -136,6 +151,11 @@ class Client
 	public function getTraderBots()
 	{
 		return $this->bots;
+	}
+
+	public function getGameID()
+	{
+		return $this->gameID;
 	}
 }
 

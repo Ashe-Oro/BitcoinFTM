@@ -6,8 +6,8 @@ class Order
 	
 	public function __construct($price, $amount)
 	{
-		$this->price = $price;
-		$this->amount = $amount;
+		$this->price = (float) $price;
+		$this->amount = (float) $amount;
 	}
 	
 	public function getPrice()

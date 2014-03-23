@@ -1,0 +1,79 @@
+#matrix-controls {
+	padding: 5px;
+	text-align: left;
+}
+
+#matrix table {
+	width: 100%;
+}
+
+#matrix td {
+	display: table-cell;
+	padding: 5px;
+	margin: 2px;
+	text-align: right;
+	-moz-transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+	transition: all 0.5s;
+}
+
+#matrix td.highlight {
+	border: 1px solid #ff0;
+	background-color: #220;
+
+}
+
+#matrix td.highlight:hover {
+	cursor: pointer;
+	background-color: #440;
+}
+
+.pos { 
+color: #0c0;
+}
+
+.neg {
+color: #c00;
+}
+
+.ask {
+	background-color: #009;
+	color: #fff;
+}
+
+.bid {
+	background-color: #990;
+	color: #fff;
+}
+
+#enter-the-matrix .updating, #enter-the-matrix .waiting {
+	font-size: 11px;
+	color: #aaa;
+}
+
+.matrix-cell-value {
+	display: block;
+	font-size: 16px;
+}
+
+.matrix-cell-perc {
+	display: block;
+	font-size: 12px;
+}
+
+.matrix-perc-icon {
+	background: transparent url('../images/up-down.png') 0px 0px no-repeat;
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin: 0px 2px;
+	padding: 0px;
+}
+
+.neg .matrix-perc-icon {
+	background-position: 0px -16px;
+}
+
+.neu .matrix-perc-icon {
+	display: none;
+}

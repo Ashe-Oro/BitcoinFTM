@@ -10,10 +10,6 @@ class PrivateKrakenUSD extends PrivateMarket
 	//const PRIVATE = "private";
 
 	private $apiVersion = 0;
-
-    private $privatekey = '';
-    private $secret = '';
-	private $clientID = '';
 	
 	private $ch = NULL;
 
@@ -75,7 +71,7 @@ class PrivateKrakenUSD extends PrivateMarket
         if ($res === false) {
             throw new Exception('Could not get reply: ' . curl_error($this->ch));
 		}
-        $json = json_decode($res, true);
+        $json = json_decode($res);
         if (!$json) {
             throw new Exception('Invalid data received, please make sure connection is working and requested API exists');
 		}
@@ -96,7 +92,7 @@ class PrivateKrakenUSD extends PrivateMarket
 		return strtoupper(hash_hmac('sha256', $message, $this->secret));
 	}
 
-	protected function _buy($amount, $price)
+	protected function _buyLive($amount, $price, $crypto="BTC", $fiat="USD")
 	{
 		iLog("[PrivateKrakenUSD] Create BUY limit order {$amount} @{$price}USD");
 		$params = array('amount' => $amount, 'price' => $price);
@@ -116,7 +112,7 @@ class PrivateKrakenUSD extends PrivateMarket
 		return false;
 	}
 
-	protected function _sell($amount, $price)
+	protected function _sellLive($amount, $price, $crypto="BTC", $fiat="USD")
 	{	
 		iLog("[PrivateKrakenUSD] Create SELL limit order {$amount} @{$price}USD");
 		$params = array('amount' => $amount, 'price' => $price);
@@ -136,7 +132,7 @@ class PrivateKrakenUSD extends PrivateMarket
 		return false;
 	}
 
-	public function getInfo()
+	protected function _getLiveInfo()
 	{	
 		global $config;
 		global $DB;
@@ -146,10 +142,12 @@ class PrivateKrakenUSD extends PrivateMarket
 			$response = $this->_sendRequest(self::API_URL, "", self::METHOD_BALANCE);
 		} else {
 			try {
-				$result = $DB->query("SELECT * FROM privatemarkets WHERE apiKey = '{$this->privatekey}' AND clientid = '{$this->clientId}'");
+				$result = $DB->query("SELECT * FROM privatemarkets WHERE marketid = {$this->publicmarketid} AND clientid = {$this->clientId}");
 				if ($client = $DB->fetch_array_assoc($result)){
-					$this->btcBalance = $client['btc'];
-					$this->usdBalance = $client['usd'];
+					$this->btcBalance = (float) ($client['btc'] != NULL ? $client['btc'] : 0);
+					$this->usdBalance = (float) ($client['usd'] != NULL ? $client['usd'] : 0);
+					$this->ltcBalance = (float) ($client['ltc'] != NULL ? $client['ltc'] : 0);
+					$this->eurBalance = (float) ($client['eur'] != NULL ? $client['eur'] : 0);
 					iLog("[PrivateKrakenUSD] Get Balance: {$this->btcBalance}BTC, {$this->usdBalance}USD");
 					return true;
 				}
@@ -159,5 +157,14 @@ class PrivateKrakenUSD extends PrivateMarket
 			}			
 		}
 	}
+
+	protected function _withdrawLive($amount, $currency)
+	{
+		// implement eventually
+	}
+  protected function _depositLive($amount, $currency)
+  {
+  	// implement eventually
+  }
 }
 ?>

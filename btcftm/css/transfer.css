@@ -1,0 +1,110 @@
+#transfer .transfer-item {
+  margin-bottom: 20px;
+}
+
+
+#transfer-vol-price {
+  position: relative;
+  display: block;
+  margin-bottom: 20px;
+}
+
+#transfer-volume {
+  position: relative;
+  display: block;
+  width: 100%;
+  float: none;
+}
+
+#transfer .buy-market {
+  display: block;
+  float: left;
+  width: 48%;
+}
+
+#transfer .sell-market {
+  display: block;
+  float: left;
+  width: 48%;
+}
+
+/***/
+
+#transfer .buysell-btn {
+  display: inline-block;
+  padding: 5px 15px;
+  color: #fff;
+  text-shadow: 0px 1px 1px rgba(0,0,0,0.5);
+  width: 310px;
+  height: 95px;
+}
+
+#transfer .buysell-btn .order-label {
+  display: block;
+  font-size: 42px;
+  line-height: 95px;
+  width: 75px;
+  height: 95px;
+  float: left;
+  margin-right: 25px;
+}
+
+#transfer .buysell-btn .order-realtime {
+  display: block;
+  width: 180px;
+  height: 75px;
+  font-size: 16px;
+  line-height: 25px;
+  float: left;
+  text-align: left;
+}
+
+
+#transfer-from {
+  background-color: #900;
+}
+
+#transfer-to {
+  background-color: #090;
+}
+
+#transfer-btn.buysell-btn {
+  display: block;
+  width: 600px;
+  margin: 0px auto;
+   padding: 15px 15px;
+   text-shadow: 0px 1px 1px rgba(0,0,0,0.5);
+  cursor: pointer;
+  height: 75px;
+  color: #fff;
+  background-color: #f26522;
+}
+
+#transfer-btn:hover {
+  background-color: #f7941d;
+}
+
+#transfer-btn.buysell-btn .order-label {
+  display: block;
+  font-size: 42px;
+  line-height: 75px;
+  width: 250px;
+  height: 75px;
+  float: left;
+  margin-right: 25px;
+}
+
+#transfer-from .order-label {
+  width: 105px !important;
+}
+
+#transfer-btn.buysell-btn .order-realtime {
+  width: 300px;
+}
+
+#transfer-btn.disabled, #transfer-btn.disabled:hover, #transfer-btn.disabled:active,
+#transfer-from.disabled, #transfer-to.disabled {
+  cursor:  default;
+  color: #ccc;
+  background-color: #444;
+}

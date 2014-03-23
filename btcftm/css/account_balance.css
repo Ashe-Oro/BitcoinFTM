@@ -1,0 +1,61 @@
+#account-balance table {
+	width: 100%;
+}
+
+#account-balance td {
+	display: table-cell;
+	padding: 5px;
+	margin: 2px;
+	text-align: right;
+}
+
+#account-balance .marketname {
+	background-color: #444;
+	color: #fff;
+}
+
+#account-balance .account-mkt-name {
+	color: #fff;
+}
+
+#account-balance .price {
+	background-color: #444;
+	color: #fff;
+}
+
+#account-balance .usd {
+	color: #fff;
+}
+
+#account-balance .btc {
+	color: #fff;
+}
+
+#account-balance .total {
+	background-color: #900;
+	color: #fff;
+}
+
+#account-mkt-total td {
+	border-top: 1px solid #444;
+}
+
+#account-pie-charts svg {
+	height: 200px;
+}
+
+#account-pie-charts .account-pie {
+	display: block;
+	float: left;
+	width: 200px;
+	height: 200px;
+	margin-right: 20px;
+}
+
+#account-market-chart {
+	width: 350px !important;
+}
+
+#account-pie-charts .account-pie:last-child {
+	margin-right: 0px;
+}

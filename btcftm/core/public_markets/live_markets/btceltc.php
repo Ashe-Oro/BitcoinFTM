@@ -7,7 +7,6 @@ class BTCeLTC extends LiveMarket
 	{
 		parent::__construct("LTC");
 		//TODO This updateRate is a random guess... Find out real update rate
-		$this->updateRate = 100;
 		$this->depthUrl = "https://btc-e.com/api/2/ltc_btc/depth";
 		$this->tickerUrl = "https://btc-e.com/api/2/ltc_btc/ticker";
 	}
@@ -70,11 +69,12 @@ class BTCeLTC extends LiveMarket
 		return $tickers;
 	}
 	
-	public function getHistoryTicker($timestamp) {
+	public function getHistoryTicker($timestamp="") {
 		global $DB;
 		$ticker = NULL;
 		
-		if (is_string($timestamp)){ $timestamp = strtotime($timestamp); }
+		if (empty($timestamp)) { $timestamp = time(); }
+if (is_string($timestamp)){ $timestamp = strtotime($timestamp); }
 		if(is_int($timestamp)){
 			$qid = $DB->query("SELECT * FROM btceltc_ticker WHERE timestamp <= {$timestamp} ORDER BY timestamp DESC LIMIT 1");
 			$result = $DB->fetch_array_assoc($qid);

@@ -1,0 +1,89 @@
+#charts-overlay {
+	background-color: rgba(53,53,53,0.7);
+	color: #fff;
+}
+
+#charts-overlay-content {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-top: -81px;
+	margin-left: -81px;
+	padding: 10px 35px;
+	background: #000;
+	border: 1px solid #444;
+}
+
+#chart-controls {
+	position: absolute;
+	left: 0px;
+	bottom: 0px;
+	height: 30px;
+	width: 100%;
+	background-color: #444;
+	color: #fff;
+	line-height: 30px;
+	font-size: 14px;
+}
+
+#chart-controls label {
+	width: auto;
+	white-space: nowrap;
+	text-align: left;
+}
+
+#chart-controls input, #chart-controls select {
+	margin-top: 4px;
+}
+
+#chart-controls .chart-item {
+	display: inline-block;
+	float: left;
+	margin: 0px 5px;
+}
+
+#ftm-chart {
+	width: 100%;
+	height: 100%;
+	background: transparent;
+}
+
+#ftm-chart.loading {
+	background: url('../images/ajax-loader.gif') center center no-repeat;
+}
+
+.nv-linesWrap {
+	stroke: #444;
+}
+
+.nvd3 .nv-axis text {
+	fill: #ddd;
+}
+
+.nvd3 .nv-axis line {
+	stroke: #444;
+}
+
+.nv-legend-text {
+	fill: #ddd;
+}
+
+.nvtooltip {
+	background: #000;
+	border: 1px solid #666;
+}
+
+.nvtooltip h3 {
+  background-color: #444;
+  color: #fff;
+  border-bottom: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+}
+
+.nvtooltip table td.value {
+	padding: 2px 4px;
+	background: #111;
+	font-weight: bold;
+}

@@ -16,7 +16,7 @@ class MOB
 		foreach($markets as $m){
 			$m->updateMarketDepth();
 			$obook = $m->getOrderBook();
-			$this->orderbooks[$m->name] = $obook;
+			$this->orderbooks[$m->mname] = $obook;
 		}
 		$this->matrix = $this->_updateExchangeMatrix();
 		//$this->dumpOrderBooks();
@@ -122,11 +122,11 @@ class MOB
 		$matrix = array();
 		
 		foreach($this->markets as $m){
-			$matrix[$m->name] = array();
+			$matrix[$m->mname] = array();
 			foreach($this->orderbooks as $mname => $obook) {
-				if ($mname != $m->name){
-					$profit = $this->compareMarketOrderBooks($m->name, $mname);
-					$matrix[$m->name][$mname] = array("market" => $mname, "profit" => $profit);
+				if ($mname != $m->mname){
+					$profit = $this->compareMarketOrderBooks($m->mname, $mname);
+					$matrix[$m->mname][$mname] = array("market" => $mname, "profit" => $profit);
 					//iLog("[MOB] Opportunity for {$askMarketName} at {$mname}: {$profit}");
 				}
 			}
@@ -136,17 +136,41 @@ class MOB
 	
 	public function compareMarketOrderBooks($askMarketName, $bidMarketName)
 	{
+		global $config;
+
 		$aOrder = $this->getMarketAskTopOrder($askMarketName);
 		$bOrder = $this->getMarketBidTopOrder($bidMarketName);
+
+		$amkt = $this->markets[$askMarketName];
+		$bmkt = $this->markets[$bidMarketName];
 		
-		if ($aOrder && $bOrder) {
-			$aPrice = $aOrder->getPrice();
-			$bPrice = $bOrder->getPrice();
+		if ($aOrder && $bOrder && $amkt && $bmkt) {
+			$acom = $amkt->commission + $config['honey'];
+			$bcom = $bmkt->commission + $config['honey'];
+
+			$ask = $aOrder->getPrice();
+			$bid = $bOrder->getPrice();
+
+			$askCom = $ask * $acom;
+			$bidCom = $bid * $bcom;
+
+			$aPrice = $ask + $askCom;
+			$bPrice = $bid - $bidCom;
+
 			$dPrice = $bPrice - $aPrice;
 			iLog("[MOB] Ask Market {$askMarketName}: {$aPrice}, Bid Market {$bidMarketName}: {$bPrice}, Spread: {$dPrice}");
 			return $dPrice;
 		}
 		return NULL;
+	}
+
+	public function printOrderBooks($tablecell=true)
+	{
+		$str = "";
+		foreach($this->orderbooks as $mname => $obook) {
+			$str .= $obook->printOrderBooks($mname, $tablecell);
+		}
+		return $str;
 	}
 	
 	public function dumpOrderBooks()

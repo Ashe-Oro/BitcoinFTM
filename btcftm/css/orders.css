@@ -1,0 +1,187 @@
+#buysell {
+	display:  block;
+	position: relative;
+	text-align: center;
+	width: 100%;
+}
+
+#buysell-bitcoins {
+	display: block;
+	position: relative;
+	width: 80%;
+	height: auto;
+	border: 1px solid #444;
+	margin: 0px auto;
+}
+
+#buysell-not-available {
+	display: block;
+	position:  absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 1000000;
+	background-color: rgba(96,96,96,0.7);
+	color: #fff;
+	text-shadow: 2px 2px 2px #000;
+}
+
+#buysell-not-available h3 {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-top: -10px;
+	margin-left: -180px;
+}
+
+#buysell .order-item {
+	margin-bottom: 20px;
+}
+
+#buysell-bitcoin-markets {
+	display: block;
+	margin: 0px auto 10px auto;
+	padding:  5px;
+	list-style: none;
+	width: 80%;
+	border: 1px solid #444;
+}
+
+#buysell-bitcoin-markets li {
+	display: table-cell;
+	text-align:  center;
+	padding: 5px 10px;
+	list-style:  none;
+	float: none;
+}
+
+#buysell-bitcoin-markets li a {
+	color: #ddd;
+}
+
+#buysell-bitcoin-markets li:hover {
+	background-color: #222;
+}
+
+#buysell-bitcoin-markets li:hover > a {
+	color: #fff;
+	text-decoration:  underline;
+}
+
+#buysell-bitcoin-markets li.active {
+	background-color: #444;
+}
+
+#buysell .order-type-button {
+	display: inline-block;
+	padding: 35px;
+	color: #fff;
+	font-size: 20px;
+	cursor: pointer;
+}
+
+#buysell .order-type-button.active {
+	background-color: #444;
+	cursor:  default;
+}
+
+#order-vol-price {
+	position: relative;
+	display: block;
+	margin-bottom: 20px;
+}
+
+#order-volume {
+	position: relative;
+	display: block;
+	width: 100%;
+	float: none;
+}
+
+#order-vol-price.limit #order-volume {
+	display: block;
+	width: 48%;
+	float: left;
+}
+
+#order-vol-price.limit #order-limit-price {
+	display: block;
+	width: 48%;
+	float: left;
+}
+
+#order-volume-val, #order-limit-price-val {
+	font-size: 18px;
+	padding: 5px;
+}
+
+#buysell .buysell-btn {
+	display: inline-block;
+	padding: 15px 15px;
+	color: #fff;
+	text-shadow: 0px 1px 1px rgba(0,0,0,0.5);
+	cursor: pointer;
+	width: 310px;
+	height: 75px;
+}
+
+#buysell .buysell-btn .order-label {
+	display: block;
+	font-size: 42px;
+	line-height: 75px;
+	width: 75px;
+	height: 75px;
+	float: left;
+	margin-right: 25px;
+}
+
+#buysell .buysell-btn .order-realtime {
+	display: block;
+	width: 180px;
+	height: 75px;
+	font-size: 16px;
+	line-height: 25px;
+	float: left;
+	text-align: left;
+}
+
+
+#buy-button {
+	background-color: #090;
+}
+
+#buy-button:hover {
+	cursor: pointer;
+	background-color: #0a0;
+}
+
+#buy-button:active {
+	cursor: pointer;
+	background-color: #0f0;
+}
+
+#buy-button.disabled, #buy-button.disabled:hover, #buy-button.disabled:active {
+	cursor:  default;
+	color: #ccc;
+	background-color: #444;
+}
+
+#sell-button {
+	cursor: pointer;
+	background-color: #900;
+}
+
+#sell-button:hover {
+	cursor: pointer;
+	background-color: #a00;
+}
+
+#sell-button:active {
+	cursor: pointer;
+	background-color: #f00;
+}
+
+#sell-button.disabled, #sell-button.disabled:hover, #sell-button.disabled:active {
+	cursor:  default;
+	color: #ccc;
+	background-color: #444;
+}

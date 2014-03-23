@@ -9,9 +9,16 @@ class Ticker
 	protected $volume;
 	protected $ask;
 
+	// PERIOD TICKER STUFF, BUT WE KEEP IT HERE SO WE CAN INTERFACE
+	protected $avg;
+	protected $avgvolume;
+	protected $count;
+	protected $open;
+	protected $close;
+
 	function __construct($timestamp=0, $high=0, $low=0, $last=0, $ask=0, $bid=0, $volume=0) {
-       if (is_object($timestamp)) {
-		   	$t = $timestamp;
+    if (is_object($timestamp)) {
+		  $t = $timestamp;
 			$this->high = (float) $t->high;
 			$this->low = (float) $t->low;
 			$this->last = (float) $t->last;
@@ -19,17 +26,17 @@ class Ticker
 			$this->bid = (float) $t->bid;
 			$this->volume = (float) $t->volume;
 			$this->ask = (float) $t->ask;
-	   } else
-	   if (is_array($timestamp)) {
-		   	$t = $timestamp;
-			$this->high = (float) $t['high'];
-			$this->low = (float) $t['low'];
-			$this->last =(float)  $t['last'];
-			$this->timestamp = (int) $t['timestamp'];
-			$this->bid = (float) $t['bid'];
-			$this->volume = (float) $t['volume'];
-			$this->ask = (float) $t['ask'];
-	   } else {
+	  } else
+	  if (is_array($timestamp)) {
+	   	$t = $timestamp;
+			$this->high = (float) isset($t['high']) ? $t['high'] : 0;
+			$this->low = (float) isset($t['low']) ? $t['low'] : 0;
+			$this->last =(float)  isset($t['last']) ? $t['last'] : 0;
+			$this->timestamp = (int) isset($t['timestamp']) ? $t['timestamp'] : 0;
+			$this->ask = (float) isset($t['ask']) ? $t['ask'] : 0;
+			$this->bid = (float) isset($t['bid']) ? $t['bid'] : 0;
+			$this->volume = (float) isset($t['volume']) ? $t['volume'] : 0;
+	  } else {
 			$this->high = (float) $high;
 			$this->low = (float) $low;
 			$this->last = (float) $last;
@@ -37,8 +44,14 @@ class Ticker
 			$this->bid = (float) $bid;
 			$this->volume = (float) $volume;
 			$this->ask = (float) $ask;
-	   }	
-    }
+	  }	
+
+	  $this->avg = $this->last;
+	  $this->avgvolume = $this->volume;
+	  $this->count = 1;
+	  $this->open = $this->last;
+	  $this->close = $this->last;
+  }
 
 	public function getTickerObject() 
 	{
@@ -121,6 +134,32 @@ class Ticker
 	public function getTimestamp()
 	{
 		return $this->timestamp;
+	}
+
+	
+	public function getOpen()
+	{
+		return $this->open;
+	}
+	
+	public function getClose()
+	{
+		return $this->close;
+	}
+	
+	public function getAvgVolume()
+	{
+		return $this->avgvolume;
+	}
+	
+	public function getAvg()
+	{
+		return $this->avg;
+	}
+	
+	public function getCount()
+	{
+		return $this->count;
 	}
 }
 ?>
